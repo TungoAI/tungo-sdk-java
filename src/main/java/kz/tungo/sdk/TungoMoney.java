@@ -35,4 +35,26 @@ public final class TungoMoney {
         }
         return String.format(Locale.ROOT, "%s%s,%02d %s", neg ? "-" : "", grouped, frac, symbol);
     }
+
+    /** Проверяет контрольную сумму 12-значного БИН или ИИН Республики Казахстан (модуль 11, два прохода). */
+    public static boolean isValidBinIin(String value) {
+        if (value == null || value.length() != 12) return false;
+        int[] digits = new int[12];
+        for (int i = 0; i < 12; i++) {
+            char ch = value.charAt(i);
+            if (ch < '0' || ch > '9') return false;
+            digits[i] = ch - '0';
+        }
+        int[] w1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        int sum1 = 0;
+        for (int i = 0; i < 11; i++) sum1 += digits[i] * w1[i];
+        int control = sum1 % 11;
+        if (control == 10) {
+            int[] w2 = {3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2};
+            int sum2 = 0;
+            for (int i = 0; i < 11; i++) sum2 += digits[i] * w2[i];
+            control = sum2 % 11;
+        }
+        return control < 10 && control == digits[11];
+    }
 }

@@ -24,10 +24,14 @@ public final class TungoWebhooks {
     }
 
     public static boolean verifyHookSignature(String rawBody, String signature, String secret) {
-        String expected = signHookPayload(rawBody, secret);
+        if (signature == null || secret == null) return false;
+        String trimmed = signature.trim();
+        if (trimmed.isEmpty() || secret.isEmpty()) return false;
+        String hex = trimmed.startsWith("sha256=") ? trimmed.substring(7) : trimmed;
+        String expected = signHookPayload(rawBody, secret).substring(7);
         return MessageDigest.isEqual(
-            expected.getBytes(StandardCharsets.UTF_8),
-            signature.trim().getBytes(StandardCharsets.UTF_8)
+            expected.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8),
+            hex.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8)
         );
     }
 
