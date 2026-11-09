@@ -5,11 +5,64 @@
     <groupId>kz.tungo</groupId>
     <artifactId>tungo-sdk</artifactId>
     <version>0.1.0</version>
+    <packaging>jar</packaging>
     <name>Tungo AI Java SDK</name>
-    <description>Официальный Java SDK для публичного API платформы Tungo AI (Java 17+)</description>
+    <description>Official Java SDK for Tungo AI Platform API (Java 17+, zero dependencies)</description>
+    <url>https://tungo.kz</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>tungo</id>
+            <name>Tungo AI</name>
+            <email>dev@tungo.kz</email>
+            <organization>Tungo AI</organization>
+            <organizationUrl>https://tungo.kz</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/TungoAI/tungo-sdk-java.git</connection>
+        <developerConnection>scm:git:ssh://github.com:TungoAI/tungo-sdk-java.git</developerConnection>
+        <url>https://github.com/TungoAI/tungo-sdk-java</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>Tungo AI GitHub Packages</name>
+            <url>https://maven.pkg.github.com/TungoAI/tungo-sdk-java</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
