@@ -31,6 +31,19 @@ final class ResponseBody implements HttpResponse.BodySubscriber<ResponseBody>, A
     private ByteBuffer current;
     private boolean ended;
 
+    /**
+     * Returns a body that is already complete and holds the given bytes.
+     *
+     * @param bytes the whole body
+     * @return the body
+     */
+    static ResponseBody of(byte[] bytes) {
+        ResponseBody body = new ResponseBody();
+        body.queue.add(Collections.singletonList(ByteBuffer.wrap(bytes)));
+        body.queue.add(END);
+        return body;
+    }
+
     @Override
     public CompletionStage<ResponseBody> getBody() {
         return CompletableFuture.completedFuture(this);

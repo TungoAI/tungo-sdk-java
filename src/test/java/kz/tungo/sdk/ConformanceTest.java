@@ -337,13 +337,45 @@ class ConformanceTest {
     }
 
     @Test
-    void chatStream() {
+    void chatStreamReplayThatIsNotAReplayIsADecodeError() {
         try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
-            for (JsonNode c : cases("chat_stream")) {
-                String n = name(c);
-                byte[] raw = c.get("raw").asText().getBytes(StandardCharsets.UTF_8);
+            int checked = 0;
+            for (JsonNode c : cases("chat_stream_replay")) {
+                if (!c.path("expect").path("decode_error").asBoolean(false)) {
+                    continue;
+                }
+                byte[] raw = c.get("body").toString().getBytes(StandardCharsets.UTF_8);
                 server.enqueue((request, exchange) -> {
-                    exchange.head(c.get("status").asInt(), "text/event-stream", TestSupport.headerPairs(c.get("headers")));
+                    exchange.head(c.get("status").asInt(), c.get("headers").get("Content-Type").asText(),
+                        TestSupport.headerPairs(c.get("headers")));
+                    exchange.write(raw);
+                });
+                DecodeException e = assertThrows(DecodeException.class,
+                    () -> client.chat().createStream("co_1", ChatMessageRequest.builder().message("m").build()), name(c));
+                assertEquals(c.get("status").asInt(), e.statusCode(), name(c));
+                checked++;
+            }
+            assertTrue(checked > 0);
+        }
+    }
+
+    @Test
+    void chatStream() {
+        // A turn repeated with the same Idempotency-Key after it finished is answered with its
+        // stored JSON result (chat_stream_replay): the stream must yield the same turn.
+        List<JsonNode> all = new ArrayList<>(cases("chat_stream"));
+        for (JsonNode c : cases("chat_stream_replay")) {
+            if (!c.path("expect").path("decode_error").asBoolean(false)) {
+                all.add(c);
+            }
+        }
+        try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
+            for (JsonNode c : all) {
+                String n = name(c);
+                byte[] raw = (c.has("raw") ? c.get("raw").asText() : c.get("body").toString()).getBytes(StandardCharsets.UTF_8);
+                server.enqueue((request, exchange) -> {
+                    exchange.head(c.get("status").asInt(), c.get("headers").get("Content-Type").asText(),
+                        TestSupport.headerPairs(c.get("headers")));
                     exchange.write(raw);
                 });
                 JsonNode expect = c.get("expect");

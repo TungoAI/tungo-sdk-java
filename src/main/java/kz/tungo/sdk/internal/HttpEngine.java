@@ -1,6 +1,10 @@
 package kz.tungo.sdk.internal;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -12,8 +16,11 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -176,6 +183,32 @@ public final class HttpEngine implements AutoCloseable {
         Exchange x = run(spec, opts, true);
         String contentType = x.headers.firstValue("content-type").orElse("").toLowerCase(Locale.ROOT);
         long idleNanos = opts.streamIdleTimeout().orElse(config.streamIdleTimeout).toNanos();
+        if (isReplayedJson(x.headers)) {
+            // A chat turn repeated with the same Idempotency-Key after it finished: the server
+            // answers the stored ChatTurnResult instead of a stream. The caller gets its events.
+            byte[] replayed;
+            try {
+                replayed = readBody(x.stream, System.nanoTime() + idleNanos);
+            } catch (BodyTimeoutException e) {
+                throw new TungoTimeoutException("The replayed response was not received in time (" + spec.method + " "
+                    + spec.route + ")", e);
+            } catch (IOException e) {
+                throw new ConnectionException("Connection error (" + spec.method + " " + spec.route + "): " + describe(e), e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new InterruptedRequestException("Interrupted while reading the response", e);
+            }
+            String requestId = x.headers.firstValue("x-request-id").filter(s -> !s.isEmpty()).orElse(null);
+            Map<String, List<String>> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            headers.putAll(x.headers.map());
+            byte[] events = replayAsEventStream(replayed, requestId, headers);
+            if (events == null) {
+                throw new DecodeException("The replayed response is not a chat turn result (HTTP " + x.status + ")", null,
+                    x.status, requestId, new String(replayed, StandardCharsets.UTF_8));
+            }
+            return new SseConnection(new ApiResponse<>(x.status, HttpHeaders.of(headers, (name, value) -> true), null),
+                ResponseBody.of(events), idleNanos);
+        }
         if (!isEventStream(contentType)) {
             // A success reply that is not an event stream (JSON, HTML of a proxy, no type at all)
             // must not look like a stream that ended without events.
@@ -193,6 +226,111 @@ public final class HttpEngine implements AutoCloseable {
                 x.headers.firstValue("x-request-id").orElse(null), text);
         }
         return new SseConnection(new ApiResponse<>(x.status, x.headers, null), x.stream, idleNanos);
+    }
+
+    /** Whether a stream call was answered with a stored result replayed by Idempotency-Key. */
+    private static boolean isReplayedJson(HttpHeaders headers) {
+        String contentType = headers.firstValue("content-type").orElse("");
+        int semicolon = contentType.indexOf(';');
+        String media = (semicolon < 0 ? contentType : contentType.substring(0, semicolon)).trim();
+        return media.equalsIgnoreCase("application/json")
+            && headers.firstValue("idempotent-replayed").orElse("").trim().equalsIgnoreCase("true");
+    }
+
+    /**
+     * Turns a replayed ChatTurnResult into the event stream of the turn it stands for: text (the
+     * answer), proposal, question, citation, error and choice events, then done. The dialog id and
+     * the turn number, which a replay carries only in the body, are added to {@code headers} as
+     * X-Dialog-Id and X-Turn-No when they are missing.
+     *
+     * @return the event stream, or null when the body is not a chat turn result
+     */
+    private static byte[] replayAsEventStream(byte[] body, String requestId, Map<String, List<String>> headers) {
+        JsonNode parsed;
+        try {
+            parsed = Json.MAPPER.readTree(body);
+        } catch (IOException e) {
+            return null;
+        }
+        if (parsed == null || !parsed.isObject() || !parsed.path("dialog_id").isTextual()) {
+            return null;
+        }
+        ObjectNode result = (ObjectNode) parsed;
+        if (headers.getOrDefault("x-dialog-id", List.of()).stream().allMatch(String::isEmpty)) {
+            headers.put("x-dialog-id", List.of(result.get("dialog_id").asText()));
+        }
+        JsonNode turnNo = result.path("turn_no");
+        if (turnNo.canConvertToExactIntegral() && headers.getOrDefault("x-turn-no", List.of()).stream().allMatch(String::isEmpty)) {
+            headers.put("x-turn-no", List.of(turnNo.bigIntegerValue().toString()));
+        }
+        StringBuilder out = new StringBuilder();
+        String answer = result.path("answer").isTextual() ? result.get("answer").asText() : "";
+        if (!answer.isEmpty()) {
+            ObjectNode text = Json.MAPPER.createObjectNode();
+            text.put("delta", answer);
+            emit(out, "text", text);
+        }
+        for (ObjectNode proposal : entries(result, "proposals")) {
+            JsonNode id = proposal.remove("id");
+            proposal.set("proposal_id", id == null ? NullNode.getInstance() : id);
+            emit(out, "proposal", proposal);
+        }
+        for (ObjectNode question : entries(result, "questions")) {
+            emit(out, "question", question);
+        }
+        for (ObjectNode citation : entries(result, "citations")) {
+            emit(out, "citation", citation);
+        }
+        for (ObjectNode error : entries(result, "errors")) {
+            ObjectNode event = Json.MAPPER.createObjectNode();
+            event.set("error", error);
+            event.put("request_id", requestId);
+            emit(out, "error", event);
+        }
+        ObjectNode done = Json.MAPPER.createObjectNode();
+        done.put("answer", answer);
+        if (result.path("stop_reason").isTextual()) {
+            done.set("stop_reason", result.get("stop_reason"));
+        }
+        if (result.path("usage").isObject()) {
+            ObjectNode usage = ((ObjectNode) result.get("usage")).deepCopy();
+            JsonNode cost = usage.remove("cost_tiyn");
+            done.set("usage", usage);
+            if (cost != null) {
+                done.set("cost_tiyn", cost);
+            }
+        }
+        if (result.path("pending_question").isObject()) {
+            ObjectNode pending = ((ObjectNode) result.get("pending_question")).deepCopy();
+            JsonNode choiceId = pending.get("choice_id");
+            emit(out, "choice", pending);
+            if (choiceId != null) {
+                done.set("choice_id", choiceId);
+            }
+        }
+        emit(out, "done", done);
+        return out.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static List<ObjectNode> entries(ObjectNode result, String key) {
+        List<ObjectNode> out = new ArrayList<>();
+        for (JsonNode item : result.path(key)) {
+            if (item.isObject()) {
+                out.add(((ObjectNode) item).deepCopy());
+            }
+        }
+        return out;
+    }
+
+    private static void emit(StringBuilder out, String type, ObjectNode event) {
+        event.put("type", type);
+        String data;
+        try {
+            data = Json.MAPPER.writeValueAsString(event);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("a JSON tree always serialises", e);
+        }
+        out.append("event: ").append(type).append("\ndata: ").append(data).append("\n\n");
     }
 
     private static boolean isEventStream(String contentType) {
