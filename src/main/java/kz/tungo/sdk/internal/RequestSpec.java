@@ -28,6 +28,7 @@ public final class RequestSpec {
     byte[] body;
     String contentType;
     String idempotencyHeader;
+    String defaultIdempotencyKey;
     boolean longRunning;
     final Map<String, String> headers = new LinkedHashMap<>();
 
@@ -130,6 +131,19 @@ public final class RequestSpec {
      */
     public RequestSpec idempotent(String headerName) {
         this.idempotencyHeader = headerName;
+        return this;
+    }
+
+    /**
+     * Sets the idempotency key used when the caller does not supply one, instead of a random key:
+     * the event id of a hook event, because the API reads {@code Idempotency-Key} before
+     * {@code X-Event-Id} and a random key would override the event id.
+     *
+     * @param key the default key; null or empty keeps the random key
+     * @return this description
+     */
+    public RequestSpec defaultIdempotencyKey(String key) {
+        this.defaultIdempotencyKey = key == null || key.isEmpty() ? null : key;
         return this;
     }
 

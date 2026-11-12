@@ -1151,6 +1151,7 @@ public final class AutomationsResource {
             .auth(RequestSpec.Auth.NONE)
             .rawBody(request.body(), request.contentType().orElse(null))
             .header("X-Event-Id", request.eventId().orElse(null))
+            .defaultIdempotencyKey(request.eventId().orElse(null))
             .header("X-Signature", request.signature().orElse(null))
             .idempotent("Idempotency-Key");
     }

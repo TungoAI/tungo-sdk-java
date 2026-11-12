@@ -173,12 +173,17 @@ class WebhooksTest {
                 assertEquals("application/octet-stream", request.header("content-type"));
                 assertEquals(raw.length, request.body.length);
                 assertEquals("evt-77", request.header("x-event-id"));
+                // The API reads Idempotency-Key before X-Event-Id: the event id must be the key.
+                assertEquals("evt-77", request.header("idempotency-key"));
                 assertEquals(TungoWebhooks.signHook(raw, "hksec_1"), request.header("x-signature"));
                 assertNull(request.header("x-api-key"));
             }
             client.sendHook("tok", HookRequest.text("<x/>", "application/xml").build());
             assertEquals("<x/>", server.request(2).text());
             assertEquals("application/xml", server.request(2).header("content-type"));
+            client.sendHook("tok", hook, RequestOptions.builder().idempotencyKey("own").build());
+            assertEquals("own", server.request(3).header("idempotency-key"), "a key the caller gives wins");
+            assertEquals("evt-77", server.request(3).header("x-event-id"));
             assertFalse(hook.toString().contains("hksec_1"));
             assertThrows(ValidationException.class, () -> HookRequest.json("x").secret(""));
         }

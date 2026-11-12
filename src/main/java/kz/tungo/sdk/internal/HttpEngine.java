@@ -282,6 +282,9 @@ public final class HttpEngine implements AutoCloseable {
         String idempotencyKey = opts.idempotencyKey().orElse(null);
         String idempotencyHeader = spec.idempotencyHeader != null ? spec.idempotencyHeader : "Idempotency-Key";
         if (idempotencyKey == null && spec.idempotencyHeader != null) {
+            idempotencyKey = spec.defaultIdempotencyKey;
+        }
+        if (idempotencyKey == null && spec.idempotencyHeader != null) {
             idempotencyKey = UUID.randomUUID().toString();
         }
         boolean retrySafe = RetryPolicy.isRetrySafe(spec.method, idempotencyKey != null);
