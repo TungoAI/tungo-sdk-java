@@ -279,7 +279,9 @@ public final class HttpEngine implements AutoCloseable {
             throw new ConfigException("No API key is configured: pass apiKey(...) to the client builder or set the "
                 + "TUNGO_API_KEY environment variable");
         }
-        String idempotencyKey = opts.idempotencyKey().orElse(null);
+        // A key goes only to an operation that declares the header: anywhere else the API ignores
+        // it, and sending it would make a retry look safe when it repeats the action.
+        String idempotencyKey = spec.idempotencyHeader != null ? opts.idempotencyKey().orElse(null) : null;
         String idempotencyHeader = spec.idempotencyHeader != null ? spec.idempotencyHeader : "Idempotency-Key";
         if (idempotencyKey == null && spec.idempotencyHeader != null) {
             idempotencyKey = spec.defaultIdempotencyKey;
@@ -368,8 +370,10 @@ public final class HttpEngine implements AutoCloseable {
             rb.timeout(timeout);
             rb.setHeader("Accept", streaming ? "text/event-stream" : "application/json");
             rb.setHeader("User-Agent", SdkVersion.USER_AGENT);
+            boolean dropKey = spec.idempotencyHeader == null;
             for (Map.Entry<String, String> h : config.defaultHeaders.entrySet()) {
-                if (!keyed && isCredentialHeader(h.getKey())) {
+                if ((!keyed && isCredentialHeader(h.getKey()))
+                    || (dropKey && "Idempotency-Key".equalsIgnoreCase(h.getKey()))) {
                     continue;
                 }
                 rb.setHeader(h.getKey(), h.getValue());
@@ -387,6 +391,9 @@ public final class HttpEngine implements AutoCloseable {
                 rb.setHeader(h.getKey(), h.getValue());
             }
             for (Map.Entry<String, String> h : opts.headers().entrySet()) {
+                if (dropKey && "Idempotency-Key".equalsIgnoreCase(h.getKey())) {
+                    continue;
+                }
                 rb.setHeader(h.getKey(), h.getValue());
             }
             rb.method(spec.method, spec.body == null

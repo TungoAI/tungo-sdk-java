@@ -130,8 +130,10 @@ public final class RequestOptions {
         }
 
         /**
-         * Sets the {@code Idempotency-Key} of the request. The same key is sent with every
-         * attempt, and a request that carries a key may be retried.
+         * Sets the {@code Idempotency-Key} of a request to an operation that declares the header,
+         * instead of the generated one. The same key is sent with every attempt. Any other
+         * operation sends no key, not even this one, and a POST or PATCH among them is never
+         * retried: the API would ignore the key there.
          *
          * @param idempotencyKey a non-empty key
          * @return this builder

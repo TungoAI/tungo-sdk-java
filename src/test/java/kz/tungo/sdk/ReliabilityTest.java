@@ -173,14 +173,16 @@ class ReliabilityTest {
     }
 
     @Test
-    void aCallerSuppliedKeyMakesAnyPostRetryable() {
+    void aCallerSuppliedKeyDoesNotMakeAnUndeclaredPostRetryable() {
+        // count-tokens declares no Idempotency-Key: the API ignores a key there, so the SDK does
+        // not send it and a lost answer is not followed by a second, billed request.
         try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
             server.enqueueJson(503, BUSY, "retry-after-ms", "1").enqueueJson(200, "{\"input_tokens\":3}");
-            client.chat().countTokens("co_1", ChatTokenCountRequest.builder().message("m").build(),
-                RequestOptions.builder().idempotencyKey("k-7").build());
-            assertEquals(2, server.requestCount());
-            assertEquals("k-7", server.request(0).header("idempotency-key"));
-            assertEquals("k-7", server.request(1).header("idempotency-key"));
+            assertThrows(UnavailableException.class, () -> client.chat().countTokens("co_1",
+                ChatTokenCountRequest.builder().message("m").build(),
+                RequestOptions.builder().idempotencyKey("k-7").header("Idempotency-Key", "k-8").build()));
+            assertEquals(1, server.requestCount());
+            assertNull(server.request(0).header("idempotency-key"));
         }
     }
 
