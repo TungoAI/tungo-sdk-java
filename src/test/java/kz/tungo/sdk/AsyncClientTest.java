@@ -80,6 +80,36 @@ class AsyncClientTest {
     }
 
     @Test
+    void closingTheClientFailsTheQueuedCalls() throws Exception {
+        try (MockServer server = new MockServer()) {
+            CountDownLatch arrived = new CountDownLatch(1);
+            CountDownLatch release = new CountDownLatch(1);
+            server.always((request, exchange) -> {
+                arrived.countDown();
+                release.await(20, TimeUnit.SECONDS);
+                exchange.json(200, "{\"id\":\"co_1\",\"permissions\":[]}");
+            });
+            TungoClient client = TestSupport.builder(server).asyncMaxThreads(1).build();
+            CompletableFuture<Company> running = client.async().companies().get("co_1");
+            CompletableFuture<Company> queued = client.async().companies().get("co_2");
+            CompletableFuture<String> dependent = queued.handle((c, e) -> e == null ? "ok" : "failed");
+            try {
+                assertTrue(arrived.await(10, TimeUnit.SECONDS));
+                client.close();
+                // The queued call never ran: its future fails at once instead of never completing.
+                ExecutionException e = assertThrows(ExecutionException.class, () -> queued.get(5, TimeUnit.SECONDS));
+                assertTrue(e.getCause() instanceof IllegalStateException, String.valueOf(e.getCause()));
+                assertEquals("failed", dependent.get(5, TimeUnit.SECONDS));
+                // The running call is interrupted and fails too.
+                assertThrows(ExecutionException.class, () -> running.get(20, TimeUnit.SECONDS));
+                assertEquals(1, server.requestCount());
+            } finally {
+                release.countDown();
+            }
+        }
+    }
+
+    @Test
     void asyncStreamsAndHelpersWork() throws Exception {
         try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
             server.enqueue((request, exchange) -> {

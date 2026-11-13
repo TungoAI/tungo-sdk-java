@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -350,7 +351,7 @@ public final class HttpEngine implements AutoCloseable {
     public <T> CompletableFuture<T> async(Supplier<T> call) {
         ensureOpen();
         InterruptingFuture<T> future = new InterruptingFuture<>();
-        FutureTask<Void> task = new FutureTask<>(() -> {
+        AsyncTask task = new AsyncTask(future, () -> {
             try {
                 future.complete(call.get());
             } catch (Throwable t) {
@@ -365,6 +366,27 @@ public final class HttpEngine implements AutoCloseable {
             future.completeExceptionally(e);
         }
         return future;
+    }
+
+    /**
+     * The task of one async call. When it is cancelled before its body completed the future
+     * (close() drains the queued calls of the owned pool), the future fails instead of never
+     * completing; a future cancelled by the caller stays cancelled.
+     */
+    private static final class AsyncTask extends FutureTask<Void> {
+        private final CompletableFuture<?> future;
+
+        AsyncTask(CompletableFuture<?> future, Callable<Void> body) {
+            super(body);
+            this.future = future;
+        }
+
+        @Override
+        protected void done() {
+            if (isCancelled()) {
+                future.completeExceptionally(new IllegalStateException("The client is closed"));
+            }
+        }
     }
 
     private static final class InterruptingFuture<T> extends CompletableFuture<T> {
@@ -641,7 +663,13 @@ public final class HttpEngine implements AutoCloseable {
             return;
         }
         if (ownedAsyncExecutor != null) {
-            ownedAsyncExecutor.shutdownNow();
+            // The queued calls never run: fail their futures, so join()/get() and dependent
+            // stages do not wait forever. The running calls are interrupted and fail on their own.
+            for (Runnable queued : ownedAsyncExecutor.shutdownNow()) {
+                if (queued instanceof FutureTask) {
+                    ((FutureTask<?>) queued).cancel(false);
+                }
+            }
         }
         if (ownsHttp) {
             try {
