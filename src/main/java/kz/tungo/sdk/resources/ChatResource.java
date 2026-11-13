@@ -19,16 +19,23 @@ import kz.tungo.sdk.models.ChatDialog;
 import kz.tungo.sdk.models.ChatDialogDeleted;
 import kz.tungo.sdk.models.ChatDialogList;
 import kz.tungo.sdk.models.ChatDialogPatch;
+import kz.tungo.sdk.models.ChatDialogRated;
+import kz.tungo.sdk.models.ChatDialogRatingBody;
 import kz.tungo.sdk.models.ChatDialogRenamed;
 import kz.tungo.sdk.models.ChatDialogSummary;
 import kz.tungo.sdk.models.ChatEvent;
 import kz.tungo.sdk.models.ChatMentionSearch;
+import kz.tungo.sdk.models.ChatMessageRated;
+import kz.tungo.sdk.models.ChatMessageRatingBody;
 import kz.tungo.sdk.models.ChatMessageRequest;
+import kz.tungo.sdk.models.ChatRatingDismissed;
+import kz.tungo.sdk.models.ChatRatingOptions;
 import kz.tungo.sdk.models.ChatStopResult;
 import kz.tungo.sdk.models.ChatSuggestions;
 import kz.tungo.sdk.models.ChatTokenCount;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import kz.tungo.sdk.models.ChatTurnResult;
+import kz.tungo.sdk.params.ChatGetRatingOptionsParams;
 import kz.tungo.sdk.params.ChatListEventsParams;
 import kz.tungo.sdk.params.ChatListMentionsParams;
 import kz.tungo.sdk.params.ChatListParams;
@@ -315,6 +322,65 @@ public final class ChatResource {
      */
     public ChatMentionSearch listMentions(String companyId) {
         return listMentions(companyId, null, RequestOptions.none());
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatRatingOptions> getRatingOptionsWithResponse(
+        String companyId,
+        ChatGetRatingOptionsParams params,
+        RequestOptions options) {
+        return engine.execute(getRatingOptionsRequest(companyId, params), options, ChatRatingOptions.class);
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatRatingOptions getRatingOptions(
+        String companyId,
+        ChatGetRatingOptionsParams params,
+        RequestOptions options) {
+        return getRatingOptionsWithResponse(companyId, params, options).body();
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return the decoded response
+     */
+    public ChatRatingOptions getRatingOptions(String companyId, ChatGetRatingOptionsParams params) {
+        return getRatingOptions(companyId, params, RequestOptions.none());
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return the decoded response
+     */
+    public ChatRatingOptions getRatingOptions(String companyId) {
+        return getRatingOptions(companyId, null, RequestOptions.none());
     }
 
     /**
@@ -650,6 +716,221 @@ public final class ChatResource {
     }
 
     /**
+     * Оценить ответ ИИ: палец вверх или вниз.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatMessageRated> rateMessageWithResponse(
+        String companyId,
+        String id,
+        String turn,
+        ChatMessageRatingBody body,
+        RequestOptions options) {
+        return engine.execute(rateMessageRequest(companyId, id, turn, body), options, ChatMessageRated.class);
+    }
+
+    /**
+     * Оценить ответ ИИ: палец вверх или вниз.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatMessageRated rateMessage(
+        String companyId,
+        String id,
+        String turn,
+        ChatMessageRatingBody body,
+        RequestOptions options) {
+        return rateMessageWithResponse(companyId, id, turn, body, options).body();
+    }
+
+    /**
+     * Оценить ответ ИИ: палец вверх или вниз.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param body the request body
+     * @return the decoded response
+     */
+    public ChatMessageRated rateMessage(String companyId, String id, String turn, ChatMessageRatingBody body) {
+        return rateMessage(companyId, id, turn, body, RequestOptions.none());
+    }
+
+    /**
+     * Снять свою оценку ответа.
+     * <p><code>DELETE
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatMessageRated> deleteMessageRatingWithResponse(
+        String companyId,
+        String id,
+        String turn,
+        RequestOptions options) {
+        return engine.execute(deleteMessageRatingRequest(companyId, id, turn), options, ChatMessageRated.class);
+    }
+
+    /**
+     * Снять свою оценку ответа.
+     * <p><code>DELETE
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatMessageRated deleteMessageRating(String companyId, String id, String turn, RequestOptions options) {
+        return deleteMessageRatingWithResponse(companyId, id, turn, options).body();
+    }
+
+    /**
+     * Снять свою оценку ответа.
+     * <p><code>DELETE
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @return the decoded response
+     */
+    public ChatMessageRated deleteMessageRating(String companyId, String id, String turn) {
+        return deleteMessageRating(companyId, id, turn, RequestOptions.none());
+    }
+
+    /**
+     * Оценить разговор целиком: от 1 до 5.
+     * <p><code>PUT /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatDialogRated> rateWithResponse(
+        String companyId,
+        String id,
+        ChatDialogRatingBody body,
+        RequestOptions options) {
+        return engine.execute(rateRequest(companyId, id, body), options, ChatDialogRated.class);
+    }
+
+    /**
+     * Оценить разговор целиком: от 1 до 5.
+     * <p><code>PUT /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatDialogRated rate(String companyId, String id, ChatDialogRatingBody body, RequestOptions options) {
+        return rateWithResponse(companyId, id, body, options).body();
+    }
+
+    /**
+     * Оценить разговор целиком: от 1 до 5.
+     * <p><code>PUT /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param body the request body
+     * @return the decoded response
+     */
+    public ChatDialogRated rate(String companyId, String id, ChatDialogRatingBody body) {
+        return rate(companyId, id, body, RequestOptions.none());
+    }
+
+    /**
+     * Не сейчас: закрыть предложение оценить разговор.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating/dismiss</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatRatingDismissed> dismissRatingWithResponse(
+        String companyId,
+        String id,
+        RequestOptions options) {
+        return engine.execute(dismissRatingRequest(companyId, id), options, ChatRatingDismissed.class);
+    }
+
+    /**
+     * Не сейчас: закрыть предложение оценить разговор.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating/dismiss</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatRatingDismissed dismissRating(String companyId, String id, RequestOptions options) {
+        return dismissRatingWithResponse(companyId, id, options).body();
+    }
+
+    /**
+     * Не сейчас: закрыть предложение оценить разговор.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating/dismiss</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @return the decoded response
+     */
+    public ChatRatingDismissed dismissRating(String companyId, String id) {
+        return dismissRating(companyId, id, RequestOptions.none());
+    }
+
+    /**
      * Остановить ход или закрыть открытый вопрос.
      * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/stop</code>, permission
      * <code>chat.use</code>.
@@ -725,6 +1006,15 @@ public final class ChatResource {
             .query(query);
     }
 
+    private static RequestSpec getRatingOptionsRequest(String companyId, ChatGetRatingOptionsParams params) {
+        QueryString query = new QueryString();
+        if (params != null) {
+            query.add("lang", params.lang().orElse(null));
+        }
+        return RequestSpec.of("GET", "/v1/companies/{co}/chat/rating-options", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/rating-options")
+            .query(query);
+    }
+
     private static RequestSpec listSuggestionsRequest(String companyId, ChatListSuggestionsParams params) {
         QueryString query = new QueryString();
         if (params != null) {
@@ -759,6 +1049,24 @@ public final class ChatResource {
         }
         return RequestSpec.of("GET", "/v1/companies/{co}/chat/{id}/events", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/events")
             .query(query);
+    }
+
+    private static RequestSpec rateMessageRequest(String companyId, String id, String turn, ChatMessageRatingBody body) {
+        return RequestSpec.of("PUT", "/v1/companies/{co}/chat/{id}/messages/{turn}/rating", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/messages/" + PathSegments.encode("turn", turn) + "/rating")
+            .jsonBody(Objects.requireNonNull(body, "body"));
+    }
+
+    private static RequestSpec deleteMessageRatingRequest(String companyId, String id, String turn) {
+        return RequestSpec.of("DELETE", "/v1/companies/{co}/chat/{id}/messages/{turn}/rating", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/messages/" + PathSegments.encode("turn", turn) + "/rating");
+    }
+
+    private static RequestSpec rateRequest(String companyId, String id, ChatDialogRatingBody body) {
+        return RequestSpec.of("PUT", "/v1/companies/{co}/chat/{id}/rating", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/rating")
+            .jsonBody(Objects.requireNonNull(body, "body"));
+    }
+
+    private static RequestSpec dismissRatingRequest(String companyId, String id) {
+        return RequestSpec.of("POST", "/v1/companies/{co}/chat/{id}/rating/dismiss", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/rating/dismiss");
     }
 
     private static RequestSpec stopRequest(String companyId, String id) {

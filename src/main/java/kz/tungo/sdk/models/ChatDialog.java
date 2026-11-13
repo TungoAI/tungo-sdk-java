@@ -56,6 +56,14 @@ public final class ChatDialog {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Boolean pdRestored;
 
+    @JsonProperty("rating")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final ChatDialogRating rating;
+
+    @JsonProperty("rating_prompt")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean ratingPrompt;
+
     @JsonProperty("running")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Boolean running;
@@ -88,6 +96,8 @@ public final class ChatDialog {
         @JsonProperty("message_count") Double messageCount,
         @JsonProperty("messages") List<ChatMessage> messages,
         @JsonProperty("pd_restored") Boolean pdRestored,
+        @JsonProperty("rating") ChatDialogRating rating,
+        @JsonProperty("rating_prompt") Boolean ratingPrompt,
         @JsonProperty("running") Boolean running,
         @JsonProperty("title") String title,
         @JsonProperty("title_source") ChatTitleSource titleSource,
@@ -101,6 +111,8 @@ public final class ChatDialog {
         this.messageCount = messageCount;
         this.messages = Internal.requiredList(messages, "messages");
         this.pdRestored = pdRestored;
+        this.rating = rating;
+        this.ratingPrompt = ratingPrompt;
         this.running = running;
         this.title = title;
         this.titleSource = titleSource;
@@ -202,6 +214,28 @@ public final class ChatDialog {
     }
 
     /**
+     * Оценка разговора человеком; null — не оценён
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ChatDialogRating> rating() {
+        return Optional.ofNullable(rating);
+    }
+
+    /**
+     * true — пора предложить человеку оценить разговор (форма 1–5 с комментарием). Решает ядро по
+     * настройке: достаточно ответов ИИ в разговоре, разговор не оценён, человек не нажимал «не
+     * сейчас», и ему не предлагали в последние дни. Пока человек не ответил, предложение остаётся в
+     * этом же разговоре и не появляется в других. Ответ — PUT …/chat/&#123;id&#125;/rating, отказ —
+     * POST …/chat/&#123;id&#125;/rating/dismiss. По ключу API всегда false
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean ratingPrompt() {
+        return ratingPrompt;
+    }
+
+    /**
      * true — идёт ход: дочитать его потоком GET …/chat/&#123;id&#125;/events?turn=&lt;turn&gt;
      *
      * @return the value; null only if the API omitted this required property
@@ -279,6 +313,8 @@ public final class ChatDialog {
             && Objects.equals(messageCount, other.messageCount)
             && Objects.equals(messages, other.messages)
             && Objects.equals(pdRestored, other.pdRestored)
+            && Objects.equals(rating, other.rating)
+            && Objects.equals(ratingPrompt, other.ratingPrompt)
             && Objects.equals(running, other.running)
             && Objects.equals(title, other.title)
             && Objects.equals(titleSource, other.titleSource)
@@ -288,7 +324,7 @@ public final class ChatDialog {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, awaiting, closed, createdAt, id, masked, messageCount, messages, pdRestored, running, title, titleSource, turn, updatedAt);
+        return Objects.hash(additionalProperties, awaiting, closed, createdAt, id, masked, messageCount, messages, pdRestored, rating, ratingPrompt, running, title, titleSource, turn, updatedAt);
     }
 
     @Override
@@ -306,6 +342,8 @@ public final class ChatDialog {
         private Double messageCount;
         private List<ChatMessage> messages;
         private Boolean pdRestored;
+        private ChatDialogRating rating;
+        private Boolean ratingPrompt;
         private Boolean running;
         private String title;
         private ChatTitleSource titleSource;
@@ -325,6 +363,8 @@ public final class ChatDialog {
             this.messageCount = source.messageCount;
             this.messages = source.messages;
             this.pdRestored = source.pdRestored;
+            this.rating = source.rating;
+            this.ratingPrompt = source.ratingPrompt;
             this.running = source.running;
             this.title = source.title;
             this.titleSource = source.titleSource;
@@ -425,6 +465,32 @@ public final class ChatDialog {
         }
 
         /**
+         * Оценка разговора человеком; null — не оценён
+         *
+         * @param rating the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder rating(ChatDialogRating rating) {
+            this.rating = rating;
+            return this;
+        }
+
+        /**
+         * true — пора предложить человеку оценить разговор (форма 1–5 с комментарием). Решает ядро по
+         * настройке: достаточно ответов ИИ в разговоре, разговор не оценён, человек не нажимал «не
+         * сейчас», и ему не предлагали в последние дни. Пока человек не ответил, предложение остаётся
+         * в этом же разговоре и не появляется в других. Ответ — PUT …/chat/&#123;id&#125;/rating,
+         * отказ — POST …/chat/&#123;id&#125;/rating/dismiss. По ключу API всегда false
+         *
+         * @param ratingPrompt the value (required)
+         * @return this builder
+         */
+        public Builder ratingPrompt(Boolean ratingPrompt) {
+            this.ratingPrompt = ratingPrompt;
+            return this;
+        }
+
+        /**
          * true — идёт ход: дочитать его потоком GET …/chat/&#123;id&#125;/events?turn=&lt;turn&gt;
          *
          * @param running the value (required)
@@ -508,6 +574,8 @@ public final class ChatDialog {
                 Internal.required(messageCount, "message_count"),
                 Internal.required(messages, "messages"),
                 Internal.required(pdRestored, "pd_restored"),
+                rating,
+                Internal.required(ratingPrompt, "rating_prompt"),
                 Internal.required(running, "running"),
                 Internal.required(title, "title"),
                 Internal.required(titleSource, "title_source"),

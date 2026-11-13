@@ -157,17 +157,26 @@ public final class AuditEntry {
      * Приглашение отправлено ещё раз - `team.seats_purchased` — Докуплены места - `team.seats_reduced`
      * — Сокращено число мест с продления - `admin.workspace.kind_changed` — Администратор платформы
      * сменил вид организации - `admin.workspace.contract_seats` — Администратор платформы задал места
-     * по договору - `workspace.sso_provider_created` — SSO: подключён сервер входа -
-     * `workspace.group_created` — Группа создана - `workspace.group_updated` — Группа изменена -
-     * `workspace.group_deleted` — Группа удалена - `workspace.group_member_added` — Сотрудник добавлен
-     * в группу - `workspace.group_member_removed` — Сотрудник убран из группы -
-     * `workspace.group_roles_changed` — Роли группы изменены - `workspace.custom_role_created` — Своя
-     * роль создана - `workspace.custom_role_updated` — Своя роль изменена -
-     * `workspace.custom_role_deleted` — Своя роль удалена - `workspace.role_ceiling_updated` — Потолок
-     * прав своих ролей изменён - `workspace.model_policy_updated` — Разрешённые модели изменены -
-     * `workspace.retention_updated` — Срок хранения чатов изменён - `workspace.training_consent` —
-     * Согласие на обучение изменено (владелец) - `workspace.audit_exported` — Журнал организации
-     * выгружен - `workspace.compliance_updated` — Выгрузка для проверок включена или выключена -
+     * по договору - `admin.plan_grant.created` — Платформа выдала организации тариф бесплатно до даты
+     * - `admin.plan_grant.extended` — Платформа продлила выданный тариф - `admin.plan_grant.revoked` —
+     * Платформа отозвала выданный тариф досрочно - `admin.plan_grant.ended` — Срок выданного тарифа
+     * закончился - `admin.platform_discount.created` — Платформа дала скидку на расход платформы
+     * разработчиков - `admin.platform_discount.revoked` — Платформа отозвала скидку на расход
+     * платформы разработчиков - `admin.subscription.cancelled` — Администратор платформы отменил
+     * продление подписки - `admin.subscription.resumed` — Администратор платформы вернул продление
+     * подписки - `admin.money.exported` — Администратор платформы выгрузил список в CSV -
+     * `admin.payment_search.pd_viewed` — Поддержка открыла реквизиты плательщиков в поиске платежей -
+     * `workspace.sso_provider_created` — SSO: подключён сервер входа - `workspace.group_created` —
+     * Группа создана - `workspace.group_updated` — Группа изменена - `workspace.group_deleted` —
+     * Группа удалена - `workspace.group_member_added` — Сотрудник добавлен в группу -
+     * `workspace.group_member_removed` — Сотрудник убран из группы - `workspace.group_roles_changed` —
+     * Роли группы изменены - `workspace.custom_role_created` — Своя роль создана -
+     * `workspace.custom_role_updated` — Своя роль изменена - `workspace.custom_role_deleted` — Своя
+     * роль удалена - `workspace.role_ceiling_updated` — Потолок прав своих ролей изменён -
+     * `workspace.model_policy_updated` — Разрешённые модели изменены - `workspace.retention_updated` —
+     * Срок хранения чатов изменён - `workspace.training_consent` — Согласие на обучение изменено
+     * (владелец) - `workspace.audit_exported` — Журнал организации выгружен -
+     * `workspace.compliance_updated` — Выгрузка для проверок включена или выключена -
      * `workspace.compliance_read` — Прочитаны разговоры через выгрузку для проверок -
      * `api_key.created` — Выпущен ключ API - `api_key.updated` — Ключ API изменён - `api_key.rolled` —
      * Секрет ключа API заменён - `api_key.revoked` — Ключ API отозван - `api_key.transferred` — Ключ
@@ -198,11 +207,14 @@ public final class AuditEntry {
      * условия - `account.deletion_code_sent` — Запрошен код удаления аккаунта -
      * `account.deletion_scheduled` — Аккаунт помечен к удалению - `account.deletion_cancelled` —
      * Удаление аккаунта отменено - `account.deleted` — Аккаунт удалён и обезличен -
-     * `account.email_code_sent` — Запрошен код подтверждения почты (аккаунт Telegram) -
-     * `account.email_bound` — Почта привязана к аккаунту Telegram - `account.telegram_merged` —
-     * Telegram привязан к аккаунту с подтверждённой почтой, аккаунт Telegram закрыт -
-     * `account.google_linked` — Вход через Google привязал Google к аккаунту с той же почтой
-     * (sessions_closed — почта не была подтверждена: прежние сессии закрыты) -
+     * `langfuse.traces_purged` — Трассы ИИ удалены из Langfuse: по сроку хранения, с аккаунтом или
+     * после отзыва согласия - `admin.dialog.langfuse_dataset` — Ход разговора отправлен в набор
+     * Langfuse (платформа) - `admin.dialog.langfuse_annotation` — Ход разговора отправлен в очередь
+     * разметки Langfuse (платформа) - `account.email_code_sent` — Запрошен код подтверждения почты
+     * (аккаунт Telegram) - `account.email_bound` — Почта привязана к аккаунту Telegram -
+     * `account.telegram_merged` — Telegram привязан к аккаунту с подтверждённой почтой, аккаунт
+     * Telegram закрыт - `account.google_linked` — Вход через Google привязал Google к аккаунту с той
+     * же почтой (sessions_closed — почта не была подтверждена: прежние сессии закрыты) -
      * `account.telegram_merge_refused` — Склейка аккаунта Telegram с аккаунтом почты отклонена
      * (данные, другой Telegram или почта закрыта) - `admin.ads.conversions_released` — Удержанные
      * рекламные конверсии отправлены вручную - `admin.ads.conversions_rejected` — Рекламные конверсии
@@ -228,19 +240,30 @@ public final class AuditEntry {
      * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` —
      * Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран
      * вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными
-     * данными - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена
-     * (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа) -
-     * `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными данными -
-     * `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
+     * данными - `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к
+     * оценкам разговора - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или
+     * заменена (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена
+     * (платформа) - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными
+     * данными - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
      * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
      * `admin.payment.pd_viewed` — Поддержка открыла платёж с реквизитами плательщика и обменом с
      * банком - `site.post_published` — Статья блога опубликована на сайте (платформа) -
      * `site.post_unpublished` — Статья блога снята с сайта (платформа) - `site.post_deleted` —
      * Черновик статьи блога удалён (платформа) - `site.legal_published` — Опубликована новая редакция
      * документа сайта (платформа) - `site.trackers_saved` — Изменены счётчики и коды подтверждения
-     * сайта (платформа) - `canary.triggered` — Сработала приманка: украденный ключ или почта
-     * «сотрудника» (платформа) - `billing.payment.new` — Платёж: создан - `billing.payment.pending` —
-     * Платёж: отправлен в банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
+     * сайта (платформа) - `help.section_created` — Центр помощи: раздел заведён (платформа) -
+     * `help.section_updated` — Центр помощи: раздел изменён (платформа) - `help.section_deleted` —
+     * Центр помощи: раздел удалён (платформа) - `help.article_created` — Центр помощи: статья заведена
+     * (платформа) - `help.article_updated` — Центр помощи: статья изменена, опубликована или скрыта
+     * (платформа) - `help.article_deleted` — Центр помощи: статья удалена (платформа) -
+     * `help.reordered` — Центр помощи: порядок разделов или статей изменён (платформа) -
+     * `support.ticket_created` — Создано обращение в поддержку - `admin.support.replied` — Поддержка
+     * ответила на обращение - `admin.support.note_added` — Поддержка добавила внутреннюю заметку к
+     * обращению - `admin.support.ticket_updated` — Поддержка изменила обращение: состояние, категорию,
+     * приоритет или исполнителя - `admin.support.attachment_viewed` — Поддержка скачала вложение
+     * обращения - `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника»
+     * (платформа) - `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж:
+     * отправлен в банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
      * `billing.payment.authorized` — Платёж: одобрен банком - `billing.payment.succeeded` — Платёж:
      * оплачен - `billing.payment.verified` — Платёж: карта проверена - `billing.payment.failed` —
      * Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён -
@@ -479,10 +502,19 @@ public final class AuditEntry {
          * Докуплены места - `team.seats_reduced` — Сокращено число мест с продления -
          * `admin.workspace.kind_changed` — Администратор платформы сменил вид организации -
          * `admin.workspace.contract_seats` — Администратор платформы задал места по договору -
-         * `workspace.sso_provider_created` — SSO: подключён сервер входа - `workspace.group_created` —
-         * Группа создана - `workspace.group_updated` — Группа изменена - `workspace.group_deleted` —
-         * Группа удалена - `workspace.group_member_added` — Сотрудник добавлен в группу -
-         * `workspace.group_member_removed` — Сотрудник убран из группы -
+         * `admin.plan_grant.created` — Платформа выдала организации тариф бесплатно до даты -
+         * `admin.plan_grant.extended` — Платформа продлила выданный тариф - `admin.plan_grant.revoked`
+         * — Платформа отозвала выданный тариф досрочно - `admin.plan_grant.ended` — Срок выданного
+         * тарифа закончился - `admin.platform_discount.created` — Платформа дала скидку на расход
+         * платформы разработчиков - `admin.platform_discount.revoked` — Платформа отозвала скидку на
+         * расход платформы разработчиков - `admin.subscription.cancelled` — Администратор платформы
+         * отменил продление подписки - `admin.subscription.resumed` — Администратор платформы вернул
+         * продление подписки - `admin.money.exported` — Администратор платформы выгрузил список в CSV
+         * - `admin.payment_search.pd_viewed` — Поддержка открыла реквизиты плательщиков в поиске
+         * платежей - `workspace.sso_provider_created` — SSO: подключён сервер входа -
+         * `workspace.group_created` — Группа создана - `workspace.group_updated` — Группа изменена -
+         * `workspace.group_deleted` — Группа удалена - `workspace.group_member_added` — Сотрудник
+         * добавлен в группу - `workspace.group_member_removed` — Сотрудник убран из группы -
          * `workspace.group_roles_changed` — Роли группы изменены - `workspace.custom_role_created` —
          * Своя роль создана - `workspace.custom_role_updated` — Своя роль изменена -
          * `workspace.custom_role_deleted` — Своя роль удалена - `workspace.role_ceiling_updated` —
@@ -521,22 +553,26 @@ public final class AuditEntry {
          * расхода добавлена (платформа) - `user.terms.accepted` — Приняты условия -
          * `account.deletion_code_sent` — Запрошен код удаления аккаунта - `account.deletion_scheduled`
          * — Аккаунт помечен к удалению - `account.deletion_cancelled` — Удаление аккаунта отменено -
-         * `account.deleted` — Аккаунт удалён и обезличен - `account.email_code_sent` — Запрошен код
-         * подтверждения почты (аккаунт Telegram) - `account.email_bound` — Почта привязана к аккаунту
-         * Telegram - `account.telegram_merged` — Telegram привязан к аккаунту с подтверждённой почтой,
-         * аккаунт Telegram закрыт - `account.google_linked` — Вход через Google привязал Google к
-         * аккаунту с той же почтой (sessions_closed — почта не была подтверждена: прежние сессии
-         * закрыты) - `account.telegram_merge_refused` — Склейка аккаунта Telegram с аккаунтом почты
-         * отклонена (данные, другой Telegram или почта закрыта) - `admin.ads.conversions_released` —
-         * Удержанные рекламные конверсии отправлены вручную - `admin.ads.conversions_rejected` —
-         * Рекламные конверсии отклонены - `admin.ads.signups_exported` — Выгрузка рекламных
-         * регистраций с IP и User-Agent (CSV) - `admin.access.signed_in` — Вход в админку по пропуску
-         * Cloudflare Access - `admin.access.refused` — Вход в админку по пропуску Cloudflare Access
-         * отклонён - `admin.two_factor.verified` — Администратор платформы подтвердил вход вторым
-         * фактором - `admin.two_factor.enable_requested` — Сотрудник платформы начал включать второй
-         * фактор (с кодом из почты) - `admin.two_factor.enabled` — Сотрудник платформы включил второй
-         * фактор - `admin.two_factor.disabled` — Сотрудник платформы отключил второй фактор (с кодом
-         * из почты) - `admin.session.signed_in` — Вход в админку по сессии со вторым фактором -
+         * `account.deleted` — Аккаунт удалён и обезличен - `langfuse.traces_purged` — Трассы ИИ
+         * удалены из Langfuse: по сроку хранения, с аккаунтом или после отзыва согласия -
+         * `admin.dialog.langfuse_dataset` — Ход разговора отправлен в набор Langfuse (платформа) -
+         * `admin.dialog.langfuse_annotation` — Ход разговора отправлен в очередь разметки Langfuse
+         * (платформа) - `account.email_code_sent` — Запрошен код подтверждения почты (аккаунт
+         * Telegram) - `account.email_bound` — Почта привязана к аккаунту Telegram -
+         * `account.telegram_merged` — Telegram привязан к аккаунту с подтверждённой почтой, аккаунт
+         * Telegram закрыт - `account.google_linked` — Вход через Google привязал Google к аккаунту с
+         * той же почтой (sessions_closed — почта не была подтверждена: прежние сессии закрыты) -
+         * `account.telegram_merge_refused` — Склейка аккаунта Telegram с аккаунтом почты отклонена
+         * (данные, другой Telegram или почта закрыта) - `admin.ads.conversions_released` — Удержанные
+         * рекламные конверсии отправлены вручную - `admin.ads.conversions_rejected` — Рекламные
+         * конверсии отклонены - `admin.ads.signups_exported` — Выгрузка рекламных регистраций с IP и
+         * User-Agent (CSV) - `admin.access.signed_in` — Вход в админку по пропуску Cloudflare Access -
+         * `admin.access.refused` — Вход в админку по пропуску Cloudflare Access отклонён -
+         * `admin.two_factor.verified` — Администратор платформы подтвердил вход вторым фактором -
+         * `admin.two_factor.enable_requested` — Сотрудник платформы начал включать второй фактор (с
+         * кодом из почты) - `admin.two_factor.enabled` — Сотрудник платформы включил второй фактор -
+         * `admin.two_factor.disabled` — Сотрудник платформы отключил второй фактор (с кодом из почты)
+         * - `admin.session.signed_in` — Вход в админку по сессии со вторым фактором -
          * `admin.user.banned` — Вход пользователю закрыт платформой - `admin.user.unbanned` — Вход
          * пользователю открыт платформой - `admin.workspace.blocked` — Организация заблокирована
          * платформой - `admin.workspace.unblocked` — Организация разблокирована платформой -
@@ -551,23 +587,35 @@ public final class AuditEntry {
          * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` —
          * Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран
          * вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными
-         * данными - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена
-         * (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа)
-         * - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными данными
-         * - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
-         * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
+         * данными - `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к
+         * оценкам разговора - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или
+         * заменена (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена
+         * (платформа) - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с
+         * персональными данными - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с
+         * ИИН - `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
          * `admin.payment.pd_viewed` — Поддержка открыла платёж с реквизитами плательщика и обменом с
          * банком - `site.post_published` — Статья блога опубликована на сайте (платформа) -
          * `site.post_unpublished` — Статья блога снята с сайта (платформа) - `site.post_deleted` —
          * Черновик статьи блога удалён (платформа) - `site.legal_published` — Опубликована новая
          * редакция документа сайта (платформа) - `site.trackers_saved` — Изменены счётчики и коды
-         * подтверждения сайта (платформа) - `canary.triggered` — Сработала приманка: украденный ключ
-         * или почта «сотрудника» (платформа) - `billing.payment.new` — Платёж: создан -
-         * `billing.payment.pending` — Платёж: отправлен в банк - `billing.payment.requires_action` —
-         * Платёж: ждёт 3-D Secure - `billing.payment.authorized` — Платёж: одобрен банком -
-         * `billing.payment.succeeded` — Платёж: оплачен - `billing.payment.verified` — Платёж: карта
-         * проверена - `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled` —
-         * Платёж: отменён - `billing.payment.partially_refunded` — Платёж: возвращён частично -
+         * подтверждения сайта (платформа) - `help.section_created` — Центр помощи: раздел заведён
+         * (платформа) - `help.section_updated` — Центр помощи: раздел изменён (платформа) -
+         * `help.section_deleted` — Центр помощи: раздел удалён (платформа) - `help.article_created` —
+         * Центр помощи: статья заведена (платформа) - `help.article_updated` — Центр помощи: статья
+         * изменена, опубликована или скрыта (платформа) - `help.article_deleted` — Центр помощи:
+         * статья удалена (платформа) - `help.reordered` — Центр помощи: порядок разделов или статей
+         * изменён (платформа) - `support.ticket_created` — Создано обращение в поддержку -
+         * `admin.support.replied` — Поддержка ответила на обращение - `admin.support.note_added` —
+         * Поддержка добавила внутреннюю заметку к обращению - `admin.support.ticket_updated` —
+         * Поддержка изменила обращение: состояние, категорию, приоритет или исполнителя -
+         * `admin.support.attachment_viewed` — Поддержка скачала вложение обращения -
+         * `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника» (платформа)
+         * - `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж: отправлен в
+         * банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
+         * `billing.payment.authorized` — Платёж: одобрен банком - `billing.payment.succeeded` —
+         * Платёж: оплачен - `billing.payment.verified` — Платёж: карта проверена -
+         * `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён
+         * - `billing.payment.partially_refunded` — Платёж: возвращён частично -
          * `billing.payment.refunded` — Платёж: возвращён
          *
          * @param action the value (required)

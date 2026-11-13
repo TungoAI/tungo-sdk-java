@@ -12,15 +12,22 @@ import kz.tungo.sdk.models.ChatDialog;
 import kz.tungo.sdk.models.ChatDialogDeleted;
 import kz.tungo.sdk.models.ChatDialogList;
 import kz.tungo.sdk.models.ChatDialogPatch;
+import kz.tungo.sdk.models.ChatDialogRated;
+import kz.tungo.sdk.models.ChatDialogRatingBody;
 import kz.tungo.sdk.models.ChatDialogRenamed;
 import kz.tungo.sdk.models.ChatDialogSummary;
 import kz.tungo.sdk.models.ChatMentionSearch;
+import kz.tungo.sdk.models.ChatMessageRated;
+import kz.tungo.sdk.models.ChatMessageRatingBody;
 import kz.tungo.sdk.models.ChatMessageRequest;
+import kz.tungo.sdk.models.ChatRatingDismissed;
+import kz.tungo.sdk.models.ChatRatingOptions;
 import kz.tungo.sdk.models.ChatStopResult;
 import kz.tungo.sdk.models.ChatSuggestions;
 import kz.tungo.sdk.models.ChatTokenCount;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import kz.tungo.sdk.models.ChatTurnResult;
+import kz.tungo.sdk.params.ChatGetRatingOptionsParams;
 import kz.tungo.sdk.params.ChatListEventsParams;
 import kz.tungo.sdk.params.ChatListMentionsParams;
 import kz.tungo.sdk.params.ChatListParams;
@@ -279,6 +286,66 @@ public final class ChatResourceAsync {
      */
     public CompletableFuture<ChatMentionSearch> listMentions(String companyId) {
         return engine.async(() -> sync.listMentions(companyId));
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatRatingOptions>> getRatingOptionsWithResponse(
+        String companyId,
+        ChatGetRatingOptionsParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.getRatingOptionsWithResponse(companyId, params, options));
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatRatingOptions> getRatingOptions(
+        String companyId,
+        ChatGetRatingOptionsParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.getRatingOptions(companyId, params, options));
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatRatingOptions> getRatingOptions(String companyId, ChatGetRatingOptionsParams params) {
+        return engine.async(() -> sync.getRatingOptions(companyId, params));
+    }
+
+    /**
+     * Что нужно форме оценки: причины «вниз» и предел комментария.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/rating-options</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatRatingOptions> getRatingOptions(String companyId) {
+        return engine.async(() -> sync.getRatingOptions(companyId));
     }
 
     /**
@@ -644,6 +711,237 @@ public final class ChatResourceAsync {
      */
     public CompletableFuture<ChatStream> listEvents(String companyId, String id) {
         return engine.async(() -> sync.listEvents(companyId, id));
+    }
+
+    /**
+     * Оценить ответ ИИ: палец вверх или вниз.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatMessageRated>> rateMessageWithResponse(
+        String companyId,
+        String id,
+        String turn,
+        ChatMessageRatingBody body,
+        RequestOptions options) {
+        return engine.async(() -> sync.rateMessageWithResponse(companyId, id, turn, body, options));
+    }
+
+    /**
+     * Оценить ответ ИИ: палец вверх или вниз.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMessageRated> rateMessage(
+        String companyId,
+        String id,
+        String turn,
+        ChatMessageRatingBody body,
+        RequestOptions options) {
+        return engine.async(() -> sync.rateMessage(companyId, id, turn, body, options));
+    }
+
+    /**
+     * Оценить ответ ИИ: палец вверх или вниз.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param body the request body
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMessageRated> rateMessage(
+        String companyId,
+        String id,
+        String turn,
+        ChatMessageRatingBody body) {
+        return engine.async(() -> sync.rateMessage(companyId, id, turn, body));
+    }
+
+    /**
+     * Снять свою оценку ответа.
+     * <p><code>DELETE
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatMessageRated>> deleteMessageRatingWithResponse(
+        String companyId,
+        String id,
+        String turn,
+        RequestOptions options) {
+        return engine.async(() -> sync.deleteMessageRatingWithResponse(companyId, id, turn, options));
+    }
+
+    /**
+     * Снять свою оценку ответа.
+     * <p><code>DELETE
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMessageRated> deleteMessageRating(
+        String companyId,
+        String id,
+        String turn,
+        RequestOptions options) {
+        return engine.async(() -> sync.deleteMessageRating(companyId, id, turn, options));
+    }
+
+    /**
+     * Снять свою оценку ответа.
+     * <p><code>DELETE
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param turn Номер ответа: turn_no сообщения ИИ в истории (он же X-Turn-No)
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMessageRated> deleteMessageRating(String companyId, String id, String turn) {
+        return engine.async(() -> sync.deleteMessageRating(companyId, id, turn));
+    }
+
+    /**
+     * Оценить разговор целиком: от 1 до 5.
+     * <p><code>PUT /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatDialogRated>> rateWithResponse(
+        String companyId,
+        String id,
+        ChatDialogRatingBody body,
+        RequestOptions options) {
+        return engine.async(() -> sync.rateWithResponse(companyId, id, body, options));
+    }
+
+    /**
+     * Оценить разговор целиком: от 1 до 5.
+     * <p><code>PUT /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatDialogRated> rate(
+        String companyId,
+        String id,
+        ChatDialogRatingBody body,
+        RequestOptions options) {
+        return engine.async(() -> sync.rate(companyId, id, body, options));
+    }
+
+    /**
+     * Оценить разговор целиком: от 1 до 5.
+     * <p><code>PUT /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param body the request body
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatDialogRated> rate(String companyId, String id, ChatDialogRatingBody body) {
+        return engine.async(() -> sync.rate(companyId, id, body));
+    }
+
+    /**
+     * Не сейчас: закрыть предложение оценить разговор.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating/dismiss</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatRatingDismissed>> dismissRatingWithResponse(
+        String companyId,
+        String id,
+        RequestOptions options) {
+        return engine.async(() -> sync.dismissRatingWithResponse(companyId, id, options));
+    }
+
+    /**
+     * Не сейчас: закрыть предложение оценить разговор.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating/dismiss</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatRatingDismissed> dismissRating(String companyId, String id, RequestOptions options) {
+        return engine.async(() -> sync.dismissRating(companyId, id, options));
+    }
+
+    /**
+     * Не сейчас: закрыть предложение оценить разговор.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/rating/dismiss</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatRatingDismissed> dismissRating(String companyId, String id) {
+        return engine.async(() -> sync.dismissRating(companyId, id));
     }
 
     /**

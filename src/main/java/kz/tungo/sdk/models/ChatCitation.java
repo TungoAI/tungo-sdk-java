@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,19 +18,61 @@ import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
 /**
- * Источник ответа: норма закона, статья базы знаний
+ * Источник ответа: норма закона, статья базы знаний. Список источников — по порядку первой ссылки в
+ * тексте ответа, без повторов. В самом тексте ответа списка источников нет: только короткие ссылки по
+ * месту («(НК РК, ст. 445, п. 1)»)
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE)
 public final class ChatCitation {
+    @JsonProperty("article")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String article;
+
+    @JsonProperty("chapter")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String chapter;
+
+    @JsonProperty("document")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String document;
+
     @JsonProperty("edition")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String edition;
 
+    @JsonProperty("edition_date")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String editionDate;
+
+    @JsonProperty("heading")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String heading;
+
+    @JsonProperty("label")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String label;
+
+    @JsonProperty("mentions")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<String> mentions;
+
+    @JsonProperty("note")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String note;
+
+    @JsonProperty("point")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String point;
+
     @JsonProperty("source")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String source;
+
+    @JsonProperty("subpoint")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String subpoint;
 
     @JsonProperty("title")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -43,12 +86,32 @@ public final class ChatCitation {
 
     @JsonCreator
     private ChatCitation(
+        @JsonProperty("article") String article,
+        @JsonProperty("chapter") String chapter,
+        @JsonProperty("document") String document,
         @JsonProperty("edition") String edition,
+        @JsonProperty("edition_date") String editionDate,
+        @JsonProperty("heading") String heading,
+        @JsonProperty("label") String label,
+        @JsonProperty("mentions") List<String> mentions,
+        @JsonProperty("note") String note,
+        @JsonProperty("point") String point,
         @JsonProperty("source") String source,
+        @JsonProperty("subpoint") String subpoint,
         @JsonProperty("title") String title,
         @JsonProperty("url") String url) {
+        this.article = article;
+        this.chapter = chapter;
+        this.document = document;
         this.edition = edition;
+        this.editionDate = editionDate;
+        this.heading = heading;
+        this.label = label;
+        this.mentions = Internal.list(mentions);
+        this.note = note;
+        this.point = point;
         this.source = source;
+        this.subpoint = subpoint;
         this.title = title;
         this.url = url;
     }
@@ -72,7 +135,35 @@ public final class ChatCitation {
     }
 
     /**
-     * Редакция нормы (на какую дату)
+     * Номер статьи
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> article() {
+        return Optional.ofNullable(article);
+    }
+
+    /**
+     * Номер главы — у источников без статей
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> chapter() {
+        return Optional.ofNullable(chapter);
+    }
+
+    /**
+     * Документ коротко: принятое сокращение, если оно есть в базе («НК РК»), иначе название обычным
+     * регистром («Социальный кодекс Республики Казахстан»)
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public String document() {
+        return document;
+    }
+
+    /**
+     * Редакция нормы словами
      *
      * @return the value, or empty when it is absent or null
      */
@@ -81,7 +172,66 @@ public final class ChatCitation {
     }
 
     /**
-     * Откуда: код нормы или статьи базы знаний
+     * Дата начала редакции, ГГГГ-ММ-ДД
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> editionDate() {
+        return Optional.ofNullable(editionDate);
+    }
+
+    /**
+     * Заголовок статьи без «Статья N.» — вторая строка чипа или подсказка
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> heading() {
+        return Optional.ofNullable(heading);
+    }
+
+    /**
+     * Короткая подпись для чипа: документ и место в нём, без редакции и пометок
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public String label() {
+        return label;
+    }
+
+    /**
+     * Как источник назван в тексте ответа — дословные куски текста («ст. 445», «статьи 445»): их можно
+     * сделать ссылкой на этот источник. Только в итоге хода и в истории, в событии потока поля нет.
+     * Поля нет и тогда, когда статья с этим номером есть среди источников ответа у двух разных
+     * документов: по номеру их не различить
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<List<String>> mentions() {
+        return Optional.ofNullable(mentions);
+    }
+
+    /**
+     * Пометка о статусе или природе источника — показывать обязательно: «УТРАТИЛА СИЛУ с 01.01.2026»,
+     * «по разъяснению КГД», «позиция органа (не норма права)»
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> note() {
+        return Optional.ofNullable(note);
+    }
+
+    /**
+     * Номер пункта
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> point() {
+        return Optional.ofNullable(point);
+    }
+
+    /**
+     * Подпись целиком, как раньше: документ, место, редакция и пометки одной строкой. Для показа
+     * удобнее label, edition и note по отдельности
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -90,7 +240,16 @@ public final class ChatCitation {
     }
 
     /**
-     * Название источника для показа
+     * Номер подпункта
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> subpoint() {
+        return Optional.ofNullable(subpoint);
+    }
+
+    /**
+     * Заголовок статьи целиком, с «Статья N.» (как раньше). Без номера — heading
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -99,7 +258,7 @@ public final class ChatCitation {
     }
 
     /**
-     * Ссылка на текст источника, если есть
+     * Ссылка на текст источника: по ней источник открывают. Она же — ключ источника внутри ответа
      *
      * @return the value, or empty when it is absent or null
      */
@@ -132,15 +291,25 @@ public final class ChatCitation {
         }
         ChatCitation other = (ChatCitation) o;
         return additionalProperties.equals(other.additionalProperties)
+            && Objects.equals(article, other.article)
+            && Objects.equals(chapter, other.chapter)
+            && Objects.equals(document, other.document)
             && Objects.equals(edition, other.edition)
+            && Objects.equals(editionDate, other.editionDate)
+            && Objects.equals(heading, other.heading)
+            && Objects.equals(label, other.label)
+            && Objects.equals(mentions, other.mentions)
+            && Objects.equals(note, other.note)
+            && Objects.equals(point, other.point)
             && Objects.equals(source, other.source)
+            && Objects.equals(subpoint, other.subpoint)
             && Objects.equals(title, other.title)
             && Objects.equals(url, other.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, edition, source, title, url);
+        return Objects.hash(additionalProperties, article, chapter, document, edition, editionDate, heading, label, mentions, note, point, source, subpoint, title, url);
     }
 
     @Override
@@ -150,8 +319,18 @@ public final class ChatCitation {
 
     /** Builder of {@link ChatCitation}. */
     public static final class Builder {
+        private String article;
+        private String chapter;
+        private String document;
         private String edition;
+        private String editionDate;
+        private String heading;
+        private String label;
+        private List<String> mentions;
+        private String note;
+        private String point;
         private String source;
+        private String subpoint;
         private String title;
         private String url;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -160,15 +339,59 @@ public final class ChatCitation {
         }
 
         private Builder(ChatCitation source) {
+            this.article = source.article;
+            this.chapter = source.chapter;
+            this.document = source.document;
             this.edition = source.edition;
+            this.editionDate = source.editionDate;
+            this.heading = source.heading;
+            this.label = source.label;
+            this.mentions = source.mentions;
+            this.note = source.note;
+            this.point = source.point;
             this.source = source.source;
+            this.subpoint = source.subpoint;
             this.title = source.title;
             this.url = source.url;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
         /**
-         * Редакция нормы (на какую дату)
+         * Номер статьи
+         *
+         * @param article the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder article(String article) {
+            this.article = article;
+            return this;
+        }
+
+        /**
+         * Номер главы — у источников без статей
+         *
+         * @param chapter the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder chapter(String chapter) {
+            this.chapter = chapter;
+            return this;
+        }
+
+        /**
+         * Документ коротко: принятое сокращение, если оно есть в базе («НК РК»), иначе название
+         * обычным регистром («Социальный кодекс Республики Казахстан»)
+         *
+         * @param document the value (required)
+         * @return this builder
+         */
+        public Builder document(String document) {
+            this.document = document;
+            return this;
+        }
+
+        /**
+         * Редакция нормы словами
          *
          * @param edition the value; null leaves the property out
          * @return this builder
@@ -179,7 +402,78 @@ public final class ChatCitation {
         }
 
         /**
-         * Откуда: код нормы или статьи базы знаний
+         * Дата начала редакции, ГГГГ-ММ-ДД
+         *
+         * @param editionDate the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder editionDate(String editionDate) {
+            this.editionDate = editionDate;
+            return this;
+        }
+
+        /**
+         * Заголовок статьи без «Статья N.» — вторая строка чипа или подсказка
+         *
+         * @param heading the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder heading(String heading) {
+            this.heading = heading;
+            return this;
+        }
+
+        /**
+         * Короткая подпись для чипа: документ и место в нём, без редакции и пометок
+         *
+         * @param label the value (required)
+         * @return this builder
+         */
+        public Builder label(String label) {
+            this.label = label;
+            return this;
+        }
+
+        /**
+         * Как источник назван в тексте ответа — дословные куски текста («ст. 445», «статьи 445»): их
+         * можно сделать ссылкой на этот источник. Только в итоге хода и в истории, в событии потока
+         * поля нет. Поля нет и тогда, когда статья с этим номером есть среди источников ответа у двух
+         * разных документов: по номеру их не различить
+         *
+         * @param mentions the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder mentions(List<String> mentions) {
+            this.mentions = mentions;
+            return this;
+        }
+
+        /**
+         * Пометка о статусе или природе источника — показывать обязательно: «УТРАТИЛА СИЛУ с
+         * 01.01.2026», «по разъяснению КГД», «позиция органа (не норма права)»
+         *
+         * @param note the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder note(String note) {
+            this.note = note;
+            return this;
+        }
+
+        /**
+         * Номер пункта
+         *
+         * @param point the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder point(String point) {
+            this.point = point;
+            return this;
+        }
+
+        /**
+         * Подпись целиком, как раньше: документ, место, редакция и пометки одной строкой. Для показа
+         * удобнее label, edition и note по отдельности
          *
          * @param source the value (required)
          * @return this builder
@@ -190,7 +484,18 @@ public final class ChatCitation {
         }
 
         /**
-         * Название источника для показа
+         * Номер подпункта
+         *
+         * @param subpoint the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder subpoint(String subpoint) {
+            this.subpoint = subpoint;
+            return this;
+        }
+
+        /**
+         * Заголовок статьи целиком, с «Статья N.» (как раньше). Без номера — heading
          *
          * @param title the value (required)
          * @return this builder
@@ -201,7 +506,7 @@ public final class ChatCitation {
         }
 
         /**
-         * Ссылка на текст источника, если есть
+         * Ссылка на текст источника: по ней источник открывают. Она же — ключ источника внутри ответа
          *
          * @param url the value; null leaves the property out
          * @return this builder
@@ -231,8 +536,18 @@ public final class ChatCitation {
          */
         public ChatCitation build() {
             ChatCitation built = new ChatCitation(
+                article,
+                chapter,
+                Internal.required(document, "document"),
                 edition,
+                editionDate,
+                heading,
+                Internal.required(label, "label"),
+                mentions,
+                note,
+                point,
                 Internal.required(source, "source"),
+                subpoint,
                 Internal.required(title, "title"),
                 url);
             built.additionalProperties.putAll(additionalProperties);

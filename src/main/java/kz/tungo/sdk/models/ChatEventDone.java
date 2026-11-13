@@ -38,6 +38,10 @@ public final class ChatEventDone implements ChatEvent {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long costTiyn;
 
+    @JsonProperty("rating_prompt")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean ratingPrompt;
+
     @JsonProperty("stop_reason")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String stopReason;
@@ -57,12 +61,14 @@ public final class ChatEventDone implements ChatEvent {
         @JsonProperty("answer") String answer,
         @JsonProperty("choice_id") String choiceId,
         @JsonProperty("cost_tiyn") Long costTiyn,
+        @JsonProperty("rating_prompt") Boolean ratingPrompt,
         @JsonProperty("stop_reason") String stopReason,
         @JsonProperty("type") String type,
         @JsonProperty("usage") ChatUsage usage) {
         this.answer = answer;
         this.choiceId = choiceId;
         this.costTiyn = costTiyn;
+        this.ratingPrompt = ratingPrompt;
         this.stopReason = stopReason;
         this.type = type != null ? type : "done";
         this.usage = usage;
@@ -112,6 +118,16 @@ public final class ChatEventDone implements ChatEvent {
      */
     public Optional<Long> costTiyn() {
         return Optional.ofNullable(costTiyn);
+    }
+
+    /**
+     * Пора предложить человеку оценить разговор — те же правила, что у rating_prompt в GET
+     * …/chat/&#123;id&#125;. Поля нет — не предлагать. Ключу API не приходит
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<Boolean> ratingPrompt() {
+        return Optional.ofNullable(ratingPrompt);
     }
 
     /**
@@ -178,6 +194,7 @@ public final class ChatEventDone implements ChatEvent {
             && Objects.equals(answer, other.answer)
             && Objects.equals(choiceId, other.choiceId)
             && Objects.equals(costTiyn, other.costTiyn)
+            && Objects.equals(ratingPrompt, other.ratingPrompt)
             && Objects.equals(stopReason, other.stopReason)
             && Objects.equals(type, other.type)
             && Objects.equals(usage, other.usage);
@@ -185,7 +202,7 @@ public final class ChatEventDone implements ChatEvent {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, answer, choiceId, costTiyn, stopReason, type, usage);
+        return Objects.hash(additionalProperties, answer, choiceId, costTiyn, ratingPrompt, stopReason, type, usage);
     }
 
     @Override
@@ -198,6 +215,7 @@ public final class ChatEventDone implements ChatEvent {
         private String answer;
         private String choiceId;
         private Long costTiyn;
+        private Boolean ratingPrompt;
         private String stopReason;
         private ChatUsage usage;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -209,6 +227,7 @@ public final class ChatEventDone implements ChatEvent {
             this.answer = source.answer;
             this.choiceId = source.choiceId;
             this.costTiyn = source.costTiyn;
+            this.ratingPrompt = source.ratingPrompt;
             this.stopReason = source.stopReason;
             this.usage = source.usage;
             this.additionalProperties.putAll(source.additionalProperties);
@@ -245,6 +264,18 @@ public final class ChatEventDone implements ChatEvent {
          */
         public Builder costTiyn(Long costTiyn) {
             this.costTiyn = costTiyn;
+            return this;
+        }
+
+        /**
+         * Пора предложить человеку оценить разговор — те же правила, что у rating_prompt в GET
+         * …/chat/&#123;id&#125;. Поля нет — не предлагать. Ключу API не приходит
+         *
+         * @param ratingPrompt the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder ratingPrompt(Boolean ratingPrompt) {
+            this.ratingPrompt = ratingPrompt;
             return this;
         }
 
@@ -295,6 +326,7 @@ public final class ChatEventDone implements ChatEvent {
                 answer,
                 choiceId,
                 costTiyn,
+                ratingPrompt,
                 stopReason,
                 "done",
                 usage);

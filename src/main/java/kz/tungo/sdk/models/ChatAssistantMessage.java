@@ -55,6 +55,10 @@ public final class ChatAssistantMessage implements ChatMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<String> proposalIds;
 
+    @JsonProperty("rating")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final ChatMessageRating rating;
+
     @JsonProperty("role")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String role;
@@ -67,6 +71,10 @@ public final class ChatAssistantMessage implements ChatMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String thinking;
 
+    @JsonProperty("turn_no")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long turnNo;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
@@ -78,9 +86,11 @@ public final class ChatAssistantMessage implements ChatMessage {
         @JsonProperty("id") String id,
         @JsonProperty("next_action") ChatNextAction nextAction,
         @JsonProperty("proposal_ids") List<String> proposalIds,
+        @JsonProperty("rating") ChatMessageRating rating,
         @JsonProperty("role") String role,
         @JsonProperty("state") ChatAssistantMessageState state,
-        @JsonProperty("thinking") String thinking) {
+        @JsonProperty("thinking") String thinking,
+        @JsonProperty("turn_no") Long turnNo) {
         this.at = at;
         this.blocks = Internal.requiredList(blocks, "blocks");
         this.citations = Internal.requiredList(citations, "citations");
@@ -88,9 +98,11 @@ public final class ChatAssistantMessage implements ChatMessage {
         this.id = id;
         this.nextAction = nextAction;
         this.proposalIds = Internal.requiredList(proposalIds, "proposal_ids");
+        this.rating = rating;
         this.role = role != null ? role : "assistant";
         this.state = state;
         this.thinking = thinking;
+        this.turnNo = turnNo;
     }
 
     /**
@@ -176,6 +188,15 @@ public final class ChatAssistantMessage implements ChatMessage {
     }
 
     /**
+     * Оценка этого ответа человеком; null — не оценён
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ChatMessageRating> rating() {
+        return Optional.ofNullable(rating);
+    }
+
+    /**
      * Ответ ИИ
      *
      * @return always <code>assistant</code>
@@ -202,6 +223,16 @@ public final class ChatAssistantMessage implements ChatMessage {
      */
     public String thinking() {
         return thinking;
+    }
+
+    /**
+     * Номер ответа в разговоре (он же X-Turn-No и средняя часть id): по нему ответ оценивают — PUT
+     * …/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long turnNo() {
+        return turnNo;
     }
 
     /**
@@ -241,14 +272,16 @@ public final class ChatAssistantMessage implements ChatMessage {
             && Objects.equals(id, other.id)
             && Objects.equals(nextAction, other.nextAction)
             && Objects.equals(proposalIds, other.proposalIds)
+            && Objects.equals(rating, other.rating)
             && Objects.equals(role, other.role)
             && Objects.equals(state, other.state)
-            && Objects.equals(thinking, other.thinking);
+            && Objects.equals(thinking, other.thinking)
+            && Objects.equals(turnNo, other.turnNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, at, blocks, citations, followups, id, nextAction, proposalIds, role, state, thinking);
+        return Objects.hash(additionalProperties, at, blocks, citations, followups, id, nextAction, proposalIds, rating, role, state, thinking, turnNo);
     }
 
     @Override
@@ -265,8 +298,10 @@ public final class ChatAssistantMessage implements ChatMessage {
         private String id;
         private ChatNextAction nextAction;
         private List<String> proposalIds;
+        private ChatMessageRating rating;
         private ChatAssistantMessageState state;
         private String thinking;
+        private Long turnNo;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -280,8 +315,10 @@ public final class ChatAssistantMessage implements ChatMessage {
             this.id = source.id;
             this.nextAction = source.nextAction;
             this.proposalIds = source.proposalIds;
+            this.rating = source.rating;
             this.state = source.state;
             this.thinking = source.thinking;
+            this.turnNo = source.turnNo;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -364,6 +401,17 @@ public final class ChatAssistantMessage implements ChatMessage {
         }
 
         /**
+         * Оценка этого ответа человеком; null — не оценён
+         *
+         * @param rating the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder rating(ChatMessageRating rating) {
+            this.rating = rating;
+            return this;
+        }
+
+        /**
          * done — ход закончился сам; stopped — нажали «Стоп»; error — ошибка, отказ модели или предел
          * шагов
          *
@@ -383,6 +431,18 @@ public final class ChatAssistantMessage implements ChatMessage {
          */
         public Builder thinking(String thinking) {
             this.thinking = thinking;
+            return this;
+        }
+
+        /**
+         * Номер ответа в разговоре (он же X-Turn-No и средняя часть id): по нему ответ оценивают — PUT
+         * …/chat/&#123;id&#125;/messages/&#123;turn&#125;/rating
+         *
+         * @param turnNo the value (required)
+         * @return this builder
+         */
+        public Builder turnNo(Long turnNo) {
+            this.turnNo = turnNo;
             return this;
         }
 
@@ -413,9 +473,11 @@ public final class ChatAssistantMessage implements ChatMessage {
                 Internal.required(id, "id"),
                 nextAction,
                 Internal.required(proposalIds, "proposal_ids"),
+                rating,
                 "assistant",
                 Internal.required(state, "state"),
-                Internal.required(thinking, "thinking"));
+                Internal.required(thinking, "thinking"),
+                Internal.required(turnNo, "turn_no"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }
