@@ -46,6 +46,36 @@ class ClientConfigTest {
     }
 
     @Test
+    void aKeyOrHeaderWithAControlCharacterIsRejectedWithoutQuotingIt() {
+        String secret = "tg_live_SECRETSECRET";
+        // A trailing newline from a secret file or `echo`, given directly or through the environment.
+        ConfigException direct = assertThrows(ConfigException.class,
+            () -> TungoClient.builder().environment(name -> null).apiKey(secret + "\n").build());
+        assertFalse(direct.getMessage().contains(secret), direct.getMessage());
+        assertNull(direct.getCause());
+        Map<String, String> env = new HashMap<>();
+        env.put("TUNGO_API_KEY", secret + "\r\n");
+        ConfigException fromEnv = assertThrows(ConfigException.class, () -> TungoClient.builder().environment(env::get).build());
+        assertFalse(fromEnv.getMessage().contains(secret), fromEnv.getMessage());
+        ConfigException header = assertThrows(ConfigException.class,
+            () -> TungoClient.builder().environment(name -> null).apiKey("tg_x").defaultHeader("X-Token", secret + "\u0000").build());
+        assertFalse(header.getMessage().contains(secret), header.getMessage());
+        assertTrue(header.getMessage().contains("X-Token"), header.getMessage());
+
+        // A per-request header is checked when the request is built: named, never quoted, sent nowhere.
+        try (MockServer server = new MockServer();
+            TungoClient client = TungoClient.builder().environment(name -> null).apiKey("tg_x").baseUrl(server.url()).build()) {
+            TungoException e = assertThrows(TungoException.class,
+                () -> client.companies().get("co_1", RequestOptions.builder().header("X-Token", secret + "\n").build()));
+            for (Throwable t = e; t != null; t = t.getCause()) {
+                assertFalse(String.valueOf(t.getMessage()).contains(secret), t.toString());
+            }
+            assertTrue(e.getMessage().contains("X-Token"), e.getMessage());
+            assertEquals(0, server.requestCount());
+        }
+    }
+
+    @Test
     void readsKeyBaseUrlAndWebhookSecretFromTheEnvironment() {
         try (MockServer server = new MockServer()) {
             Map<String, String> env = new HashMap<>();

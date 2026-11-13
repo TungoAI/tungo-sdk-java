@@ -487,7 +487,8 @@ public final class HttpEngine implements AutoCloseable {
                 }
                 failure = new ConnectionException("Connection error (" + spec.method + " " + spec.route + "): " + describe(e), e);
             } catch (IllegalArgumentException e) {
-                throw new ValidationException("The request could not be built: " + e.getMessage(), e);
+                // The JDK message can quote a header value (the API key among them): never pass it on.
+                throw new ValidationException(UNBUILDABLE);
             }
             if (!retrySafe || attempt >= maxRetries) {
                 throw failure;
@@ -514,33 +515,66 @@ public final class HttpEngine implements AutoCloseable {
                     || (dropKey && "Idempotency-Key".equalsIgnoreCase(h.getKey()))) {
                     continue;
                 }
-                rb.setHeader(h.getKey(), h.getValue());
+                setHeader(rb, h.getKey(), h.getValue());
             }
             if (keyed) {
-                rb.setHeader("x-api-key", config.apiKey);
+                setHeader(rb, "x-api-key", config.apiKey);
             }
             if (spec.body != null && spec.contentType != null) {
                 rb.setHeader("Content-Type", spec.contentType);
             }
             if (idempotencyKey != null) {
-                rb.setHeader(idempotencyHeader, idempotencyKey);
+                setHeader(rb, idempotencyHeader, idempotencyKey);
             }
             for (Map.Entry<String, String> h : spec.headers.entrySet()) {
-                rb.setHeader(h.getKey(), h.getValue());
+                setHeader(rb, h.getKey(), h.getValue());
             }
             for (Map.Entry<String, String> h : opts.headers().entrySet()) {
                 if (dropKey && "Idempotency-Key".equalsIgnoreCase(h.getKey())) {
                     continue;
                 }
-                rb.setHeader(h.getKey(), h.getValue());
+                setHeader(rb, h.getKey(), h.getValue());
             }
             rb.method(spec.method, spec.body == null
                 ? HttpRequest.BodyPublishers.noBody()
                 : HttpRequest.BodyPublishers.ofByteArray(spec.body));
             return rb.build();
         } catch (IllegalArgumentException e) {
-            throw new ValidationException("The request could not be built: " + e.getMessage(), e);
+            // The JDK message quotes the rejected header value, which can be the API key: neither the
+            // message nor the exception itself (as the cause) is passed on.
+            throw new ValidationException(UNBUILDABLE);
         }
+    }
+
+    private static final String UNBUILDABLE = "The request could not be built: a header name or value is invalid";
+
+    /**
+     * Sets one header after checking its value, so that a rejected value is named by its header
+     * and never quoted.
+     */
+    private static void setHeader(HttpRequest.Builder rb, String name, String value) {
+        if (!isHeaderValueSafe(value)) {
+            throw new ValidationException("The request could not be built: the value of header '" + name
+                + "' contains a control character (such as a trailing newline)");
+        }
+        rb.setHeader(name, value);
+    }
+
+    /**
+     * Tells whether a header value can be sent: no control character but the tab.
+     * Internal: not part of the public API.
+     *
+     * @param value the header value
+     * @return true when the value has no CR, LF, NUL or other control character
+     */
+    public static boolean isHeaderValueSafe(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if ((c < 0x20 && c != '\t') || c == 0x7f) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean isCredentialHeader(String name) {

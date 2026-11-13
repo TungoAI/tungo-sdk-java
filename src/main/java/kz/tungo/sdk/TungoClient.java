@@ -678,6 +678,17 @@ public final class TungoClient implements AutoCloseable {
          */
         public TungoClient build() {
             String key = firstNonEmpty(apiKey, env.apply("TUNGO_API_KEY"));
+            // A value the JDK rejects would fail every call, and its error quotes the value: name it here.
+            if (key != null && !HttpEngine.isHeaderValueSafe(key)) {
+                throw new ConfigException("The API key contains a control character (such as a trailing newline"
+                    + " from a secret file); remove it");
+            }
+            for (Map.Entry<String, String> h : defaultHeaders.entrySet()) {
+                if (!HttpEngine.isHeaderValueSafe(h.getValue())) {
+                    throw new ConfigException("The value of default header '" + h.getKey()
+                        + "' contains a control character (such as a trailing newline)");
+                }
+            }
             String secret = firstNonEmpty(webhookSecret, env.apply("TUNGO_WEBHOOK_SECRET"));
             String url = firstNonEmpty(baseUrl, env.apply("TUNGO_BASE_URL"));
             if (url == null) {
