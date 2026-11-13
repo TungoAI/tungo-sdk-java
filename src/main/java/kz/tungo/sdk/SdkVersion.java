@@ -6,7 +6,7 @@ package kz.tungo.sdk;
  */
 public final class SdkVersion {
     /** The version of this library; the release process keeps it equal to the version in pom.xml. */
-    public static final String VERSION = "0.2.0"; // x-release-version
+    public static final String VERSION = "0.3.0"; // x-release-version
 
     /** The value of the {@code User-Agent} header sent with every request. */
     public static final String USER_AGENT = "tungo-sdk-java/" + VERSION;

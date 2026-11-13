@@ -81,7 +81,7 @@ class StreamingTest {
     @Test
     void theNonStreamingVariantAsksForJson() {
         try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
-            server.enqueueJson(200, "{\"answer\":\"42\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"proposals\":[],\"questions\":[]}");
+            server.enqueueJson(200, "{\"answer\":\"42\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"followups\":[],\"proposals\":[],\"questions\":[]}");
             assertEquals("42", client.ask("co_1", "Сколько?").answer());
             MockServer.Request request = server.request(0);
             assertEquals("application/json", request.header("accept"));

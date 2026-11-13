@@ -24,6 +24,10 @@ import kz.tungo.sdk.internal.Json;
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE)
 public final class ProposalPage {
+    @JsonProperty("approval_requested_count")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long approvalRequestedCount;
+
     @JsonProperty("counts")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Map<String, Double> counts;
@@ -44,10 +48,12 @@ public final class ProposalPage {
 
     @JsonCreator
     private ProposalPage(
+        @JsonProperty("approval_requested_count") Long approvalRequestedCount,
         @JsonProperty("counts") Map<String, Double> counts,
         @JsonProperty("data") List<ProposalListItem> data,
         @JsonProperty("next_cursor") String nextCursor,
         @JsonProperty("total") Double total) {
+        this.approvalRequestedCount = approvalRequestedCount;
         this.counts = Internal.requiredMap(counts, "counts");
         this.data = Internal.requiredList(data, "data");
         this.nextCursor = nextCursor;
@@ -73,8 +79,19 @@ public final class ProposalPage {
     }
 
     /**
-     * Сколько предложений в каждом статусе (ключ — ProposalStatus), без учёта фильтра — для бейджей
-     * вкладок; статусов без предложений нет
+     * Сколько предложений ждёт решения по просьбе («Отправить на одобрение») — в тех же пределах, что
+     * counts
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long approvalRequestedCount() {
+        return approvalRequestedCount;
+    }
+
+    /**
+     * Сколько предложений в каждом статусе (ключ — ProposalStatus) — для бейджей вкладок; статусов без
+     * предложений нет. Считается в пределах source и batch_id (откуда и из какой пачки), остальные
+     * фильтры (status, kind, даты, q) на счётчики не влияют
      *
      * @return the value, never null: a response without this required property does not decode
      */
@@ -137,6 +154,7 @@ public final class ProposalPage {
         }
         ProposalPage other = (ProposalPage) o;
         return additionalProperties.equals(other.additionalProperties)
+            && Objects.equals(approvalRequestedCount, other.approvalRequestedCount)
             && Objects.equals(counts, other.counts)
             && Objects.equals(data, other.data)
             && Objects.equals(nextCursor, other.nextCursor)
@@ -145,7 +163,7 @@ public final class ProposalPage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, counts, data, nextCursor, total);
+        return Objects.hash(additionalProperties, approvalRequestedCount, counts, data, nextCursor, total);
     }
 
     @Override
@@ -155,6 +173,7 @@ public final class ProposalPage {
 
     /** Builder of {@link ProposalPage}. */
     public static final class Builder {
+        private Long approvalRequestedCount;
         private Map<String, Double> counts;
         private List<ProposalListItem> data;
         private String nextCursor;
@@ -165,6 +184,7 @@ public final class ProposalPage {
         }
 
         private Builder(ProposalPage source) {
+            this.approvalRequestedCount = source.approvalRequestedCount;
             this.counts = source.counts;
             this.data = source.data;
             this.nextCursor = source.nextCursor;
@@ -173,8 +193,21 @@ public final class ProposalPage {
         }
 
         /**
-         * Сколько предложений в каждом статусе (ключ — ProposalStatus), без учёта фильтра — для
-         * бейджей вкладок; статусов без предложений нет
+         * Сколько предложений ждёт решения по просьбе («Отправить на одобрение») — в тех же пределах,
+         * что counts
+         *
+         * @param approvalRequestedCount the value (required)
+         * @return this builder
+         */
+        public Builder approvalRequestedCount(Long approvalRequestedCount) {
+            this.approvalRequestedCount = approvalRequestedCount;
+            return this;
+        }
+
+        /**
+         * Сколько предложений в каждом статусе (ключ — ProposalStatus) — для бейджей вкладок; статусов
+         * без предложений нет. Считается в пределах source и batch_id (откуда и из какой пачки),
+         * остальные фильтры (status, kind, даты, q) на счётчики не влияют
          *
          * @param counts the value (required)
          * @return this builder
@@ -240,6 +273,7 @@ public final class ProposalPage {
          */
         public ProposalPage build() {
             ProposalPage built = new ProposalPage(
+                Internal.required(approvalRequestedCount, "approval_requested_count"),
                 Internal.required(counts, "counts"),
                 Internal.required(data, "data"),
                 nextCursor,

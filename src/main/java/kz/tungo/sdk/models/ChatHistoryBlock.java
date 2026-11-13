@@ -12,12 +12,13 @@ import java.util.Objects;
 
 /**
  * Блок ответа в истории — те же виды, что клиент собирает из живого потока: text | tool | proposal |
- * question | error
+ * batch | question | error
  * <p>A tagged union selected by the <code>kind</code> property: <code>text</code> {@link
  * ChatHistoryText}, <code>tool</code> {@link ChatHistoryTool}, <code>proposal</code> {@link
- * ChatHistoryProposal}, <code>question</code> {@link ChatHistoryQuestion}, <code>error</code> {@link
- * ChatHistoryError}. A value with a tag this version of the SDK does not know is decoded as {@link
- * Unknown}. Use <code>instanceof</code> or {@link #accept(Visitor)}.
+ * ChatHistoryProposal}, <code>batch</code> {@link ChatHistoryBatch}, <code>question</code> {@link
+ * ChatHistoryQuestion}, <code>error</code> {@link ChatHistoryError}. A value with a tag this version
+ * of the SDK does not know is decoded as {@link Unknown}. Use <code>instanceof</code> or {@link
+ * #accept(Visitor)}.
  */
 @JsonDeserialize(using = ChatHistoryBlock.Deserializer.class)
 public interface ChatHistoryBlock {
@@ -72,6 +73,16 @@ public interface ChatHistoryBlock {
          * @return the result
          */
         default R visitChatHistoryProposal(ChatHistoryProposal value) {
+            return visitDefault(value);
+        }
+
+        /**
+         * Handles the <code>batch</code> variant.
+         *
+         * @param value the value
+         * @return the result
+         */
+        default R visitChatHistoryBatch(ChatHistoryBatch value) {
             return visitDefault(value);
         }
 
@@ -187,6 +198,8 @@ public interface ChatHistoryBlock {
                         return context.readTreeAsValue(node, ChatHistoryTool.class);
                     case "proposal":
                         return context.readTreeAsValue(node, ChatHistoryProposal.class);
+                    case "batch":
+                        return context.readTreeAsValue(node, ChatHistoryBatch.class);
                     case "question":
                         return context.readTreeAsValue(node, ChatHistoryQuestion.class);
                     case "error":

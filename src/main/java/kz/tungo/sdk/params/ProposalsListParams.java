@@ -4,27 +4,34 @@ package kz.tungo.sdk.params;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import kz.tungo.sdk.models.ListCompanyProposalsApprovalRequested;
 
 /**
  * Query parameters of <code>proposals.list</code> (<code>GET
  * /v1/companies/&#123;co&#125;/proposals</code>). Instances are immutable.
  */
 public final class ProposalsListParams {
+    private final ListCompanyProposalsApprovalRequested approvalRequested;
+    private final String batchId;
     private final String cursor;
     private final String dateFrom;
     private final String dateTo;
     private final String kind;
     private final Integer limit;
     private final String q;
+    private final String source;
     private final String status;
 
     private ProposalsListParams(Builder b) {
+        this.approvalRequested = b.approvalRequested;
+        this.batchId = b.batchId;
         this.cursor = b.cursor;
         this.dateFrom = b.dateFrom;
         this.dateTo = b.dateTo;
         this.kind = b.kind;
         this.limit = b.limit;
         this.q = b.q;
+        this.source = b.source;
         this.status = b.status;
     }
 
@@ -44,6 +51,25 @@ public final class ProposalsListParams {
      */
     public Builder toBuilder() {
         return new Builder(this);
+    }
+
+    /**
+     * true — только отправленные на одобрение и ещё не решённые; false — только остальные
+     *
+     * @return the value, or empty when the parameter is not sent
+     */
+    public Optional<ListCompanyProposalsApprovalRequested> approvalRequested() {
+        return Optional.ofNullable(approvalRequested);
+    }
+
+    /**
+     * Только документы одного задания пачки (bat_…) — тот же состав, что в сводке задания и у
+     * «Одобрить и отправить в 1С». Не id задания — 400; задания нет — пустой список
+     *
+     * @return the value, or empty when the parameter is not sent
+     */
+    public Optional<String> batchId() {
+        return Optional.ofNullable(batchId);
     }
 
     /**
@@ -96,12 +122,22 @@ public final class ProposalsListParams {
 
     /**
      * Поиск без учёта регистра: номер предложения (P-…), номер документа 1С, контрагент (имя из
-     * превью), БИН/ИИН и другие реквизиты документа
+     * превью), БИН/ИИН, сумма (как пишут: «150 000,50» или 150000.5) и другие реквизиты документа
      *
      * @return the value, or empty when the parameter is not sent
      */
     public Optional<String> q() {
         return Optional.ofNullable(q);
+    }
+
+    /**
+     * Только из этих источников (origin.source): один или несколько через запятую (chat, statement,
+     * esf, automation). Неизвестный — 400
+     *
+     * @return the value, or empty when the parameter is not sent
+     */
+    public Optional<String> source() {
+        return Optional.ofNullable(source);
     }
 
     /**
@@ -123,52 +159,87 @@ public final class ProposalsListParams {
             return false;
         }
         ProposalsListParams other = (ProposalsListParams) o;
-        return Objects.equals(cursor, other.cursor)
+        return Objects.equals(approvalRequested, other.approvalRequested)
+            && Objects.equals(batchId, other.batchId)
+            && Objects.equals(cursor, other.cursor)
             && Objects.equals(dateFrom, other.dateFrom)
             && Objects.equals(dateTo, other.dateTo)
             && Objects.equals(kind, other.kind)
             && Objects.equals(limit, other.limit)
             && Objects.equals(q, other.q)
+            && Objects.equals(source, other.source)
             && Objects.equals(status, other.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cursor, dateFrom, dateTo, kind, limit, q, status);
+        return Objects.hash(approvalRequested, batchId, cursor, dateFrom, dateTo, kind, limit, q, source, status);
     }
 
     @Override
     public String toString() {
-        return "ProposalsListParams{" + "cursor=" + cursor
+        return "ProposalsListParams{" + "approvalRequested=" + approvalRequested
+            + ", " + "batchId=" + batchId
+            + ", " + "cursor=" + cursor
             + ", " + "dateFrom=" + dateFrom
             + ", " + "dateTo=" + dateTo
             + ", " + "kind=" + kind
             + ", " + "limit=" + limit
             + ", " + "q=" + q
+            + ", " + "source=" + source
             + ", " + "status=" + status + "}";
     }
 
     /** Builder of {@link ProposalsListParams}. */
     public static final class Builder {
+        private ListCompanyProposalsApprovalRequested approvalRequested;
+        private String batchId;
         private String cursor;
         private String dateFrom;
         private String dateTo;
         private String kind;
         private Integer limit;
         private String q;
+        private String source;
         private String status;
 
         private Builder() {
         }
 
         private Builder(ProposalsListParams source) {
+            this.approvalRequested = source.approvalRequested;
+            this.batchId = source.batchId;
             this.cursor = source.cursor;
             this.dateFrom = source.dateFrom;
             this.dateTo = source.dateTo;
             this.kind = source.kind;
             this.limit = source.limit;
             this.q = source.q;
+            this.source = source.source;
             this.status = source.status;
+        }
+
+        /**
+         * true — только отправленные на одобрение и ещё не решённые; false — только остальные
+         *
+         * @param approvalRequested the value; null leaves the parameter out
+         * @return this builder
+         */
+        public Builder approvalRequested(ListCompanyProposalsApprovalRequested approvalRequested) {
+            this.approvalRequested = approvalRequested;
+            return this;
+        }
+
+        /**
+         * Только документы одного задания пачки (bat_…) — тот же состав, что в сводке задания и у
+         * «Одобрить и отправить в 1С». Не id задания — 400; задания нет — пустой список
+         *
+         * @param batchId the value; null leaves the parameter out
+         * @return this builder
+         */
+        public Builder batchId(String batchId) {
+            this.batchId = batchId;
+            return this;
         }
 
         /**
@@ -253,13 +324,25 @@ public final class ProposalsListParams {
 
         /**
          * Поиск без учёта регистра: номер предложения (P-…), номер документа 1С, контрагент (имя из
-         * превью), БИН/ИИН и другие реквизиты документа
+         * превью), БИН/ИИН, сумма (как пишут: «150 000,50» или 150000.5) и другие реквизиты документа
          *
          * @param q the value; null leaves the parameter out
          * @return this builder
          */
         public Builder q(String q) {
             this.q = q;
+            return this;
+        }
+
+        /**
+         * Только из этих источников (origin.source): один или несколько через запятую (chat,
+         * statement, esf, automation). Неизвестный — 400
+         *
+         * @param source the value; null leaves the parameter out
+         * @return this builder
+         */
+        public Builder source(String source) {
+            this.source = source;
             return this;
         }
 

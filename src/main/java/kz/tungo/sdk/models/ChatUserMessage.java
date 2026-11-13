@@ -39,6 +39,10 @@ public final class ChatUserMessage implements ChatMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String id;
 
+    @JsonProperty("mentions")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<ChatHistoryMention> mentions;
+
     @JsonProperty("pending")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Boolean pending;
@@ -58,12 +62,14 @@ public final class ChatUserMessage implements ChatMessage {
         @JsonProperty("at") String at,
         @JsonProperty("attachments") List<ChatAttachmentMeta> attachments,
         @JsonProperty("id") String id,
+        @JsonProperty("mentions") List<ChatHistoryMention> mentions,
         @JsonProperty("pending") Boolean pending,
         @JsonProperty("role") String role,
         @JsonProperty("text") String text) {
         this.at = at;
         this.attachments = Internal.list(attachments);
         this.id = id;
+        this.mentions = Internal.list(mentions);
         this.pending = pending;
         this.role = role != null ? role : "user";
         this.text = text;
@@ -112,6 +118,15 @@ public final class ChatUserMessage implements ChatMessage {
      */
     public String id() {
         return id;
+    }
+
+    /**
+     * Упоминания через «&#64;» в этом вопросе, если были: вид, id и название на момент отправки
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<List<ChatHistoryMention>> mentions() {
+        return Optional.ofNullable(mentions);
     }
 
     /**
@@ -176,6 +191,7 @@ public final class ChatUserMessage implements ChatMessage {
             && Objects.equals(at, other.at)
             && Objects.equals(attachments, other.attachments)
             && Objects.equals(id, other.id)
+            && Objects.equals(mentions, other.mentions)
             && Objects.equals(pending, other.pending)
             && Objects.equals(role, other.role)
             && Objects.equals(text, other.text);
@@ -183,7 +199,7 @@ public final class ChatUserMessage implements ChatMessage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, at, attachments, id, pending, role, text);
+        return Objects.hash(additionalProperties, at, attachments, id, mentions, pending, role, text);
     }
 
     @Override
@@ -196,6 +212,7 @@ public final class ChatUserMessage implements ChatMessage {
         private String at;
         private List<ChatAttachmentMeta> attachments;
         private String id;
+        private List<ChatHistoryMention> mentions;
         private Boolean pending;
         private String text;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -207,6 +224,7 @@ public final class ChatUserMessage implements ChatMessage {
             this.at = source.at;
             this.attachments = source.attachments;
             this.id = source.id;
+            this.mentions = source.mentions;
             this.pending = source.pending;
             this.text = source.text;
             this.additionalProperties.putAll(source.additionalProperties);
@@ -242,6 +260,17 @@ public final class ChatUserMessage implements ChatMessage {
          */
         public Builder id(String id) {
             this.id = id;
+            return this;
+        }
+
+        /**
+         * Упоминания через «&#64;» в этом вопросе, если были: вид, id и название на момент отправки
+         *
+         * @param mentions the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder mentions(List<ChatHistoryMention> mentions) {
+            this.mentions = mentions;
             return this;
         }
 
@@ -291,6 +320,7 @@ public final class ChatUserMessage implements ChatMessage {
                 Internal.required(at, "at"),
                 attachments,
                 Internal.required(id, "id"),
+                mentions,
                 pending,
                 "user",
                 Internal.required(text, "text"));

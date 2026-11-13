@@ -32,14 +32,26 @@ public final class GetWorkspacePlatformAuditResponse {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final String nextCursor;
 
+    @JsonProperty("total")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long total;
+
+    @JsonProperty("total_more")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean totalMore;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private GetWorkspacePlatformAuditResponse(
         @JsonProperty("data") List<AuditEntry> data,
-        @JsonProperty("next_cursor") String nextCursor) {
+        @JsonProperty("next_cursor") String nextCursor,
+        @JsonProperty("total") Long total,
+        @JsonProperty("total_more") Boolean totalMore) {
         this.data = Internal.requiredList(data, "data");
         this.nextCursor = nextCursor;
+        this.total = total;
+        this.totalMore = totalMore;
     }
 
     /**
@@ -82,6 +94,25 @@ public final class GetWorkspacePlatformAuditResponse {
     }
 
     /**
+     * Сколько всего записей под этими фильтрами (курсор не учитывается). Считается не дальше 10 000:
+     * если записей больше — здесь 10 000 и total_more = true
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long total() {
+        return total;
+    }
+
+    /**
+     * true — записей больше, чем total: писать «больше 10 000», а не точное число
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean totalMore() {
+        return totalMore;
+    }
+
+    /**
      * Returns the properties of the JSON object that this version of the SDK does not model.
      *
      * @return an unmodifiable map of property names to raw JSON values
@@ -107,12 +138,14 @@ public final class GetWorkspacePlatformAuditResponse {
         GetWorkspacePlatformAuditResponse other = (GetWorkspacePlatformAuditResponse) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(data, other.data)
-            && Objects.equals(nextCursor, other.nextCursor);
+            && Objects.equals(nextCursor, other.nextCursor)
+            && Objects.equals(total, other.total)
+            && Objects.equals(totalMore, other.totalMore);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, data, nextCursor);
+        return Objects.hash(additionalProperties, data, nextCursor, total, totalMore);
     }
 
     @Override
@@ -124,6 +157,8 @@ public final class GetWorkspacePlatformAuditResponse {
     public static final class Builder {
         private List<AuditEntry> data;
         private String nextCursor;
+        private Long total;
+        private Boolean totalMore;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -132,6 +167,8 @@ public final class GetWorkspacePlatformAuditResponse {
         private Builder(GetWorkspacePlatformAuditResponse source) {
             this.data = source.data;
             this.nextCursor = source.nextCursor;
+            this.total = source.total;
+            this.totalMore = source.totalMore;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -161,6 +198,29 @@ public final class GetWorkspacePlatformAuditResponse {
         }
 
         /**
+         * Сколько всего записей под этими фильтрами (курсор не учитывается). Считается не дальше 10
+         * 000: если записей больше — здесь 10 000 и total_more = true
+         *
+         * @param total the value (required)
+         * @return this builder
+         */
+        public Builder total(Long total) {
+            this.total = total;
+            return this;
+        }
+
+        /**
+         * true — записей больше, чем total: писать «больше 10 000», а не точное число
+         *
+         * @param totalMore the value (required)
+         * @return this builder
+         */
+        public Builder totalMore(Boolean totalMore) {
+            this.totalMore = totalMore;
+            return this;
+        }
+
+        /**
          * Sets a property this version of the SDK does not model.
          *
          * @param name the JSON property name
@@ -181,7 +241,9 @@ public final class GetWorkspacePlatformAuditResponse {
         public GetWorkspacePlatformAuditResponse build() {
             GetWorkspacePlatformAuditResponse built = new GetWorkspacePlatformAuditResponse(
                 Internal.required(data, "data"),
-                nextCursor);
+                nextCursor,
+                Internal.required(total, "total"),
+                Internal.required(totalMore, "total_more"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

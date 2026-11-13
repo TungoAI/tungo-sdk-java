@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Форма: ip — ИП, too — ТОО, ao — АО, other — другое
+ * Форма: ip — ИП, too — ТОО, ao — АО, other — другое; null — ещё не указана (задаётся в карточке
+ * компании: PATCH /v1/companies/&#123;co&#125;)
  * <p>This is an open enumeration: a value this version of the SDK does not know is preserved (see
  * {@link #value()}) and never fails decoding. Compare with <code>equals</code> or switch on {@link
  * #known()}.

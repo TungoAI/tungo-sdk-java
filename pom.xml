@@ -7,7 +7,7 @@
 
   <groupId>kz.tungo</groupId>
   <artifactId>tungo-sdk</artifactId>
-  <version>0.2.0</version> <!-- x-release-version -->
+  <version>0.3.0</version> <!-- x-release-version -->
   <packaging>jar</packaging>
 
   <name>Tungo SDK for Java</name>

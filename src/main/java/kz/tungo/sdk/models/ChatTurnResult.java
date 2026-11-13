@@ -40,6 +40,14 @@ public final class ChatTurnResult {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ChatTurnError> errors;
 
+    @JsonProperty("followups")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<String> followups;
+
+    @JsonProperty("next_action")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final ChatNextAction nextAction;
+
     @JsonProperty("pending_question")
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final ChatPendingQuestion pendingQuestion;
@@ -72,6 +80,8 @@ public final class ChatTurnResult {
         @JsonProperty("citations") List<ChatCitation> citations,
         @JsonProperty("dialog_id") String dialogId,
         @JsonProperty("errors") List<ChatTurnError> errors,
+        @JsonProperty("followups") List<String> followups,
+        @JsonProperty("next_action") ChatNextAction nextAction,
         @JsonProperty("pending_question") ChatPendingQuestion pendingQuestion,
         @JsonProperty("proposals") List<ChatTurnProposal> proposals,
         @JsonProperty("questions") List<ChatQuestion> questions,
@@ -82,6 +92,8 @@ public final class ChatTurnResult {
         this.citations = Internal.requiredList(citations, "citations");
         this.dialogId = dialogId;
         this.errors = Internal.requiredList(errors, "errors");
+        this.followups = Internal.requiredList(followups, "followups");
+        this.nextAction = nextAction;
         this.pendingQuestion = pendingQuestion;
         this.proposals = Internal.requiredList(proposals, "proposals");
         this.questions = Internal.requiredList(questions, "questions");
@@ -143,6 +155,25 @@ public final class ChatTurnResult {
      */
     public List<ChatTurnError> errors() {
         return errors;
+    }
+
+    /**
+     * Вопросы-продолжения под ответом, до 3, на языке разговора: нажатие — обычный новый вопрос с этим
+     * текстом. Пусто — предложить нечего
+     *
+     * @return the value, never null: a response without this required property does not decode
+     */
+    public List<String> followups() {
+        return followups;
+    }
+
+    /**
+     * Предложенное следующее действие; null — нет
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ChatNextAction> nextAction() {
+        return Optional.ofNullable(nextAction);
     }
 
     /**
@@ -229,6 +260,8 @@ public final class ChatTurnResult {
             && Objects.equals(citations, other.citations)
             && Objects.equals(dialogId, other.dialogId)
             && Objects.equals(errors, other.errors)
+            && Objects.equals(followups, other.followups)
+            && Objects.equals(nextAction, other.nextAction)
             && Objects.equals(pendingQuestion, other.pendingQuestion)
             && Objects.equals(proposals, other.proposals)
             && Objects.equals(questions, other.questions)
@@ -239,7 +272,7 @@ public final class ChatTurnResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, answer, citations, dialogId, errors, pendingQuestion, proposals, questions, stopReason, turnNo, usage);
+        return Objects.hash(additionalProperties, answer, citations, dialogId, errors, followups, nextAction, pendingQuestion, proposals, questions, stopReason, turnNo, usage);
     }
 
     @Override
@@ -253,6 +286,8 @@ public final class ChatTurnResult {
         private List<ChatCitation> citations;
         private String dialogId;
         private List<ChatTurnError> errors;
+        private List<String> followups;
+        private ChatNextAction nextAction;
         private ChatPendingQuestion pendingQuestion;
         private List<ChatTurnProposal> proposals;
         private List<ChatQuestion> questions;
@@ -269,6 +304,8 @@ public final class ChatTurnResult {
             this.citations = source.citations;
             this.dialogId = source.dialogId;
             this.errors = source.errors;
+            this.followups = source.followups;
+            this.nextAction = source.nextAction;
             this.pendingQuestion = source.pendingQuestion;
             this.proposals = source.proposals;
             this.questions = source.questions;
@@ -320,6 +357,29 @@ public final class ChatTurnResult {
          */
         public Builder errors(List<ChatTurnError> errors) {
             this.errors = errors;
+            return this;
+        }
+
+        /**
+         * Вопросы-продолжения под ответом, до 3, на языке разговора: нажатие — обычный новый вопрос с
+         * этим текстом. Пусто — предложить нечего
+         *
+         * @param followups the value (required)
+         * @return this builder
+         */
+        public Builder followups(List<String> followups) {
+            this.followups = followups;
+            return this;
+        }
+
+        /**
+         * Предложенное следующее действие; null — нет
+         *
+         * @param nextAction the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder nextAction(ChatNextAction nextAction) {
+            this.nextAction = nextAction;
             return this;
         }
 
@@ -415,6 +475,8 @@ public final class ChatTurnResult {
                 Internal.required(citations, "citations"),
                 Internal.required(dialogId, "dialog_id"),
                 Internal.required(errors, "errors"),
+                Internal.required(followups, "followups"),
+                nextAction,
                 pendingQuestion,
                 Internal.required(proposals, "proposals"),
                 Internal.required(questions, "questions"),

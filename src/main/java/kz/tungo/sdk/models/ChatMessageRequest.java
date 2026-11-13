@@ -37,6 +37,14 @@ public final class ChatMessageRequest {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final JsonNullable<String> dialogId;
 
+    @JsonProperty("effort")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private final JsonNullable<ChatMessageRequestEffort> effort;
+
+    @JsonProperty("mentions")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<ChatMention> mentions;
+
     @JsonProperty("message")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String message;
@@ -68,6 +76,8 @@ public final class ChatMessageRequest {
         @JsonProperty("attachments") List<ChatAttachment> attachments,
         @JsonProperty("capabilities") List<String> capabilities,
         @JsonProperty("dialog_id") JsonNullable<String> dialogId,
+        @JsonProperty("effort") JsonNullable<ChatMessageRequestEffort> effort,
+        @JsonProperty("mentions") List<ChatMention> mentions,
         @JsonProperty("message") String message,
         @JsonProperty("mode") ChatMessageRequestMode mode,
         @JsonProperty("new_dialog") Boolean newDialog,
@@ -77,6 +87,8 @@ public final class ChatMessageRequest {
         this.attachments = Internal.list(attachments);
         this.capabilities = Internal.list(capabilities);
         this.dialogId = dialogId != null ? dialogId : JsonNullable.undefined();
+        this.effort = effort != null ? effort : JsonNullable.undefined();
+        this.mentions = Internal.list(mentions);
         this.message = message;
         this.mode = mode;
         this.newDialog = newDialog;
@@ -132,6 +144,31 @@ public final class ChatMessageRequest {
      */
     public JsonNullable<String> dialogId() {
         return dialogId;
+    }
+
+    /**
+     * Усилие ИИ на этот вопрос: low &lt; medium &lt; high &lt; xhigh &lt; max — глубже думает, дольше
+     * и дороже (больше расход лимита). Не прислано или null — усилие выбирает Tungo. Только на тарифе
+     * с выбором усилия (max_effort тарифа в GET /v1/plans не null): иначе 402 effort_not_in_plan. Выше
+     * max_effort тарифа — опускается до него. Ответ на уточняющий вопрос продолжает ход с прежним
+     * усилием. Ключу API тариф не нужен: усилие — как прислано
+     *
+     * @return the value, an explicit null, or undefined when the property is absent
+     */
+    public JsonNullable<ChatMessageRequestEffort> effort() {
+        return effort;
+    }
+
+    /**
+     * Упоминания через «&#64;» в этом вопросе, до 10: ИИ получит их вместе с вопросом. Каждое
+     * проверяется на доступ: нет объекта в этой компании или нет права его видеть — 404 (error.code =
+     * mention_not_found, error.index — номер в списке), ход не начинается. Неверная форма — 400
+     * (error.code = mentions_invalid)
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<List<ChatMention>> mentions() {
+        return Optional.ofNullable(mentions);
     }
 
     /**
@@ -220,6 +257,8 @@ public final class ChatMessageRequest {
             && Objects.equals(attachments, other.attachments)
             && Objects.equals(capabilities, other.capabilities)
             && Objects.equals(dialogId, other.dialogId)
+            && Objects.equals(effort, other.effort)
+            && Objects.equals(mentions, other.mentions)
             && Objects.equals(message, other.message)
             && Objects.equals(mode, other.mode)
             && Objects.equals(newDialog, other.newDialog)
@@ -230,7 +269,7 @@ public final class ChatMessageRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, attachments, capabilities, dialogId, message, mode, newDialog, proposalId, stream, turn);
+        return Objects.hash(additionalProperties, attachments, capabilities, dialogId, effort, mentions, message, mode, newDialog, proposalId, stream, turn);
     }
 
     @Override
@@ -243,6 +282,8 @@ public final class ChatMessageRequest {
         private List<ChatAttachment> attachments;
         private List<String> capabilities;
         private JsonNullable<String> dialogId = JsonNullable.undefined();
+        private JsonNullable<ChatMessageRequestEffort> effort = JsonNullable.undefined();
+        private List<ChatMention> mentions;
         private String message;
         private ChatMessageRequestMode mode;
         private Boolean newDialog;
@@ -258,6 +299,8 @@ public final class ChatMessageRequest {
             this.attachments = source.attachments;
             this.capabilities = source.capabilities;
             this.dialogId = source.dialogId;
+            this.effort = source.effort;
+            this.mentions = source.mentions;
             this.message = source.message;
             this.mode = source.mode;
             this.newDialog = source.newDialog;
@@ -315,6 +358,51 @@ public final class ChatMessageRequest {
          */
         public Builder dialogId(JsonNullable<String> dialogId) {
             this.dialogId = dialogId != null ? dialogId : JsonNullable.undefined();
+            return this;
+        }
+
+        /**
+         * Усилие ИИ на этот вопрос: low &lt; medium &lt; high &lt; xhigh &lt; max — глубже думает,
+         * дольше и дороже (больше расход лимита). Не прислано или null — усилие выбирает Tungo. Только
+         * на тарифе с выбором усилия (max_effort тарифа в GET /v1/plans не null): иначе 402
+         * effort_not_in_plan. Выше max_effort тарифа — опускается до него. Ответ на уточняющий вопрос
+         * продолжает ход с прежним усилием. Ключу API тариф не нужен: усилие — как прислано
+         *
+         * @param effort the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder effort(ChatMessageRequestEffort effort) {
+            this.effort = JsonNullable.of(effort);
+            return this;
+        }
+
+        /**
+         * Усилие ИИ на этот вопрос: low &lt; medium &lt; high &lt; xhigh &lt; max — глубже думает,
+         * дольше и дороже (больше расход лимита). Не прислано или null — усилие выбирает Tungo. Только
+         * на тарифе с выбором усилия (max_effort тарифа в GET /v1/plans не null): иначе 402
+         * effort_not_in_plan. Выше max_effort тарифа — опускается до него. Ответ на уточняющий вопрос
+         * продолжает ход с прежним усилием. Ключу API тариф не нужен: усилие — как прислано
+         *
+         * @param effort the value, <code>JsonNullable.ofNull()</code> or
+         *     <code>JsonNullable.undefined()</code>
+         * @return this builder
+         */
+        public Builder effort(JsonNullable<ChatMessageRequestEffort> effort) {
+            this.effort = effort != null ? effort : JsonNullable.undefined();
+            return this;
+        }
+
+        /**
+         * Упоминания через «&#64;» в этом вопросе, до 10: ИИ получит их вместе с вопросом. Каждое
+         * проверяется на доступ: нет объекта в этой компании или нет права его видеть — 404
+         * (error.code = mention_not_found, error.index — номер в списке), ход не начинается. Неверная
+         * форма — 400 (error.code = mentions_invalid)
+         *
+         * @param mentions the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder mentions(List<ChatMention> mentions) {
+            this.mentions = mentions;
             return this;
         }
 
@@ -438,6 +526,8 @@ public final class ChatMessageRequest {
                 attachments,
                 capabilities,
                 dialogId,
+                effort,
+                mentions,
                 message,
                 mode,
                 newDialog,

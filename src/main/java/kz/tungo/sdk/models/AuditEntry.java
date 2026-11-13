@@ -55,6 +55,10 @@ public final class AuditEntry {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final String ip;
 
+    @JsonProperty("object")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final AuditEntryObject object;
+
     @JsonProperty("request_id")
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final String requestId;
@@ -75,6 +79,7 @@ public final class AuditEntry {
         @JsonProperty("data") JsonNode data,
         @JsonProperty("id") String id,
         @JsonProperty("ip") String ip,
+        @JsonProperty("object") AuditEntryObject object,
         @JsonProperty("request_id") String requestId,
         @JsonProperty("target") AuditEntryTarget target) {
         this.action = action;
@@ -85,6 +90,7 @@ public final class AuditEntry {
         this.data = data;
         this.id = id;
         this.ip = ip;
+        this.object = object;
         this.requestId = requestId;
         this.target = target;
     }
@@ -108,23 +114,26 @@ public final class AuditEntry {
     }
 
     /**
-     * Что сделано — машинное имя вида «объект.действие»; подпись по-русски — в action_title. Значения:
-     * - `company.created` — Компания заведена - `company.updated` — Карточка компании изменена -
-     * `company.archived` — Компания убрана в архив - `company.unarchived` — Компания возвращена из
-     * архива - `company.member_added` — Сотруднику дан доступ к компании -
-     * `company.member_role_changed` — Роль сотрудника в компании изменена - `company.member_removed` —
-     * Доступ сотрудника к компании снят - `company.onboarding_waived` — Подключение компании без
-     * оплаты - `company.onboarding_unwaived` — Подключение без оплаты отменено -
-     * `company.onec_connected` — Подключена 1С - `company.onec_updated` — Подключение 1С изменено -
-     * `company.onec_copy_uploaded` — Загружена копия базы 1С - `company.onec_copy_held` — Копия базы
-     * 1С собрана, но не подключена: пока она собиралась, подключили другое -
-     * `company.onec_connector_code_created` — Выдан код привязки программы в офисе -
-     * `company.onec_connector_paired` — Программа в офисе привязана - `company.onec_connector_rotated`
-     * — Ключ программы в офисе заменён - `company.onec_connector_revoked` — Программа в офисе отвязана
-     * - `company.onec_connector_link_approved` — Привязка программы в офисе одобрена в кабинете -
+     * Код действия вида «объект.действие». Текст для человека собирайте сами на его языке: по этому
+     * коду и параметрам из data (ниже — что значит каждый код). Значения: - `company.created` —
+     * Компания заведена - `company.updated` — Карточка компании изменена - `company.archived` —
+     * Компания убрана в архив - `company.unarchived` — Компания возвращена из архива -
+     * `company.member_added` — Сотруднику дан доступ к компании - `company.member_role_changed` — Роль
+     * сотрудника в компании изменена - `company.member_removed` — Доступ сотрудника к компании снят -
+     * `company.onboarding_waived` — Подключение компании без оплаты - `company.onboarding_unwaived` —
+     * Подключение без оплаты отменено - `company.onec_connected` — Подключена 1С -
+     * `company.onec_updated` — Подключение 1С изменено - `company.onec_copy_uploaded` — Загружена
+     * копия базы 1С - `company.onec_copy_held` — Копия базы 1С собрана, но не подключена: пока она
+     * собиралась, подключили другое - `company.onec_connector_code_created` — Выдан код привязки
+     * программы в офисе - `company.onec_connector_paired` — Программа в офисе привязана -
+     * `company.onec_connector_rotated` — Ключ программы в офисе заменён -
+     * `company.onec_connector_rotate_refused` — Отказ в повторе смены ключа программы в офисе: прежний
+     * ключ без метки той смены - `company.onec_connector_revoked` — Программа в офисе отвязана -
+     * `company.onec_connector_link_approved` — Привязка программы в офисе одобрена в кабинете -
      * `connector.link_created` — Программа в офисе запросила привязку через браузер -
      * `connector.link_denied` — Привязка программы в офисе отклонена - `company.onec_link_approved` —
      * Вход в Tungo из 1С подтверждён - `company.onec_link_revoked` — Вход в Tungo из 1С отозван -
+     * `onec_link.wrong_match` — Вход в Tungo из 1С отменён: на сайте нажато не то число сверки -
      * `company.profile_rebuild` — Справка о компании пересобрана - `workspace.member_joined` —
      * Сотрудник вступил в организацию - `workspace.member_role_changed` — Роль сотрудника в
      * организации изменена - `workspace.member_removed` — Сотрудник удалён из организации -
@@ -140,7 +149,9 @@ public final class AuditEntry {
      * `workspace.sso_domain_verification_requested` — SSO: запрошено подтверждение домена -
      * `workspace.sso_domain_verified` — SSO: домен подтверждён - `workspace.ownership_transferred` —
      * Владение организацией передано - `workspace.deleted` — Организация удалена - `workspace.created`
-     * — Создана команда - `workspace.converted_to_team` — Личная организация стала командой -
+     * — Создана команда - `team.checkout_abandoned` — Оформление Team не завершено: черновик команды
+     * убран - `enterprise.request_created` — Отправлена заявка на Enterprise -
+     * `workspace.converted_to_team` — Личная организация стала командой -
      * `workspace.deletion_scheduled` — Владелец запланировал удаление организации -
      * `workspace.deletion_cancelled` — Удаление организации отменено - `workspace.invitation_resent` —
      * Приглашение отправлено ещё раз - `team.seats_purchased` — Докуплены места - `team.seats_reduced`
@@ -169,14 +180,15 @@ public final class AuditEntry {
      * `automation.paused` — Автоматизации компании поставлены на паузу - `automation.resumed` —
      * Автоматизации компании сняты с паузы - `automation.run.cancel` — Запуск автоматизации отменён -
      * `billing.profile.updated` — Реквизиты для счетов изменены - `billing.payment_method.disabled` —
-     * Карта отключена - `billing.refund.succeeded` — Деньги возвращены - `subscription.created` —
-     * Подписка оформлена - `subscription.changed` — Тариф изменён - `subscription.cancel_scheduled` —
-     * Подписка отменена с конца периода - `subscription.resumed` — Отмена подписки снята -
-     * `extra_usage.configured` — Настройки доп. использования изменены - `extra_usage.adjusted` —
-     * Баланс доп. использования скорректирован - `platform.configured` — Настройки платформы изменены
-     * - `platform.adjusted` — Баланс платформы скорректирован - `extra_usage.member_cap_set` — Личный
-     * потолок доп. использования изменён - `extra_usage.alert_thresholds_set` — Пороги оповещений о
-     * потолке организации изменены - `company.spend_cap_set` — Месячный потолок компании изменён -
+     * Карта отключена - `billing.refund.succeeded` — Деньги возвращены - `billing.manual_charge` —
+     * Админ платформы списал деньги с карты вручную - `subscription.created` — Подписка оформлена -
+     * `subscription.changed` — Тариф изменён - `subscription.cancel_scheduled` — Подписка отменена с
+     * конца периода - `subscription.resumed` — Отмена подписки снята - `extra_usage.configured` —
+     * Настройки доп. использования изменены - `extra_usage.adjusted` — Баланс доп. использования
+     * скорректирован - `platform.configured` — Настройки платформы изменены - `platform.adjusted` —
+     * Баланс платформы скорректирован - `extra_usage.member_cap_set` — Личный потолок доп.
+     * использования изменён - `extra_usage.alert_thresholds_set` — Пороги оповещений о потолке
+     * организации изменены - `company.spend_cap_set` — Месячный потолок компании изменён -
      * `team.analytics_exported` — Аналитика команды выгружена в CSV - `team.spend_exported` — Расходы
      * по людям выгружены в CSV - `ai_budget.member_set` — Лимит ИИ сотрудника задан -
      * `ai_budget.member_reset` — Лимит ИИ сотрудника сброшен - `spend.cap_threshold_reached` — Расход
@@ -186,19 +198,54 @@ public final class AuditEntry {
      * условия - `account.deletion_code_sent` — Запрошен код удаления аккаунта -
      * `account.deletion_scheduled` — Аккаунт помечен к удалению - `account.deletion_cancelled` —
      * Удаление аккаунта отменено - `account.deleted` — Аккаунт удалён и обезличен -
-     * `admin.workspace.blocked` — Организация заблокирована платформой - `admin.workspace.unblocked` —
-     * Организация разблокирована платформой - `admin.workspace.training_consent` — Согласие на
-     * обучение изменено (платформа) - `admin.user.platform_roles_changed` — Роли платформы изменены -
+     * `account.email_code_sent` — Запрошен код подтверждения почты (аккаунт Telegram) -
+     * `account.email_bound` — Почта привязана к аккаунту Telegram - `account.telegram_merged` —
+     * Telegram привязан к аккаунту с подтверждённой почтой, аккаунт Telegram закрыт -
+     * `account.google_linked` — Вход через Google привязал Google к аккаунту с той же почтой
+     * (sessions_closed — почта не была подтверждена: прежние сессии закрыты) -
+     * `account.telegram_merge_refused` — Склейка аккаунта Telegram с аккаунтом почты отклонена
+     * (данные, другой Telegram или почта закрыта) - `admin.ads.conversions_released` — Удержанные
+     * рекламные конверсии отправлены вручную - `admin.ads.conversions_rejected` — Рекламные конверсии
+     * отклонены - `admin.ads.signups_exported` — Выгрузка рекламных регистраций с IP и User-Agent
+     * (CSV) - `admin.access.signed_in` — Вход в админку по пропуску Cloudflare Access -
+     * `admin.access.refused` — Вход в админку по пропуску Cloudflare Access отклонён -
+     * `admin.two_factor.verified` — Администратор платформы подтвердил вход вторым фактором -
+     * `admin.two_factor.enable_requested` — Сотрудник платформы начал включать второй фактор (с кодом
+     * из почты) - `admin.two_factor.enabled` — Сотрудник платформы включил второй фактор -
+     * `admin.two_factor.disabled` — Сотрудник платформы отключил второй фактор (с кодом из почты) -
+     * `admin.session.signed_in` — Вход в админку по сессии со вторым фактором - `admin.user.banned` —
+     * Вход пользователю закрыт платформой - `admin.user.unbanned` — Вход пользователю открыт
+     * платформой - `admin.workspace.blocked` — Организация заблокирована платформой -
+     * `admin.workspace.unblocked` — Организация разблокирована платформой -
+     * `admin.workspace.training_consent` — Согласие на обучение изменено (платформа) -
+     * `admin.user.platform_roles_changed` — Роли платформы изменены -
      * `admin.user.free_eligibility_changed` — Бесплатный лимит пользователя выдан или снят вручную
-     * (платформа) - `admin.training.exported` — Выгрузка для обучения (платформа) -
-     * `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными данными -
-     * `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника» (платформа) -
-     * `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж: отправлен в банк -
-     * `billing.payment.requires_action` — Платёж: ждёт 3-D Secure - `billing.payment.authorized` —
-     * Платёж: одобрен банком - `billing.payment.succeeded` — Платёж: оплачен -
-     * `billing.payment.verified` — Платёж: карта проверена - `billing.payment.failed` — Платёж: не
-     * прошёл - `billing.payment.cancelled` — Платёж: отменён - `billing.payment.partially_refunded` —
-     * Платёж: возвращён частично - `billing.payment.refunded` — Платёж: возвращён
+     * (платформа) - `admin.user.limit_resets_granted` — Человеку выданы сбросы лимита (платформа) -
+     * `admin.user.limit_resets_revoked` — Выданные сбросы лимита отозваны (платформа) -
+     * `usage.limit_reset_applied` — Применён сброс лимита - `referral.claimed` — Регистрация по
+     * приглашению друга - `referral.rewarded` — За приглашённого друга выдан сброс лимита -
+     * `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён (платформа) -
+     * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` —
+     * Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран
+     * вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными
+     * данными - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена
+     * (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа) -
+     * `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными данными -
+     * `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
+     * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
+     * `admin.payment.pd_viewed` — Поддержка открыла платёж с реквизитами плательщика и обменом с
+     * банком - `site.post_published` — Статья блога опубликована на сайте (платформа) -
+     * `site.post_unpublished` — Статья блога снята с сайта (платформа) - `site.post_deleted` —
+     * Черновик статьи блога удалён (платформа) - `site.legal_published` — Опубликована новая редакция
+     * документа сайта (платформа) - `site.trackers_saved` — Изменены счётчики и коды подтверждения
+     * сайта (платформа) - `canary.triggered` — Сработала приманка: украденный ключ или почта
+     * «сотрудника» (платформа) - `billing.payment.new` — Платёж: создан - `billing.payment.pending` —
+     * Платёж: отправлен в банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
+     * `billing.payment.authorized` — Платёж: одобрен банком - `billing.payment.succeeded` — Платёж:
+     * оплачен - `billing.payment.verified` — Платёж: карта проверена - `billing.payment.failed` —
+     * Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён -
+     * `billing.payment.partially_refunded` — Платёж: возвращён частично - `billing.payment.refunded` —
+     * Платёж: возвращён
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -207,10 +254,13 @@ public final class AuditEntry {
     }
 
     /**
-     * Что сделано, по-русски — для показа
+     * Что сделано, готовой фразой по-русски. Оставлено для совместимости: фраза всегда русская,
+     * поэтому для показа берите код action и параметры data и подставляйте текст на языке человека
      *
      * @return the value; null only if the API omitted this required property
+     * @deprecated the API contract marks this as deprecated
      */
+    @Deprecated
     public String actionTitle() {
         return actionTitle;
     }
@@ -244,8 +294,9 @@ public final class AuditEntry {
     }
 
     /**
-     * Подробности действия (JSON, ключи snake_case): например &#123; before, after &#125; у изменений.
-     * Вид зависит от action — показывать как дополнительные сведения
+     * Параметры действия (JSON, ключи snake_case) — для подстановки в текст и для подробностей:
+     * например &#123; role &#125; у смены роли, &#123; from, amount_tiyn, kind &#125; у платежа,
+     * &#123; before, after &#125; у изменений. Набор зависит от action
      *
      * @return the value, or empty when it is absent or null
      */
@@ -269,6 +320,17 @@ public final class AuditEntry {
      */
     public Optional<String> ip() {
         return Optional.ofNullable(ip);
+    }
+
+    /**
+     * Над чем сделано — с названием, чтобы не показывать безликое «Организация»: в отличие от target,
+     * у действий с вебхуком это сам адрес вебхука, у платежа есть сумма и назначение. null — без
+     * отдельного объекта. По ключу API названия, суммы и назначения нет (null): они только по сессии
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<AuditEntryObject> object() {
+        return Optional.ofNullable(object);
     }
 
     /**
@@ -322,13 +384,14 @@ public final class AuditEntry {
             && Objects.equals(data, other.data)
             && Objects.equals(id, other.id)
             && Objects.equals(ip, other.ip)
+            && Objects.equals(object, other.object)
             && Objects.equals(requestId, other.requestId)
             && Objects.equals(target, other.target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, action, actionTitle, actor, at, companyId, data, id, ip, requestId, target);
+        return Objects.hash(additionalProperties, action, actionTitle, actor, at, companyId, data, id, ip, object, requestId, target);
     }
 
     @Override
@@ -346,6 +409,7 @@ public final class AuditEntry {
         private JsonNode data;
         private String id;
         private String ip;
+        private AuditEntryObject object;
         private String requestId;
         private AuditEntryTarget target;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -362,16 +426,18 @@ public final class AuditEntry {
             this.data = source.data;
             this.id = source.id;
             this.ip = source.ip;
+            this.object = source.object;
             this.requestId = source.requestId;
             this.target = source.target;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
         /**
-         * Что сделано — машинное имя вида «объект.действие»; подпись по-русски — в action_title.
-         * Значения: - `company.created` — Компания заведена - `company.updated` — Карточка компании
-         * изменена - `company.archived` — Компания убрана в архив - `company.unarchived` — Компания
-         * возвращена из архива - `company.member_added` — Сотруднику дан доступ к компании -
+         * Код действия вида «объект.действие». Текст для человека собирайте сами на его языке: по
+         * этому коду и параметрам из data (ниже — что значит каждый код). Значения: -
+         * `company.created` — Компания заведена - `company.updated` — Карточка компании изменена -
+         * `company.archived` — Компания убрана в архив - `company.unarchived` — Компания возвращена из
+         * архива - `company.member_added` — Сотруднику дан доступ к компании -
          * `company.member_role_changed` — Роль сотрудника в компании изменена -
          * `company.member_removed` — Доступ сотрудника к компании снят - `company.onboarding_waived` —
          * Подключение компании без оплаты - `company.onboarding_unwaived` — Подключение без оплаты
@@ -381,13 +447,15 @@ public final class AuditEntry {
          * подключили другое - `company.onec_connector_code_created` — Выдан код привязки программы в
          * офисе - `company.onec_connector_paired` — Программа в офисе привязана -
          * `company.onec_connector_rotated` — Ключ программы в офисе заменён -
-         * `company.onec_connector_revoked` — Программа в офисе отвязана -
-         * `company.onec_connector_link_approved` — Привязка программы в офисе одобрена в кабинете -
-         * `connector.link_created` — Программа в офисе запросила привязку через браузер -
+         * `company.onec_connector_rotate_refused` — Отказ в повторе смены ключа программы в офисе:
+         * прежний ключ без метки той смены - `company.onec_connector_revoked` — Программа в офисе
+         * отвязана - `company.onec_connector_link_approved` — Привязка программы в офисе одобрена в
+         * кабинете - `connector.link_created` — Программа в офисе запросила привязку через браузер -
          * `connector.link_denied` — Привязка программы в офисе отклонена -
          * `company.onec_link_approved` — Вход в Tungo из 1С подтверждён - `company.onec_link_revoked`
-         * — Вход в Tungo из 1С отозван - `company.profile_rebuild` — Справка о компании пересобрана -
-         * `workspace.member_joined` — Сотрудник вступил в организацию -
+         * — Вход в Tungo из 1С отозван - `onec_link.wrong_match` — Вход в Tungo из 1С отменён: на
+         * сайте нажато не то число сверки - `company.profile_rebuild` — Справка о компании пересобрана
+         * - `workspace.member_joined` — Сотрудник вступил в организацию -
          * `workspace.member_role_changed` — Роль сотрудника в организации изменена -
          * `workspace.member_removed` — Сотрудник удалён из организации -
          * `workspace.member_access_revoked` — Доступы сотрудника к компаниям сняты -
@@ -402,9 +470,11 @@ public final class AuditEntry {
          * `workspace.sso_domain_verification_requested` — SSO: запрошено подтверждение домена -
          * `workspace.sso_domain_verified` — SSO: домен подтверждён - `workspace.ownership_transferred`
          * — Владение организацией передано - `workspace.deleted` — Организация удалена -
-         * `workspace.created` — Создана команда - `workspace.converted_to_team` — Личная организация
-         * стала командой - `workspace.deletion_scheduled` — Владелец запланировал удаление организации
-         * - `workspace.deletion_cancelled` — Удаление организации отменено -
+         * `workspace.created` — Создана команда - `team.checkout_abandoned` — Оформление Team не
+         * завершено: черновик команды убран - `enterprise.request_created` — Отправлена заявка на
+         * Enterprise - `workspace.converted_to_team` — Личная организация стала командой -
+         * `workspace.deletion_scheduled` — Владелец запланировал удаление организации -
+         * `workspace.deletion_cancelled` — Удаление организации отменено -
          * `workspace.invitation_resent` — Приглашение отправлено ещё раз - `team.seats_purchased` —
          * Докуплены места - `team.seats_reduced` — Сокращено число мест с продления -
          * `admin.workspace.kind_changed` — Администратор платформы сменил вид организации -
@@ -434,37 +504,70 @@ public final class AuditEntry {
          * Автоматизации компании сняты с паузы - `automation.run.cancel` — Запуск автоматизации
          * отменён - `billing.profile.updated` — Реквизиты для счетов изменены -
          * `billing.payment_method.disabled` — Карта отключена - `billing.refund.succeeded` — Деньги
-         * возвращены - `subscription.created` — Подписка оформлена - `subscription.changed` — Тариф
-         * изменён - `subscription.cancel_scheduled` — Подписка отменена с конца периода -
-         * `subscription.resumed` — Отмена подписки снята - `extra_usage.configured` — Настройки доп.
-         * использования изменены - `extra_usage.adjusted` — Баланс доп. использования скорректирован -
-         * `platform.configured` — Настройки платформы изменены - `platform.adjusted` — Баланс
-         * платформы скорректирован - `extra_usage.member_cap_set` — Личный потолок доп. использования
-         * изменён - `extra_usage.alert_thresholds_set` — Пороги оповещений о потолке организации
-         * изменены - `company.spend_cap_set` — Месячный потолок компании изменён -
-         * `team.analytics_exported` — Аналитика команды выгружена в CSV - `team.spend_exported` —
-         * Расходы по людям выгружены в CSV - `ai_budget.member_set` — Лимит ИИ сотрудника задан -
-         * `ai_budget.member_reset` — Лимит ИИ сотрудника сброшен - `spend.cap_threshold_reached` —
-         * Расход дошёл до порога потолка - `spend.company_cap_reached` — Компания упёрлась в месячный
-         * потолок - `plan.created` — Тариф заведён (платформа) - `plan.updated` — Тариф изменён
-         * (платформа) - `usage_rate.added` — Цена расхода добавлена (платформа) -
-         * `user.terms.accepted` — Приняты условия - `account.deletion_code_sent` — Запрошен код
-         * удаления аккаунта - `account.deletion_scheduled` — Аккаунт помечен к удалению -
-         * `account.deletion_cancelled` — Удаление аккаунта отменено - `account.deleted` — Аккаунт
-         * удалён и обезличен - `admin.workspace.blocked` — Организация заблокирована платформой -
-         * `admin.workspace.unblocked` — Организация разблокирована платформой -
+         * возвращены - `billing.manual_charge` — Админ платформы списал деньги с карты вручную -
+         * `subscription.created` — Подписка оформлена - `subscription.changed` — Тариф изменён -
+         * `subscription.cancel_scheduled` — Подписка отменена с конца периода - `subscription.resumed`
+         * — Отмена подписки снята - `extra_usage.configured` — Настройки доп. использования изменены -
+         * `extra_usage.adjusted` — Баланс доп. использования скорректирован - `platform.configured` —
+         * Настройки платформы изменены - `platform.adjusted` — Баланс платформы скорректирован -
+         * `extra_usage.member_cap_set` — Личный потолок доп. использования изменён -
+         * `extra_usage.alert_thresholds_set` — Пороги оповещений о потолке организации изменены -
+         * `company.spend_cap_set` — Месячный потолок компании изменён - `team.analytics_exported` —
+         * Аналитика команды выгружена в CSV - `team.spend_exported` — Расходы по людям выгружены в CSV
+         * - `ai_budget.member_set` — Лимит ИИ сотрудника задан - `ai_budget.member_reset` — Лимит ИИ
+         * сотрудника сброшен - `spend.cap_threshold_reached` — Расход дошёл до порога потолка -
+         * `spend.company_cap_reached` — Компания упёрлась в месячный потолок - `plan.created` — Тариф
+         * заведён (платформа) - `plan.updated` — Тариф изменён (платформа) - `usage_rate.added` — Цена
+         * расхода добавлена (платформа) - `user.terms.accepted` — Приняты условия -
+         * `account.deletion_code_sent` — Запрошен код удаления аккаунта - `account.deletion_scheduled`
+         * — Аккаунт помечен к удалению - `account.deletion_cancelled` — Удаление аккаунта отменено -
+         * `account.deleted` — Аккаунт удалён и обезличен - `account.email_code_sent` — Запрошен код
+         * подтверждения почты (аккаунт Telegram) - `account.email_bound` — Почта привязана к аккаунту
+         * Telegram - `account.telegram_merged` — Telegram привязан к аккаунту с подтверждённой почтой,
+         * аккаунт Telegram закрыт - `account.google_linked` — Вход через Google привязал Google к
+         * аккаунту с той же почтой (sessions_closed — почта не была подтверждена: прежние сессии
+         * закрыты) - `account.telegram_merge_refused` — Склейка аккаунта Telegram с аккаунтом почты
+         * отклонена (данные, другой Telegram или почта закрыта) - `admin.ads.conversions_released` —
+         * Удержанные рекламные конверсии отправлены вручную - `admin.ads.conversions_rejected` —
+         * Рекламные конверсии отклонены - `admin.ads.signups_exported` — Выгрузка рекламных
+         * регистраций с IP и User-Agent (CSV) - `admin.access.signed_in` — Вход в админку по пропуску
+         * Cloudflare Access - `admin.access.refused` — Вход в админку по пропуску Cloudflare Access
+         * отклонён - `admin.two_factor.verified` — Администратор платформы подтвердил вход вторым
+         * фактором - `admin.two_factor.enable_requested` — Сотрудник платформы начал включать второй
+         * фактор (с кодом из почты) - `admin.two_factor.enabled` — Сотрудник платформы включил второй
+         * фактор - `admin.two_factor.disabled` — Сотрудник платформы отключил второй фактор (с кодом
+         * из почты) - `admin.session.signed_in` — Вход в админку по сессии со вторым фактором -
+         * `admin.user.banned` — Вход пользователю закрыт платформой - `admin.user.unbanned` — Вход
+         * пользователю открыт платформой - `admin.workspace.blocked` — Организация заблокирована
+         * платформой - `admin.workspace.unblocked` — Организация разблокирована платформой -
          * `admin.workspace.training_consent` — Согласие на обучение изменено (платформа) -
          * `admin.user.platform_roles_changed` — Роли платформы изменены -
          * `admin.user.free_eligibility_changed` — Бесплатный лимит пользователя выдан или снят вручную
-         * (платформа) - `admin.training.exported` — Выгрузка для обучения (платформа) -
-         * `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными данными -
-         * `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника» (платформа)
-         * - `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж: отправлен в
-         * банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
-         * `billing.payment.authorized` — Платёж: одобрен банком - `billing.payment.succeeded` —
-         * Платёж: оплачен - `billing.payment.verified` — Платёж: карта проверена -
-         * `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён
-         * - `billing.payment.partially_refunded` — Платёж: возвращён частично -
+         * (платформа) - `admin.user.limit_resets_granted` — Человеку выданы сбросы лимита (платформа)
+         * - `admin.user.limit_resets_revoked` — Выданные сбросы лимита отозваны (платформа) -
+         * `usage.limit_reset_applied` — Применён сброс лимита - `referral.claimed` — Регистрация по
+         * приглашению друга - `referral.rewarded` — За приглашённого друга выдан сброс лимита -
+         * `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён (платформа) -
+         * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` —
+         * Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран
+         * вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными
+         * данными - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена
+         * (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа)
+         * - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными данными
+         * - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
+         * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
+         * `admin.payment.pd_viewed` — Поддержка открыла платёж с реквизитами плательщика и обменом с
+         * банком - `site.post_published` — Статья блога опубликована на сайте (платформа) -
+         * `site.post_unpublished` — Статья блога снята с сайта (платформа) - `site.post_deleted` —
+         * Черновик статьи блога удалён (платформа) - `site.legal_published` — Опубликована новая
+         * редакция документа сайта (платформа) - `site.trackers_saved` — Изменены счётчики и коды
+         * подтверждения сайта (платформа) - `canary.triggered` — Сработала приманка: украденный ключ
+         * или почта «сотрудника» (платформа) - `billing.payment.new` — Платёж: создан -
+         * `billing.payment.pending` — Платёж: отправлен в банк - `billing.payment.requires_action` —
+         * Платёж: ждёт 3-D Secure - `billing.payment.authorized` — Платёж: одобрен банком -
+         * `billing.payment.succeeded` — Платёж: оплачен - `billing.payment.verified` — Платёж: карта
+         * проверена - `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled` —
+         * Платёж: отменён - `billing.payment.partially_refunded` — Платёж: возвращён частично -
          * `billing.payment.refunded` — Платёж: возвращён
          *
          * @param action the value (required)
@@ -476,11 +579,14 @@ public final class AuditEntry {
         }
 
         /**
-         * Что сделано, по-русски — для показа
+         * Что сделано, готовой фразой по-русски. Оставлено для совместимости: фраза всегда русская,
+         * поэтому для показа берите код action и параметры data и подставляйте текст на языке человека
          *
          * @param actionTitle the value (required)
          * @return this builder
+         * @deprecated the API contract marks this as deprecated
          */
+        @Deprecated
         public Builder actionTitle(String actionTitle) {
             this.actionTitle = actionTitle;
             return this;
@@ -521,8 +627,9 @@ public final class AuditEntry {
         }
 
         /**
-         * Подробности действия (JSON, ключи snake_case): например &#123; before, after &#125; у
-         * изменений. Вид зависит от action — показывать как дополнительные сведения
+         * Параметры действия (JSON, ключи snake_case) — для подстановки в текст и для подробностей:
+         * например &#123; role &#125; у смены роли, &#123; from, amount_tiyn, kind &#125; у платежа,
+         * &#123; before, after &#125; у изменений. Набор зависит от action
          *
          * @param data the value; null leaves the property out
          * @return this builder
@@ -551,6 +658,20 @@ public final class AuditEntry {
          */
         public Builder ip(String ip) {
             this.ip = ip;
+            return this;
+        }
+
+        /**
+         * Над чем сделано — с названием, чтобы не показывать безликое «Организация»: в отличие от
+         * target, у действий с вебхуком это сам адрес вебхука, у платежа есть сумма и назначение. null
+         * — без отдельного объекта. По ключу API названия, суммы и назначения нет (null): они только
+         * по сессии
+         *
+         * @param object the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder object(AuditEntryObject object) {
+            this.object = object;
             return this;
         }
 
@@ -604,6 +725,7 @@ public final class AuditEntry {
                 data,
                 Internal.required(id, "id"),
                 ip,
+                object,
                 requestId,
                 target);
             built.additionalProperties.putAll(additionalProperties);

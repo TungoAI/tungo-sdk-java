@@ -41,7 +41,7 @@ public final class CompanyListItem {
     private final String id;
 
     @JsonProperty("legal_form")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private final CompanyLegalForm legalForm;
 
     @JsonProperty("name")
@@ -154,10 +154,10 @@ public final class CompanyListItem {
     /**
      * The <code>legal_form</code> property.
      *
-     * @return the value; null only if the API omitted this required property
+     * @return the value, or empty when it is absent or null
      */
-    public CompanyLegalForm legalForm() {
-        return legalForm;
+    public Optional<CompanyLegalForm> legalForm() {
+        return Optional.ofNullable(legalForm);
     }
 
     /**
@@ -345,7 +345,7 @@ public final class CompanyListItem {
         /**
          * The <code>legal_form</code> property.
          *
-         * @param legalForm the value (required)
+         * @param legalForm the value; null sends an explicit JSON null
          * @return this builder
          */
         public Builder legalForm(CompanyLegalForm legalForm) {
@@ -446,7 +446,7 @@ public final class CompanyListItem {
                 Internal.required(counts, "counts"),
                 Internal.required(createdAt, "created_at"),
                 Internal.required(id, "id"),
-                Internal.required(legalForm, "legal_form"),
+                legalForm,
                 Internal.required(name, "name"),
                 Internal.required(permissions, "permissions"),
                 Internal.required(role, "role"),

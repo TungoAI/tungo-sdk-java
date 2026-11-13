@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Только у code = budget: day — дневной лимит, dialog — лимит разговора
+ * Только у code = budget — почему ход остановлен: - `day` — дневной лимит человека исчерпан —
+ * продолжить завтра (по Алматы) или поднять лимит - `dialog` — лимит разговора исчерпан — начать новый
+ * разговор - `turn` — потолок расхода на один вопрос — уточнить или разбить вопрос - `plan` — лимит
+ * тарифа или доп. использования организации — ждать обновления лимита или поднять его в настройках
+ * оплаты - `disabled` — ИИ временно выключен на платформе — повторить позже - `meter` — расход не
+ * удалось проверить или записать — ход остановлен, чтобы не тратить вслепую; повторить позже
  * <p>This is an open enumeration: a value this version of the SDK does not know is preserved (see
  * {@link #value()}) and never fails decoding. Compare with <code>equals</code> or switch on {@link
  * #known()}.
@@ -21,7 +26,19 @@ public final class ChatTurnErrorLimitKind {
     /** The value <code>dialog</code>. */
     public static final ChatTurnErrorLimitKind DIALOG = new ChatTurnErrorLimitKind("dialog");
 
-    private static final List<ChatTurnErrorLimitKind> VALUES = Collections.unmodifiableList(Arrays.asList(DAY, DIALOG));
+    /** The value <code>turn</code>. */
+    public static final ChatTurnErrorLimitKind TURN = new ChatTurnErrorLimitKind("turn");
+
+    /** The value <code>plan</code>. */
+    public static final ChatTurnErrorLimitKind PLAN = new ChatTurnErrorLimitKind("plan");
+
+    /** The value <code>disabled</code>. */
+    public static final ChatTurnErrorLimitKind DISABLED = new ChatTurnErrorLimitKind("disabled");
+
+    /** The value <code>meter</code>. */
+    public static final ChatTurnErrorLimitKind METER = new ChatTurnErrorLimitKind("meter");
+
+    private static final List<ChatTurnErrorLimitKind> VALUES = Collections.unmodifiableList(Arrays.asList(DAY, DIALOG, TURN, PLAN, DISABLED, METER));
 
     private final String value;
 
@@ -78,6 +95,14 @@ public final class ChatTurnErrorLimitKind {
                 return Known.DAY;
             case "dialog":
                 return Known.DIALOG;
+            case "turn":
+                return Known.TURN;
+            case "plan":
+                return Known.PLAN;
+            case "disabled":
+                return Known.DISABLED;
+            case "meter":
+                return Known.METER;
             default:
                 return Known.UNKNOWN_VALUE;
         }
@@ -113,6 +138,14 @@ public final class ChatTurnErrorLimitKind {
         DAY,
         /** The value <code>dialog</code>. */
         DIALOG,
+        /** The value <code>turn</code>. */
+        TURN,
+        /** The value <code>plan</code>. */
+        PLAN,
+        /** The value <code>disabled</code>. */
+        DISABLED,
+        /** The value <code>meter</code>. */
+        METER,
         /** A value this version of the SDK does not know. */
         UNKNOWN_VALUE
     }

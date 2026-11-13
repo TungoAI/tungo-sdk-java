@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /** Runs every code sample of the README (examples/kz/tungo/examples/ReadmeExamples.java). */
 class ReadmeExamplesTest {
     private static final String COMPANY = "{\"id\":\"co_1\",\"permissions\":[],\"name\":\"Ромашка\"}";
-    private static final String TURN = "{\"answer\":\"5 400 ₸\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"proposals\":[],\"questions\":[]}";
+    private static final String TURN = "{\"answer\":\"5 400 ₸\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"followups\":[],\"proposals\":[],\"questions\":[]}";
     private static final String STREAM = "event: text\ndata: {\"type\":\"text\",\"delta\":\"НДС \"}\n\n"
         + "event: tool\ndata: {\"type\":\"tool\",\"name\":\"ledger\",\"status\":\"running\"}\n\n"
         + "event: text\ndata: {\"type\":\"text\",\"delta\":\"5 400 ₸\"}\n\n"

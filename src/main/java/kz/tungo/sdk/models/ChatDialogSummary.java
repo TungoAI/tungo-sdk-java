@@ -38,6 +38,10 @@ public final class ChatDialogSummary {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String title;
 
+    @JsonProperty("title_source")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ChatTitleSource titleSource;
+
     @JsonProperty("updated_at")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String updatedAt;
@@ -50,11 +54,13 @@ public final class ChatDialogSummary {
         @JsonProperty("message_count") Double messageCount,
         @JsonProperty("running") Boolean running,
         @JsonProperty("title") String title,
+        @JsonProperty("title_source") ChatTitleSource titleSource,
         @JsonProperty("updated_at") String updatedAt) {
         this.id = id;
         this.messageCount = messageCount;
         this.running = running;
         this.title = title;
+        this.titleSource = titleSource;
         this.updatedAt = updatedAt;
     }
 
@@ -105,13 +111,22 @@ public final class ChatDialogSummary {
     }
 
     /**
-     * Заголовок — первый вопрос одной строкой (до 64 знаков, длиннее — с «…»); вопрос из одних файлов
-     * — их имена
+     * Название одной строкой (до 64 знаков, длиннее — с «…»): человека, иначе от ИИ, иначе первый
+     * вопрос (вопрос из одних файлов — их имена). Откуда оно — title_source
      *
      * @return the value; null only if the API omitted this required property
      */
     public String title() {
         return title;
+    }
+
+    /**
+     * The <code>title_source</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ChatTitleSource titleSource() {
+        return titleSource;
     }
 
     /**
@@ -152,12 +167,13 @@ public final class ChatDialogSummary {
             && Objects.equals(messageCount, other.messageCount)
             && Objects.equals(running, other.running)
             && Objects.equals(title, other.title)
+            && Objects.equals(titleSource, other.titleSource)
             && Objects.equals(updatedAt, other.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, id, messageCount, running, title, updatedAt);
+        return Objects.hash(additionalProperties, id, messageCount, running, title, titleSource, updatedAt);
     }
 
     @Override
@@ -171,6 +187,7 @@ public final class ChatDialogSummary {
         private Double messageCount;
         private Boolean running;
         private String title;
+        private ChatTitleSource titleSource;
         private String updatedAt;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
@@ -182,6 +199,7 @@ public final class ChatDialogSummary {
             this.messageCount = source.messageCount;
             this.running = source.running;
             this.title = source.title;
+            this.titleSource = source.titleSource;
             this.updatedAt = source.updatedAt;
             this.additionalProperties.putAll(source.additionalProperties);
         }
@@ -221,14 +239,25 @@ public final class ChatDialogSummary {
         }
 
         /**
-         * Заголовок — первый вопрос одной строкой (до 64 знаков, длиннее — с «…»); вопрос из одних
-         * файлов — их имена
+         * Название одной строкой (до 64 знаков, длиннее — с «…»): человека, иначе от ИИ, иначе первый
+         * вопрос (вопрос из одних файлов — их имена). Откуда оно — title_source
          *
          * @param title the value (required)
          * @return this builder
          */
         public Builder title(String title) {
             this.title = title;
+            return this;
+        }
+
+        /**
+         * The <code>title_source</code> property.
+         *
+         * @param titleSource the value (required)
+         * @return this builder
+         */
+        public Builder titleSource(ChatTitleSource titleSource) {
+            this.titleSource = titleSource;
             return this;
         }
 
@@ -267,6 +296,7 @@ public final class ChatDialogSummary {
                 Internal.required(messageCount, "message_count"),
                 Internal.required(running, "running"),
                 Internal.required(title, "title"),
+                Internal.required(titleSource, "title_source"),
                 Internal.required(updatedAt, "updated_at"));
             built.additionalProperties.putAll(additionalProperties);
             return built;

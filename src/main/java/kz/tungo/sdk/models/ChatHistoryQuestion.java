@@ -19,13 +19,18 @@ import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
 /**
- * Вопрос ИИ к человеку
+ * Вопрос ИИ к человеку. Уточнение, которое ещё ждёт ответа, сюда не попадает — оно приходит только
+ * полем awaiting разговора, чтобы экран не показал его дважды
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonDeserialize(using = JsonDeserializer.None.class)
 public final class ChatHistoryQuestion implements ChatHistoryBlock {
+    @JsonProperty("answer")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ChatHistoryQuestionAnswer answer;
+
     @JsonProperty("kind")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String kind;
@@ -42,9 +47,11 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
 
     @JsonCreator
     private ChatHistoryQuestion(
+        @JsonProperty("answer") ChatHistoryQuestionAnswer answer,
         @JsonProperty("kind") String kind,
         @JsonProperty("proposal_id") String proposalId,
         @JsonProperty("text") String text) {
+        this.answer = answer;
         this.kind = kind != null ? kind : "question";
         this.proposalId = proposalId;
         this.text = text;
@@ -66,6 +73,15 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
      */
     public Builder toBuilder() {
         return new Builder(this);
+    }
+
+    /**
+     * The <code>answer</code> property.
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ChatHistoryQuestionAnswer> answer() {
+        return Optional.ofNullable(answer);
     }
 
     /**
@@ -126,6 +142,7 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
         }
         ChatHistoryQuestion other = (ChatHistoryQuestion) o;
         return additionalProperties.equals(other.additionalProperties)
+            && Objects.equals(answer, other.answer)
             && Objects.equals(kind, other.kind)
             && Objects.equals(proposalId, other.proposalId)
             && Objects.equals(text, other.text);
@@ -133,7 +150,7 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, kind, proposalId, text);
+        return Objects.hash(additionalProperties, answer, kind, proposalId, text);
     }
 
     @Override
@@ -143,6 +160,7 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
 
     /** Builder of {@link ChatHistoryQuestion}. */
     public static final class Builder {
+        private ChatHistoryQuestionAnswer answer;
         private String proposalId;
         private String text;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -151,9 +169,21 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
         }
 
         private Builder(ChatHistoryQuestion source) {
+            this.answer = source.answer;
             this.proposalId = source.proposalId;
             this.text = source.text;
             this.additionalProperties.putAll(source.additionalProperties);
+        }
+
+        /**
+         * The <code>answer</code> property.
+         *
+         * @param answer the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder answer(ChatHistoryQuestionAnswer answer) {
+            this.answer = answer;
+            return this;
         }
 
         /**
@@ -198,6 +228,7 @@ public final class ChatHistoryQuestion implements ChatHistoryBlock {
          */
         public ChatHistoryQuestion build() {
             ChatHistoryQuestion built = new ChatHistoryQuestion(
+                answer,
                 "question",
                 proposalId,
                 Internal.required(text, "text"));

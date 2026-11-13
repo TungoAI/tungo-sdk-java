@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 class ReliabilityTest {
     private static final String COMPANY = "{\"id\":\"co_1\",\"permissions\":[],\"name\":\"n\"}";
-    private static final String TURN = "{\"answer\":\"ok\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"proposals\":[],\"questions\":[]}";
+    private static final String TURN = "{\"answer\":\"ok\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"followups\":[],\"proposals\":[],\"questions\":[]}";
     private static final String BUSY = TestSupport.envelope("unavailable_error", "busy", "Busy");
     private static final String UUID_V4 = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 

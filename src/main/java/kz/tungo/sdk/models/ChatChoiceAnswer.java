@@ -32,14 +32,20 @@ public final class ChatChoiceAnswer {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<String> selected;
 
+    @JsonProperty("skipped")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean skipped;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private ChatChoiceAnswer(
         @JsonProperty("other") String other,
-        @JsonProperty("selected") List<String> selected) {
+        @JsonProperty("selected") List<String> selected,
+        @JsonProperty("skipped") Boolean skipped) {
         this.other = other;
         this.selected = Internal.list(selected);
+        this.skipped = skipped;
     }
 
     /**
@@ -61,7 +67,7 @@ public final class ChatChoiceAnswer {
     }
 
     /**
-     * Свой ответ текстом (вариант «свой ответ»). Нужен selected или other — хотя бы одно
+     * Свой ответ текстом (вариант «свой ответ»). Нужен selected или other — хотя бы одно (или skipped)
      *
      * @return the value, or empty when it is absent or null
      */
@@ -77,6 +83,17 @@ public final class ChatChoiceAnswer {
      */
     public Optional<List<String>> selected() {
         return Optional.ofNullable(selected);
+    }
+
+    /**
+     * true — «Пропустить»: вопрос оставлен без ответа, selected и other не передавать. ИИ узнаёт, что
+     * вопрос пропущен, и продолжает без этого ответа. У вопроса-подтверждения действия пропуск равен
+     * отказу: действие не выполняется
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<Boolean> skipped() {
+        return Optional.ofNullable(skipped);
     }
 
     /**
@@ -105,12 +122,13 @@ public final class ChatChoiceAnswer {
         ChatChoiceAnswer other = (ChatChoiceAnswer) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(other, other.other)
-            && Objects.equals(selected, other.selected);
+            && Objects.equals(selected, other.selected)
+            && Objects.equals(skipped, other.skipped);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, other, selected);
+        return Objects.hash(additionalProperties, other, selected, skipped);
     }
 
     @Override
@@ -122,6 +140,7 @@ public final class ChatChoiceAnswer {
     public static final class Builder {
         private String other;
         private List<String> selected;
+        private Boolean skipped;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -130,11 +149,13 @@ public final class ChatChoiceAnswer {
         private Builder(ChatChoiceAnswer source) {
             this.other = source.other;
             this.selected = source.selected;
+            this.skipped = source.skipped;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
         /**
-         * Свой ответ текстом (вариант «свой ответ»). Нужен selected или other — хотя бы одно
+         * Свой ответ текстом (вариант «свой ответ»). Нужен selected или other — хотя бы одно (или
+         * skipped)
          *
          * @param other the value; null leaves the property out
          * @return this builder
@@ -153,6 +174,19 @@ public final class ChatChoiceAnswer {
          */
         public Builder selected(List<String> selected) {
             this.selected = selected;
+            return this;
+        }
+
+        /**
+         * true — «Пропустить»: вопрос оставлен без ответа, selected и other не передавать. ИИ узнаёт,
+         * что вопрос пропущен, и продолжает без этого ответа. У вопроса-подтверждения действия пропуск
+         * равен отказу: действие не выполняется
+         *
+         * @param skipped the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder skipped(Boolean skipped) {
+            this.skipped = skipped;
             return this;
         }
 
@@ -176,7 +210,8 @@ public final class ChatChoiceAnswer {
         public ChatChoiceAnswer build() {
             ChatChoiceAnswer built = new ChatChoiceAnswer(
                 other,
-                selected);
+                selected,
+                skipped);
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

@@ -27,6 +27,10 @@ public final class ProposalListItem {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final ProposalApproval approval;
 
+    @JsonProperty("approval_request")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ProposalApprovalRequest approvalRequest;
+
     @JsonProperty("blocker_count")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long blockerCount;
@@ -75,9 +79,17 @@ public final class ProposalListItem {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long lineCount;
 
+    @JsonProperty("origin")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ProposalOrigin origin;
+
     @JsonProperty("status")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final ProposalStatus status;
+
+    @JsonProperty("status_reason")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final ProposalListItemStatusReason statusReason;
 
     @JsonProperty("status_title")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -104,6 +116,7 @@ public final class ProposalListItem {
     @JsonCreator
     private ProposalListItem(
         @JsonProperty("approval") ProposalApproval approval,
+        @JsonProperty("approval_request") ProposalApprovalRequest approvalRequest,
         @JsonProperty("blocker_count") Long blockerCount,
         @JsonProperty("counterparty") ProposalParty counterparty,
         @JsonProperty("created_at") String createdAt,
@@ -116,13 +129,16 @@ public final class ProposalListItem {
         @JsonProperty("level") AutonomyLevel level,
         @JsonProperty("level_title") String levelTitle,
         @JsonProperty("line_count") Long lineCount,
+        @JsonProperty("origin") ProposalOrigin origin,
         @JsonProperty("status") ProposalStatus status,
+        @JsonProperty("status_reason") ProposalListItemStatusReason statusReason,
         @JsonProperty("status_title") String statusTitle,
         @JsonProperty("title") String title,
         @JsonProperty("total") Money total,
         @JsonProperty("vat") Money vat,
         @JsonProperty("warning_count") Long warningCount) {
         this.approval = approval;
+        this.approvalRequest = approvalRequest;
         this.blockerCount = blockerCount;
         this.counterparty = counterparty;
         this.createdAt = createdAt;
@@ -135,7 +151,9 @@ public final class ProposalListItem {
         this.level = level;
         this.levelTitle = levelTitle;
         this.lineCount = lineCount;
+        this.origin = origin;
         this.status = status;
+        this.statusReason = statusReason;
         this.statusTitle = statusTitle;
         this.title = title;
         this.total = total;
@@ -171,6 +189,15 @@ public final class ProposalListItem {
     }
 
     /**
+     * The <code>approval_request</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ProposalApprovalRequest approvalRequest() {
+        return approvalRequest;
+    }
+
+    /**
      * Сколько блокеров: больше 0 — одобрить нельзя, нужен ответ человека в чате
      *
      * @return the value; null only if the API omitted this required property
@@ -199,7 +226,8 @@ public final class ProposalListItem {
 
     /**
      * Разговор чата, в котором ИИ подготовил предложение: «Открыть разговор» — GET
-     * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из чата (пачка, автоматизация, MCP)
+     * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из разговора человека (пачка из ручки,
+     * автоматизация, MCP)
      *
      * @return the value, or empty when it is absent or null
      */
@@ -281,12 +309,31 @@ public final class ProposalListItem {
     }
 
     /**
+     * The <code>origin</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ProposalOrigin origin() {
+        return origin;
+    }
+
+    /**
      * The <code>status</code> property.
      *
      * @return the value; null only if the API omitted this required property
      */
     public ProposalStatus status() {
         return status;
+    }
+
+    /**
+     * Причина отказа — у статусов rejected (отклонено) и failed (записать не удалось): последняя такая
+     * запись history. null — статус другой или причину не записали
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ProposalListItemStatusReason> statusReason() {
+        return Optional.ofNullable(statusReason);
     }
 
     /**
@@ -360,6 +407,7 @@ public final class ProposalListItem {
         ProposalListItem other = (ProposalListItem) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(approval, other.approval)
+            && Objects.equals(approvalRequest, other.approvalRequest)
             && Objects.equals(blockerCount, other.blockerCount)
             && Objects.equals(counterparty, other.counterparty)
             && Objects.equals(createdAt, other.createdAt)
@@ -372,7 +420,9 @@ public final class ProposalListItem {
             && Objects.equals(level, other.level)
             && Objects.equals(levelTitle, other.levelTitle)
             && Objects.equals(lineCount, other.lineCount)
+            && Objects.equals(origin, other.origin)
             && Objects.equals(status, other.status)
+            && Objects.equals(statusReason, other.statusReason)
             && Objects.equals(statusTitle, other.statusTitle)
             && Objects.equals(title, other.title)
             && Objects.equals(total, other.total)
@@ -382,7 +432,7 @@ public final class ProposalListItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, approval, blockerCount, counterparty, createdAt, dialogId, documentNumber, href, id, kind, kindTitle, level, levelTitle, lineCount, status, statusTitle, title, total, vat, warningCount);
+        return Objects.hash(additionalProperties, approval, approvalRequest, blockerCount, counterparty, createdAt, dialogId, documentNumber, href, id, kind, kindTitle, level, levelTitle, lineCount, origin, status, statusReason, statusTitle, title, total, vat, warningCount);
     }
 
     @Override
@@ -393,6 +443,7 @@ public final class ProposalListItem {
     /** Builder of {@link ProposalListItem}. */
     public static final class Builder {
         private ProposalApproval approval;
+        private ProposalApprovalRequest approvalRequest;
         private Long blockerCount;
         private ProposalParty counterparty;
         private String createdAt;
@@ -405,7 +456,9 @@ public final class ProposalListItem {
         private AutonomyLevel level;
         private String levelTitle;
         private Long lineCount;
+        private ProposalOrigin origin;
         private ProposalStatus status;
+        private ProposalListItemStatusReason statusReason;
         private String statusTitle;
         private String title;
         private Money total;
@@ -418,6 +471,7 @@ public final class ProposalListItem {
 
         private Builder(ProposalListItem source) {
             this.approval = source.approval;
+            this.approvalRequest = source.approvalRequest;
             this.blockerCount = source.blockerCount;
             this.counterparty = source.counterparty;
             this.createdAt = source.createdAt;
@@ -430,7 +484,9 @@ public final class ProposalListItem {
             this.level = source.level;
             this.levelTitle = source.levelTitle;
             this.lineCount = source.lineCount;
+            this.origin = source.origin;
             this.status = source.status;
+            this.statusReason = source.statusReason;
             this.statusTitle = source.statusTitle;
             this.title = source.title;
             this.total = source.total;
@@ -447,6 +503,17 @@ public final class ProposalListItem {
          */
         public Builder approval(ProposalApproval approval) {
             this.approval = approval;
+            return this;
+        }
+
+        /**
+         * The <code>approval_request</code> property.
+         *
+         * @param approvalRequest the value (required)
+         * @return this builder
+         */
+        public Builder approvalRequest(ProposalApprovalRequest approvalRequest) {
+            this.approvalRequest = approvalRequest;
             return this;
         }
 
@@ -485,7 +552,8 @@ public final class ProposalListItem {
 
         /**
          * Разговор чата, в котором ИИ подготовил предложение: «Открыть разговор» — GET
-         * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из чата (пачка, автоматизация, MCP)
+         * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из разговора человека (пачка из ручки,
+         * автоматизация, MCP)
          *
          * @param dialogId the value; null sends an explicit JSON null
          * @return this builder
@@ -585,6 +653,17 @@ public final class ProposalListItem {
         }
 
         /**
+         * The <code>origin</code> property.
+         *
+         * @param origin the value (required)
+         * @return this builder
+         */
+        public Builder origin(ProposalOrigin origin) {
+            this.origin = origin;
+            return this;
+        }
+
+        /**
          * The <code>status</code> property.
          *
          * @param status the value (required)
@@ -592,6 +671,18 @@ public final class ProposalListItem {
          */
         public Builder status(ProposalStatus status) {
             this.status = status;
+            return this;
+        }
+
+        /**
+         * Причина отказа — у статусов rejected (отклонено) и failed (записать не удалось): последняя
+         * такая запись history. null — статус другой или причину не записали
+         *
+         * @param statusReason the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder statusReason(ProposalListItemStatusReason statusReason) {
+            this.statusReason = statusReason;
             return this;
         }
 
@@ -671,6 +762,7 @@ public final class ProposalListItem {
         public ProposalListItem build() {
             ProposalListItem built = new ProposalListItem(
                 Internal.required(approval, "approval"),
+                Internal.required(approvalRequest, "approval_request"),
                 Internal.required(blockerCount, "blocker_count"),
                 counterparty,
                 Internal.required(createdAt, "created_at"),
@@ -683,7 +775,9 @@ public final class ProposalListItem {
                 Internal.required(level, "level"),
                 Internal.required(levelTitle, "level_title"),
                 Internal.required(lineCount, "line_count"),
+                Internal.required(origin, "origin"),
                 Internal.required(status, "status"),
+                statusReason,
                 Internal.required(statusTitle, "status_title"),
                 Internal.required(title, "title"),
                 Internal.required(total, "total"),

@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Причина: - `budget` — кончился лимит (дня или разговора) - `rate_limited` — сервис модели перегружен
- * — повторите - `api` — сбой сервиса модели - `refusal` — модель отказалась отвечать -
- * `context_overflow` — разговор слишком длинный — начните новый - `aborted` — ход остановили -
- * `max_iterations` — ИИ не уложился в предел шагов — попросите по частям - `max_tokens` — ответ
- * слишком длинный и оборвался — попросите короче или по частям - `empty_answer` — модель закончила ход
- * без ответа — повторите вопрос - `unexpected` — ход закончился неожиданно — повторите вопрос -
- * `history` — ответ не сохранился в истории - `internal` — внутренняя ошибка - `stream_failed` — поток
- * ответа оборвался на нашей стороне - `batch_failed` — пачка прервана ошибкой - `batch_abandoned` —
- * пачка брошена (процесс перезапущен)
+ * Причина: - `budget` — кончился лимит (дня или разговора) - `parallel_turns_limit` — у человека уже
+ * идёт предельное число ходов ИИ (тариф без доп. использования) — дождаться ответа на предыдущие
+ * вопросы - `rate_limited` — сервис модели перегружен — повторите - `api` — сбой сервиса модели -
+ * `refusal` — модель отказалась отвечать - `context_overflow` — разговор слишком длинный — начните
+ * новый - `aborted` — ход остановили - `max_iterations` — ИИ не уложился в предел шагов — попросите по
+ * частям - `max_tokens` — ответ слишком длинный и оборвался — попросите короче или по частям -
+ * `empty_answer` — модель закончила ход без ответа — повторите вопрос - `unexpected` — ход закончился
+ * неожиданно — повторите вопрос - `history` — ответ не сохранился в истории - `internal` — внутренняя
+ * ошибка - `stream_failed` — поток ответа оборвался на нашей стороне - `batch_failed` — пачка прервана
+ * ошибкой - `batch_abandoned` — пачка брошена (процесс перезапущен)
  * <p>This is an open enumeration: a value this version of the SDK does not know is preserved (see
  * {@link #value()}) and never fails decoding. Compare with <code>equals</code> or switch on {@link
  * #known()}.
@@ -25,6 +26,9 @@ import java.util.Objects;
 public final class ChatTurnErrorCode {
     /** The value <code>budget</code>. */
     public static final ChatTurnErrorCode BUDGET = new ChatTurnErrorCode("budget");
+
+    /** The value <code>parallel_turns_limit</code>. */
+    public static final ChatTurnErrorCode PARALLEL_TURNS_LIMIT = new ChatTurnErrorCode("parallel_turns_limit");
 
     /** The value <code>rate_limited</code>. */
     public static final ChatTurnErrorCode RATE_LIMITED = new ChatTurnErrorCode("rate_limited");
@@ -68,7 +72,7 @@ public final class ChatTurnErrorCode {
     /** The value <code>batch_abandoned</code>. */
     public static final ChatTurnErrorCode BATCH_ABANDONED = new ChatTurnErrorCode("batch_abandoned");
 
-    private static final List<ChatTurnErrorCode> VALUES = Collections.unmodifiableList(Arrays.asList(BUDGET, RATE_LIMITED, API, REFUSAL, CONTEXT_OVERFLOW, ABORTED, MAX_ITERATIONS, MAX_TOKENS, EMPTY_ANSWER, UNEXPECTED, HISTORY, INTERNAL, STREAM_FAILED, BATCH_FAILED, BATCH_ABANDONED));
+    private static final List<ChatTurnErrorCode> VALUES = Collections.unmodifiableList(Arrays.asList(BUDGET, PARALLEL_TURNS_LIMIT, RATE_LIMITED, API, REFUSAL, CONTEXT_OVERFLOW, ABORTED, MAX_ITERATIONS, MAX_TOKENS, EMPTY_ANSWER, UNEXPECTED, HISTORY, INTERNAL, STREAM_FAILED, BATCH_FAILED, BATCH_ABANDONED));
 
     private final String value;
 
@@ -123,6 +127,8 @@ public final class ChatTurnErrorCode {
         switch (value) {
             case "budget":
                 return Known.BUDGET;
+            case "parallel_turns_limit":
+                return Known.PARALLEL_TURNS_LIMIT;
             case "rate_limited":
                 return Known.RATE_LIMITED;
             case "api":
@@ -184,6 +190,8 @@ public final class ChatTurnErrorCode {
     public enum Known {
         /** The value <code>budget</code>. */
         BUDGET,
+        /** The value <code>parallel_turns_limit</code>. */
+        PARALLEL_TURNS_LIMIT,
         /** The value <code>rate_limited</code>. */
         RATE_LIMITED,
         /** The value <code>api</code>. */

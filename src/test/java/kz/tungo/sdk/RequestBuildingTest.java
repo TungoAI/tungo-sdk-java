@@ -111,7 +111,7 @@ class RequestBuildingTest {
     @Test
     void bodiesAreTypedJsonWithNullAndAbsentKeptApart() {
         try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
-            server.always((request, exchange) -> exchange.json(200, "{\"answer\":\"ok\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"proposals\":[],\"questions\":[]}"));
+            server.always((request, exchange) -> exchange.json(200, "{\"answer\":\"ok\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"followups\":[],\"proposals\":[],\"questions\":[]}"));
             client.chat().create("co_1", ChatMessageRequest.builder().message("Привет\n\"мир\"\u0001").build());
             MockServer.Request request = server.request(0);
             assertEquals("POST", request.method);

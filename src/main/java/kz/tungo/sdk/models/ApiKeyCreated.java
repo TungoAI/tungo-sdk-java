@@ -80,6 +80,10 @@ public final class ApiKeyCreated {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String name;
 
+    @JsonProperty("no_companies")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean noCompanies;
+
     @JsonProperty("permissions")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ApiKeyCreatedPermissionItem> permissions;
@@ -138,6 +142,7 @@ public final class ApiKeyCreated {
         @JsonProperty("last_used_ip") String lastUsedIp,
         @JsonProperty("monthly_cap_tiyn") Long monthlyCapTiyn,
         @JsonProperty("name") String name,
+        @JsonProperty("no_companies") Boolean noCompanies,
         @JsonProperty("permissions") List<ApiKeyCreatedPermissionItem> permissions,
         @JsonProperty("prefix") String prefix,
         @JsonProperty("previous_secret_valid_until") String previousSecretValidUntil,
@@ -162,6 +167,7 @@ public final class ApiKeyCreated {
         this.lastUsedIp = lastUsedIp;
         this.monthlyCapTiyn = monthlyCapTiyn;
         this.name = name;
+        this.noCompanies = noCompanies;
         this.permissions = Internal.requiredList(permissions, "permissions");
         this.prefix = prefix;
         this.previousSecretValidUntil = previousSecretValidUntil;
@@ -212,7 +218,8 @@ public final class ApiKeyCreated {
     }
 
     /**
-     * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies)
+     * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies) и у
+     * ключа без компаний (no_companies)
      *
      * @return the value, never null: a response without this required property does not decode
      */
@@ -322,6 +329,17 @@ public final class ApiKeyCreated {
      */
     public String name() {
         return name;
+    }
+
+    /**
+     * Ключ без доступа к компаниям и их 1С: company_ids пуст, all_companies = false; компаний не видит
+     * никогда. Пустой company_ids сам по себе вида не называет — смотреть на all_companies и
+     * no_companies
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean noCompanies() {
+        return noCompanies;
     }
 
     /**
@@ -471,6 +489,7 @@ public final class ApiKeyCreated {
             && Objects.equals(lastUsedIp, other.lastUsedIp)
             && Objects.equals(monthlyCapTiyn, other.monthlyCapTiyn)
             && Objects.equals(name, other.name)
+            && Objects.equals(noCompanies, other.noCompanies)
             && Objects.equals(permissions, other.permissions)
             && Objects.equals(prefix, other.prefix)
             && Objects.equals(previousSecretValidUntil, other.previousSecretValidUntil)
@@ -485,7 +504,7 @@ public final class ApiKeyCreated {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, allCompanies, allowedIps, companyIds, createdAt, createdBy, disabledAt, expiresAt, id, key, keyNote, lastUsedAt, lastUsedIp, monthlyCapTiyn, name, permissions, prefix, previousSecretValidUntil, revokedAt, status, warnings, workspaceId, writeKinds, writeMaxAmountPerDayTiyn, writeMaxAmountPerDocumentTiyn);
+        return Objects.hash(additionalProperties, allCompanies, allowedIps, companyIds, createdAt, createdBy, disabledAt, expiresAt, id, key, keyNote, lastUsedAt, lastUsedIp, monthlyCapTiyn, name, noCompanies, permissions, prefix, previousSecretValidUntil, revokedAt, status, warnings, workspaceId, writeKinds, writeMaxAmountPerDayTiyn, writeMaxAmountPerDocumentTiyn);
     }
 
     /**
@@ -514,6 +533,7 @@ public final class ApiKeyCreated {
         private String lastUsedIp;
         private Long monthlyCapTiyn;
         private String name;
+        private Boolean noCompanies;
         private List<ApiKeyCreatedPermissionItem> permissions;
         private String prefix;
         private String previousSecretValidUntil;
@@ -544,6 +564,7 @@ public final class ApiKeyCreated {
             this.lastUsedIp = source.lastUsedIp;
             this.monthlyCapTiyn = source.monthlyCapTiyn;
             this.name = source.name;
+            this.noCompanies = source.noCompanies;
             this.permissions = source.permissions;
             this.prefix = source.prefix;
             this.previousSecretValidUntil = source.previousSecretValidUntil;
@@ -582,7 +603,8 @@ public final class ApiKeyCreated {
         }
 
         /**
-         * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies)
+         * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies) и
+         * у ключа без компаний (no_companies)
          *
          * @param companyIds the value (required)
          * @return this builder
@@ -715,6 +737,19 @@ public final class ApiKeyCreated {
          */
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        /**
+         * Ключ без доступа к компаниям и их 1С: company_ids пуст, all_companies = false; компаний не
+         * видит никогда. Пустой company_ids сам по себе вида не называет — смотреть на all_companies и
+         * no_companies
+         *
+         * @param noCompanies the value (required)
+         * @return this builder
+         */
+        public Builder noCompanies(Boolean noCompanies) {
+            this.noCompanies = noCompanies;
             return this;
         }
 
@@ -880,6 +915,7 @@ public final class ApiKeyCreated {
                 lastUsedIp,
                 monthlyCapTiyn,
                 Internal.required(name, "name"),
+                Internal.required(noCompanies, "no_companies"),
                 Internal.required(permissions, "permissions"),
                 Internal.required(prefix, "prefix"),
                 previousSecretValidUntil,

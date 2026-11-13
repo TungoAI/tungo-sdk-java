@@ -31,6 +31,10 @@ public final class ProposalHistoryEvent {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String at;
 
+    @JsonProperty("code")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String code;
+
     @JsonProperty("note")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String note;
@@ -49,11 +53,13 @@ public final class ProposalHistoryEvent {
     private ProposalHistoryEvent(
         @JsonProperty("actor") String actor,
         @JsonProperty("at") String at,
+        @JsonProperty("code") String code,
         @JsonProperty("note") String note,
         @JsonProperty("status") ProposalStatus status,
         @JsonProperty("status_title") String statusTitle) {
         this.actor = actor;
         this.at = at;
+        this.code = code;
         this.note = note;
         this.status = status;
         this.statusTitle = statusTitle;
@@ -94,6 +100,17 @@ public final class ProposalHistoryEvent {
      */
     public String at() {
         return at;
+    }
+
+    /**
+     * Машинная пометка шага, если есть: `approval_requested` — просили одобрить (статус при этом не
+     * менялся); `write_unknown`, `rejected_write_unknown`, `revert_unknown` — исход записи в 1С
+     * неизвестен
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> code() {
+        return Optional.ofNullable(code);
     }
 
     /**
@@ -150,6 +167,7 @@ public final class ProposalHistoryEvent {
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(actor, other.actor)
             && Objects.equals(at, other.at)
+            && Objects.equals(code, other.code)
             && Objects.equals(note, other.note)
             && Objects.equals(status, other.status)
             && Objects.equals(statusTitle, other.statusTitle);
@@ -157,7 +175,7 @@ public final class ProposalHistoryEvent {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, actor, at, note, status, statusTitle);
+        return Objects.hash(additionalProperties, actor, at, code, note, status, statusTitle);
     }
 
     @Override
@@ -169,6 +187,7 @@ public final class ProposalHistoryEvent {
     public static final class Builder {
         private String actor;
         private String at;
+        private String code;
         private String note;
         private ProposalStatus status;
         private String statusTitle;
@@ -180,6 +199,7 @@ public final class ProposalHistoryEvent {
         private Builder(ProposalHistoryEvent source) {
             this.actor = source.actor;
             this.at = source.at;
+            this.code = source.code;
             this.note = source.note;
             this.status = source.status;
             this.statusTitle = source.statusTitle;
@@ -206,6 +226,19 @@ public final class ProposalHistoryEvent {
          */
         public Builder at(String at) {
             this.at = at;
+            return this;
+        }
+
+        /**
+         * Машинная пометка шага, если есть: `approval_requested` — просили одобрить (статус при этом
+         * не менялся); `write_unknown`, `rejected_write_unknown`, `revert_unknown` — исход записи в 1С
+         * неизвестен
+         *
+         * @param code the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder code(String code) {
+            this.code = code;
             return this;
         }
 
@@ -264,6 +297,7 @@ public final class ProposalHistoryEvent {
             ProposalHistoryEvent built = new ProposalHistoryEvent(
                 Internal.required(actor, "actor"),
                 Internal.required(at, "at"),
+                code,
                 note,
                 Internal.required(status, "status"),
                 Internal.required(statusTitle, "status_title"));

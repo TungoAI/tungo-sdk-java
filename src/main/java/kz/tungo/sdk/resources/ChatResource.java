@@ -22,13 +22,17 @@ import kz.tungo.sdk.models.ChatDialogPatch;
 import kz.tungo.sdk.models.ChatDialogRenamed;
 import kz.tungo.sdk.models.ChatDialogSummary;
 import kz.tungo.sdk.models.ChatEvent;
+import kz.tungo.sdk.models.ChatMentionSearch;
 import kz.tungo.sdk.models.ChatMessageRequest;
 import kz.tungo.sdk.models.ChatStopResult;
+import kz.tungo.sdk.models.ChatSuggestions;
 import kz.tungo.sdk.models.ChatTokenCount;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import kz.tungo.sdk.models.ChatTurnResult;
 import kz.tungo.sdk.params.ChatListEventsParams;
+import kz.tungo.sdk.params.ChatListMentionsParams;
 import kz.tungo.sdk.params.ChatListParams;
+import kz.tungo.sdk.params.ChatListSuggestionsParams;
 
 /**
  * Диалоги с ИИ-бухгалтером: вопросы, потоковый чат (SSE), подсчёт токенов и история.
@@ -255,6 +259,118 @@ public final class ChatResource {
      */
     public ChatTokenCount countTokens(String companyId, ChatTokenCountRequest body) {
         return countTokens(companyId, body, RequestOptions.none());
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatMentionSearch> listMentionsWithResponse(
+        String companyId,
+        ChatListMentionsParams params,
+        RequestOptions options) {
+        return engine.execute(listMentionsRequest(companyId, params), options, ChatMentionSearch.class);
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatMentionSearch listMentions(String companyId, ChatListMentionsParams params, RequestOptions options) {
+        return listMentionsWithResponse(companyId, params, options).body();
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return the decoded response
+     */
+    public ChatMentionSearch listMentions(String companyId, ChatListMentionsParams params) {
+        return listMentions(companyId, params, RequestOptions.none());
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return the decoded response
+     */
+    public ChatMentionSearch listMentions(String companyId) {
+        return listMentions(companyId, null, RequestOptions.none());
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatSuggestions> listSuggestionsWithResponse(
+        String companyId,
+        ChatListSuggestionsParams params,
+        RequestOptions options) {
+        return engine.execute(listSuggestionsRequest(companyId, params), options, ChatSuggestions.class);
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatSuggestions listSuggestions(String companyId, ChatListSuggestionsParams params, RequestOptions options) {
+        return listSuggestionsWithResponse(companyId, params, options).body();
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return the decoded response
+     */
+    public ChatSuggestions listSuggestions(String companyId, ChatListSuggestionsParams params) {
+        return listSuggestions(companyId, params, RequestOptions.none());
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return the decoded response
+     */
+    public ChatSuggestions listSuggestions(String companyId) {
+        return listSuggestions(companyId, null, RequestOptions.none());
     }
 
     /**
@@ -596,6 +712,26 @@ public final class ChatResource {
     private static RequestSpec countTokensRequest(String companyId, ChatTokenCountRequest body) {
         return RequestSpec.of("POST", "/v1/companies/{co}/chat/count-tokens", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/count-tokens")
             .jsonBody(Objects.requireNonNull(body, "body"));
+    }
+
+    private static RequestSpec listMentionsRequest(String companyId, ChatListMentionsParams params) {
+        QueryString query = new QueryString();
+        if (params != null) {
+            query.add("limit", params.limit().orElse(null));
+            query.add("q", params.q().orElse(null));
+            query.add("types", params.types().orElse(null));
+        }
+        return RequestSpec.of("GET", "/v1/companies/{co}/chat/mentions", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/mentions")
+            .query(query);
+    }
+
+    private static RequestSpec listSuggestionsRequest(String companyId, ChatListSuggestionsParams params) {
+        QueryString query = new QueryString();
+        if (params != null) {
+            query.add("lang", params.lang().orElse(null));
+        }
+        return RequestSpec.of("GET", "/v1/companies/{co}/chat/suggestions", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/suggestions")
+            .query(query);
     }
 
     private static RequestSpec getRequest(String companyId, String id) {

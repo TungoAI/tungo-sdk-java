@@ -49,6 +49,10 @@ public final class ApiKeyCreate {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String name;
 
+    @JsonProperty("no_companies")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean noCompanies;
+
     @JsonProperty("permissions")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<String> permissions;
@@ -75,6 +79,7 @@ public final class ApiKeyCreate {
         @JsonProperty("expires_at") JsonNullable<String> expiresAt,
         @JsonProperty("monthly_cap_tiyn") JsonNullable<Long> monthlyCapTiyn,
         @JsonProperty("name") String name,
+        @JsonProperty("no_companies") Boolean noCompanies,
         @JsonProperty("permissions") List<String> permissions,
         @JsonProperty("write_kinds") JsonNullable<List<ApiKeyCreateWriteKindItem>> writeKinds,
         @JsonProperty("write_max_amount_per_day_tiyn") JsonNullable<Long> writeMaxAmountPerDayTiyn,
@@ -85,7 +90,8 @@ public final class ApiKeyCreate {
         this.expiresAt = expiresAt != null ? expiresAt : JsonNullable.undefined();
         this.monthlyCapTiyn = monthlyCapTiyn != null ? monthlyCapTiyn : JsonNullable.undefined();
         this.name = name;
-        this.permissions = Internal.requiredList(permissions, "permissions");
+        this.noCompanies = noCompanies;
+        this.permissions = Internal.list(permissions);
         this.writeKinds = writeKinds != null ? writeKinds : JsonNullable.undefined();
         this.writeMaxAmountPerDayTiyn = writeMaxAmountPerDayTiyn != null ? writeMaxAmountPerDayTiyn : JsonNullable.undefined();
         this.writeMaxAmountPerDocumentTiyn = writeMaxAmountPerDocumentTiyn != null ? writeMaxAmountPerDocumentTiyn : JsonNullable.undefined();
@@ -171,17 +177,29 @@ public final class ApiKeyCreate {
     }
 
     /**
+     * Ключ без доступа к компаниям и их 1С: ни одной компании он не видит — ни сейчас, ни будущих;
+     * company_ids и all_companies не передаются, права — только company.read (он ничего не открывает).
+     * По умолчанию false
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<Boolean> noCompanies() {
+        return Optional.ofNullable(noCompanies);
+    }
+
+    /**
      * Права ключа (1–20): `company.read` — читать данные компаний (добавляется всегда, даже если не
      * передано); `chat.use` — работать с ИИ-бухгалтером; `proposals.create` — готовить документы для
      * 1С; `proposals.approve` — одобрять запись документов в 1С; `automations.read` — видеть хуки,
      * сценарии и журнал запусков; `automations.manage` — менять и запускать автоматизации;
      * `webhooks.manage` — вебхуки всей организации (только у ключа на все её компании). Ни одно право
-     * не шире прав создателя
+     * не шире прав создателя. Обязательно, кроме ключа с no_companies: true (ему права в компаниях не
+     * даются)
      *
-     * @return the value, never null: a response without this required property does not decode
+     * @return the value, or empty when it is absent or null
      */
-    public List<String> permissions() {
-        return permissions;
+    public Optional<List<String>> permissions() {
+        return Optional.ofNullable(permissions);
     }
 
     /**
@@ -252,6 +270,7 @@ public final class ApiKeyCreate {
             && Objects.equals(expiresAt, other.expiresAt)
             && Objects.equals(monthlyCapTiyn, other.monthlyCapTiyn)
             && Objects.equals(name, other.name)
+            && Objects.equals(noCompanies, other.noCompanies)
             && Objects.equals(permissions, other.permissions)
             && Objects.equals(writeKinds, other.writeKinds)
             && Objects.equals(writeMaxAmountPerDayTiyn, other.writeMaxAmountPerDayTiyn)
@@ -260,7 +279,7 @@ public final class ApiKeyCreate {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, allCompanies, allowedIps, companyIds, expiresAt, monthlyCapTiyn, name, permissions, writeKinds, writeMaxAmountPerDayTiyn, writeMaxAmountPerDocumentTiyn);
+        return Objects.hash(additionalProperties, allCompanies, allowedIps, companyIds, expiresAt, monthlyCapTiyn, name, noCompanies, permissions, writeKinds, writeMaxAmountPerDayTiyn, writeMaxAmountPerDocumentTiyn);
     }
 
     @Override
@@ -276,6 +295,7 @@ public final class ApiKeyCreate {
         private JsonNullable<String> expiresAt = JsonNullable.undefined();
         private JsonNullable<Long> monthlyCapTiyn = JsonNullable.undefined();
         private String name;
+        private Boolean noCompanies;
         private List<String> permissions;
         private JsonNullable<List<ApiKeyCreateWriteKindItem>> writeKinds = JsonNullable.undefined();
         private JsonNullable<Long> writeMaxAmountPerDayTiyn = JsonNullable.undefined();
@@ -292,6 +312,7 @@ public final class ApiKeyCreate {
             this.expiresAt = source.expiresAt;
             this.monthlyCapTiyn = source.monthlyCapTiyn;
             this.name = source.name;
+            this.noCompanies = source.noCompanies;
             this.permissions = source.permissions;
             this.writeKinds = source.writeKinds;
             this.writeMaxAmountPerDayTiyn = source.writeMaxAmountPerDayTiyn;
@@ -412,14 +433,28 @@ public final class ApiKeyCreate {
         }
 
         /**
+         * Ключ без доступа к компаниям и их 1С: ни одной компании он не видит — ни сейчас, ни будущих;
+         * company_ids и all_companies не передаются, права — только company.read (он ничего не
+         * открывает). По умолчанию false
+         *
+         * @param noCompanies the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder noCompanies(Boolean noCompanies) {
+            this.noCompanies = noCompanies;
+            return this;
+        }
+
+        /**
          * Права ключа (1–20): `company.read` — читать данные компаний (добавляется всегда, даже если
          * не передано); `chat.use` — работать с ИИ-бухгалтером; `proposals.create` — готовить
          * документы для 1С; `proposals.approve` — одобрять запись документов в 1С; `automations.read`
          * — видеть хуки, сценарии и журнал запусков; `automations.manage` — менять и запускать
          * автоматизации; `webhooks.manage` — вебхуки всей организации (только у ключа на все её
-         * компании). Ни одно право не шире прав создателя
+         * компании). Ни одно право не шире прав создателя. Обязательно, кроме ключа с no_companies:
+         * true (ему права в компаниях не даются)
          *
-         * @param permissions the value (required)
+         * @param permissions the value; null leaves the property out
          * @return this builder
          */
         public Builder permissions(List<String> permissions) {
@@ -542,7 +577,8 @@ public final class ApiKeyCreate {
                 expiresAt,
                 monthlyCapTiyn,
                 Internal.required(name, "name"),
-                Internal.required(permissions, "permissions"),
+                noCompanies,
+                permissions,
                 writeKinds,
                 writeMaxAmountPerDayTiyn,
                 writeMaxAmountPerDocumentTiyn);

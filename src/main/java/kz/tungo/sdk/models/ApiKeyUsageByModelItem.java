@@ -74,7 +74,7 @@ public final class ApiKeyUsageByModelItem {
     }
 
     /**
-     * Модель ИИ (техническое имя)
+     * Модель ИИ: tungo-1-flash, tungo-1, tungo-1-deep (tungo-search, tungo-legacy)
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -160,7 +160,7 @@ public final class ApiKeyUsageByModelItem {
         }
 
         /**
-         * Модель ИИ (техническое имя)
+         * Модель ИИ: tungo-1-flash, tungo-1, tungo-1-deep (tungo-search, tungo-legacy)
          *
          * @param model the value (required)
          * @return this builder

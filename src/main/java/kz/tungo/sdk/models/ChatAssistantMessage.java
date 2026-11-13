@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
@@ -38,9 +39,17 @@ public final class ChatAssistantMessage implements ChatMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ChatCitation> citations;
 
+    @JsonProperty("followups")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<String> followups;
+
     @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String id;
+
+    @JsonProperty("next_action")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final ChatNextAction nextAction;
 
     @JsonProperty("proposal_ids")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -65,7 +74,9 @@ public final class ChatAssistantMessage implements ChatMessage {
         @JsonProperty("at") String at,
         @JsonProperty("blocks") List<ChatHistoryBlock> blocks,
         @JsonProperty("citations") List<ChatCitation> citations,
+        @JsonProperty("followups") List<String> followups,
         @JsonProperty("id") String id,
+        @JsonProperty("next_action") ChatNextAction nextAction,
         @JsonProperty("proposal_ids") List<String> proposalIds,
         @JsonProperty("role") String role,
         @JsonProperty("state") ChatAssistantMessageState state,
@@ -73,7 +84,9 @@ public final class ChatAssistantMessage implements ChatMessage {
         this.at = at;
         this.blocks = Internal.requiredList(blocks, "blocks");
         this.citations = Internal.requiredList(citations, "citations");
+        this.followups = Internal.requiredList(followups, "followups");
         this.id = id;
+        this.nextAction = nextAction;
         this.proposalIds = Internal.requiredList(proposalIds, "proposal_ids");
         this.role = role != null ? role : "assistant";
         this.state = state;
@@ -126,12 +139,31 @@ public final class ChatAssistantMessage implements ChatMessage {
     }
 
     /**
+     * Вопросы-продолжения под ответом, до 3, на языке разговора: нажатие — обычный новый вопрос с этим
+     * текстом. Пусто — предложить нечего
+     *
+     * @return the value, never null: a response without this required property does not decode
+     */
+    public List<String> followups() {
+        return followups;
+    }
+
+    /**
      * Устойчивый id сообщения: &lt;dialog_id&gt;:&lt;номер хода&gt;:a
      *
      * @return the value; null only if the API omitted this required property
      */
     public String id() {
         return id;
+    }
+
+    /**
+     * Предложенное следующее действие; null — нет
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ChatNextAction> nextAction() {
+        return Optional.ofNullable(nextAction);
     }
 
     /**
@@ -205,7 +237,9 @@ public final class ChatAssistantMessage implements ChatMessage {
             && Objects.equals(at, other.at)
             && Objects.equals(blocks, other.blocks)
             && Objects.equals(citations, other.citations)
+            && Objects.equals(followups, other.followups)
             && Objects.equals(id, other.id)
+            && Objects.equals(nextAction, other.nextAction)
             && Objects.equals(proposalIds, other.proposalIds)
             && Objects.equals(role, other.role)
             && Objects.equals(state, other.state)
@@ -214,7 +248,7 @@ public final class ChatAssistantMessage implements ChatMessage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, at, blocks, citations, id, proposalIds, role, state, thinking);
+        return Objects.hash(additionalProperties, at, blocks, citations, followups, id, nextAction, proposalIds, role, state, thinking);
     }
 
     @Override
@@ -227,7 +261,9 @@ public final class ChatAssistantMessage implements ChatMessage {
         private String at;
         private List<ChatHistoryBlock> blocks;
         private List<ChatCitation> citations;
+        private List<String> followups;
         private String id;
+        private ChatNextAction nextAction;
         private List<String> proposalIds;
         private ChatAssistantMessageState state;
         private String thinking;
@@ -240,7 +276,9 @@ public final class ChatAssistantMessage implements ChatMessage {
             this.at = source.at;
             this.blocks = source.blocks;
             this.citations = source.citations;
+            this.followups = source.followups;
             this.id = source.id;
+            this.nextAction = source.nextAction;
             this.proposalIds = source.proposalIds;
             this.state = source.state;
             this.thinking = source.thinking;
@@ -281,6 +319,18 @@ public final class ChatAssistantMessage implements ChatMessage {
         }
 
         /**
+         * Вопросы-продолжения под ответом, до 3, на языке разговора: нажатие — обычный новый вопрос с
+         * этим текстом. Пусто — предложить нечего
+         *
+         * @param followups the value (required)
+         * @return this builder
+         */
+        public Builder followups(List<String> followups) {
+            this.followups = followups;
+            return this;
+        }
+
+        /**
          * Устойчивый id сообщения: &lt;dialog_id&gt;:&lt;номер хода&gt;:a
          *
          * @param id the value (required)
@@ -288,6 +338,17 @@ public final class ChatAssistantMessage implements ChatMessage {
          */
         public Builder id(String id) {
             this.id = id;
+            return this;
+        }
+
+        /**
+         * Предложенное следующее действие; null — нет
+         *
+         * @param nextAction the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder nextAction(ChatNextAction nextAction) {
+            this.nextAction = nextAction;
             return this;
         }
 
@@ -348,7 +409,9 @@ public final class ChatAssistantMessage implements ChatMessage {
                 Internal.required(at, "at"),
                 Internal.required(blocks, "blocks"),
                 Internal.required(citations, "citations"),
+                Internal.required(followups, "followups"),
                 Internal.required(id, "id"),
+                nextAction,
                 Internal.required(proposalIds, "proposal_ids"),
                 "assistant",
                 Internal.required(state, "state"),

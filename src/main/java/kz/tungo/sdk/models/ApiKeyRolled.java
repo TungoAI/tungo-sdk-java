@@ -57,8 +57,12 @@ public final class ApiKeyRolled {
     private final String id;
 
     @JsonProperty("key")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private final String key;
+
+    @JsonProperty("key_note")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String keyNote;
 
     @JsonProperty("last_used_at")
     @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -75,6 +79,10 @@ public final class ApiKeyRolled {
     @JsonProperty("name")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String name;
+
+    @JsonProperty("no_companies")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean noCompanies;
 
     @JsonProperty("permissions")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -129,10 +137,12 @@ public final class ApiKeyRolled {
         @JsonProperty("expires_at") String expiresAt,
         @JsonProperty("id") String id,
         @JsonProperty("key") String key,
+        @JsonProperty("key_note") String keyNote,
         @JsonProperty("last_used_at") String lastUsedAt,
         @JsonProperty("last_used_ip") String lastUsedIp,
         @JsonProperty("monthly_cap_tiyn") Long monthlyCapTiyn,
         @JsonProperty("name") String name,
+        @JsonProperty("no_companies") Boolean noCompanies,
         @JsonProperty("permissions") List<ApiKeyRolledPermissionItem> permissions,
         @JsonProperty("prefix") String prefix,
         @JsonProperty("previous_secret_valid_until") String previousSecretValidUntil,
@@ -152,10 +162,12 @@ public final class ApiKeyRolled {
         this.expiresAt = expiresAt;
         this.id = id;
         this.key = key;
+        this.keyNote = keyNote;
         this.lastUsedAt = lastUsedAt;
         this.lastUsedIp = lastUsedIp;
         this.monthlyCapTiyn = monthlyCapTiyn;
         this.name = name;
+        this.noCompanies = noCompanies;
         this.permissions = Internal.requiredList(permissions, "permissions");
         this.prefix = prefix;
         this.previousSecretValidUntil = previousSecretValidUntil;
@@ -206,7 +218,8 @@ public final class ApiKeyRolled {
     }
 
     /**
-     * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies)
+     * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies) и у
+     * ключа без компаний (no_companies)
      *
      * @return the value, never null: a response without this required property does not decode
      */
@@ -261,12 +274,23 @@ public final class ApiKeyRolled {
     }
 
     /**
-     * Новый ключ целиком (tg_…) — один раз: показать с кнопкой «Скопировать»
+     * Новый ключ целиком (tg_…) — один раз: показать с кнопкой «Скопировать». В повторе по
+     * Idempotency-Key — null
      *
-     * @return the value; null only if the API omitted this required property
+     * @return the value, or empty when it is absent or null
      */
-    public String key() {
-        return key;
+    public Optional<String> key() {
+        return Optional.ofNullable(key);
+    }
+
+    /**
+     * Только в повторе по Idempotency-Key: почему key = null и что делать, если новый секрет потерян
+     * (сменить ещё раз)
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> keyNote() {
+        return Optional.ofNullable(keyNote);
     }
 
     /**
@@ -305,6 +329,17 @@ public final class ApiKeyRolled {
      */
     public String name() {
         return name;
+    }
+
+    /**
+     * Ключ без доступа к компаниям и их 1С: company_ids пуст, all_companies = false; компаний не видит
+     * никогда. Пустой company_ids сам по себе вида не называет — смотреть на all_companies и
+     * no_companies
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean noCompanies() {
+        return noCompanies;
     }
 
     /**
@@ -448,10 +483,12 @@ public final class ApiKeyRolled {
             && Objects.equals(expiresAt, other.expiresAt)
             && Objects.equals(id, other.id)
             && Objects.equals(key, other.key)
+            && Objects.equals(keyNote, other.keyNote)
             && Objects.equals(lastUsedAt, other.lastUsedAt)
             && Objects.equals(lastUsedIp, other.lastUsedIp)
             && Objects.equals(monthlyCapTiyn, other.monthlyCapTiyn)
             && Objects.equals(name, other.name)
+            && Objects.equals(noCompanies, other.noCompanies)
             && Objects.equals(permissions, other.permissions)
             && Objects.equals(prefix, other.prefix)
             && Objects.equals(previousSecretValidUntil, other.previousSecretValidUntil)
@@ -466,7 +503,7 @@ public final class ApiKeyRolled {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, allCompanies, allowedIps, companyIds, createdAt, createdBy, disabledAt, expiresAt, id, key, lastUsedAt, lastUsedIp, monthlyCapTiyn, name, permissions, prefix, previousSecretValidUntil, previousValidUntil, revokedAt, status, workspaceId, writeKinds, writeMaxAmountPerDayTiyn, writeMaxAmountPerDocumentTiyn);
+        return Objects.hash(additionalProperties, allCompanies, allowedIps, companyIds, createdAt, createdBy, disabledAt, expiresAt, id, key, keyNote, lastUsedAt, lastUsedIp, monthlyCapTiyn, name, noCompanies, permissions, prefix, previousSecretValidUntil, previousValidUntil, revokedAt, status, workspaceId, writeKinds, writeMaxAmountPerDayTiyn, writeMaxAmountPerDocumentTiyn);
     }
 
     /**
@@ -490,10 +527,12 @@ public final class ApiKeyRolled {
         private String expiresAt;
         private String id;
         private String key;
+        private String keyNote;
         private String lastUsedAt;
         private String lastUsedIp;
         private Long monthlyCapTiyn;
         private String name;
+        private Boolean noCompanies;
         private List<ApiKeyRolledPermissionItem> permissions;
         private String prefix;
         private String previousSecretValidUntil;
@@ -519,10 +558,12 @@ public final class ApiKeyRolled {
             this.expiresAt = source.expiresAt;
             this.id = source.id;
             this.key = source.key;
+            this.keyNote = source.keyNote;
             this.lastUsedAt = source.lastUsedAt;
             this.lastUsedIp = source.lastUsedIp;
             this.monthlyCapTiyn = source.monthlyCapTiyn;
             this.name = source.name;
+            this.noCompanies = source.noCompanies;
             this.permissions = source.permissions;
             this.prefix = source.prefix;
             this.previousSecretValidUntil = source.previousSecretValidUntil;
@@ -561,7 +602,8 @@ public final class ApiKeyRolled {
         }
 
         /**
-         * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies)
+         * Компании, к которым ключ даёт доступ (co_…); пусто у ключа на все компании (all_companies) и
+         * у ключа без компаний (no_companies)
          *
          * @param companyIds the value (required)
          * @return this builder
@@ -628,13 +670,26 @@ public final class ApiKeyRolled {
         }
 
         /**
-         * Новый ключ целиком (tg_…) — один раз: показать с кнопкой «Скопировать»
+         * Новый ключ целиком (tg_…) — один раз: показать с кнопкой «Скопировать». В повторе по
+         * Idempotency-Key — null
          *
-         * @param key the value (required)
+         * @param key the value; null sends an explicit JSON null
          * @return this builder
          */
         public Builder key(String key) {
             this.key = key;
+            return this;
+        }
+
+        /**
+         * Только в повторе по Idempotency-Key: почему key = null и что делать, если новый секрет
+         * потерян (сменить ещё раз)
+         *
+         * @param keyNote the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder keyNote(String keyNote) {
+            this.keyNote = keyNote;
             return this;
         }
 
@@ -681,6 +736,19 @@ public final class ApiKeyRolled {
          */
         public Builder name(String name) {
             this.name = name;
+            return this;
+        }
+
+        /**
+         * Ключ без доступа к компаниям и их 1С: company_ids пуст, all_companies = false; компаний не
+         * видит никогда. Пустой company_ids сам по себе вида не называет — смотреть на all_companies и
+         * no_companies
+         *
+         * @param noCompanies the value (required)
+         * @return this builder
+         */
+        public Builder noCompanies(Boolean noCompanies) {
+            this.noCompanies = noCompanies;
             return this;
         }
 
@@ -839,11 +907,13 @@ public final class ApiKeyRolled {
                 disabledAt,
                 Internal.required(expiresAt, "expires_at"),
                 Internal.required(id, "id"),
-                Internal.required(key, "key"),
+                key,
+                keyNote,
                 lastUsedAt,
                 lastUsedIp,
                 monthlyCapTiyn,
                 Internal.required(name, "name"),
+                Internal.required(noCompanies, "no_companies"),
                 Internal.required(permissions, "permissions"),
                 Internal.required(prefix, "prefix"),
                 previousSecretValidUntil,

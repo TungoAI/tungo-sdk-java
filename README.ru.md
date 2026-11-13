@@ -40,12 +40,12 @@
 <dependency>
   <groupId>kz.tungo</groupId>
   <artifactId>tungo-sdk</artifactId>
-  <version>0.2.0</version> <!-- x-release-version -->
+  <version>0.3.0</version> <!-- x-release-version -->
 </dependency>
 ```
 
 ```kotlin
-implementation("kz.tungo:tungo-sdk:0.2.0") // x-release-version
+implementation("kz.tungo:tungo-sdk:0.3.0") // x-release-version
 ```
 
 ## Быстрый старт
@@ -245,7 +245,7 @@ boolean valid = TungoMoney.isValidBinIin("990140000017");  // true
 
 ## Справочник API
 
-Создано из контракта API платформы Tungo: **ресурсов — 13, методов — 82, типов событий вебхуков — 22**.
+Создано из контракта API платформы Tungo: **ресурсов — 13, методов — 85, типов событий вебхуков — 22**.
 
 | Ресурс | Описание | Методы |
 | --- | --- | --- |
@@ -254,8 +254,8 @@ boolean valid = TungoMoney.isValidBinIin("990140000017");  // true
 | `client.platform()` | Баланс платформы, книга движений, отчёты о расходе, лимиты, аудит и тарифы моделей | `listUsageRates` · `getAccount` · `getAudit / getAuditAll` · `getLedger / getLedgerAll` · `listLimits` · `listRequests / listRequestsAll` · `getUsage` |
 | `client.apiKeys()` | Сведения о текущем ключе API и статистика его расхода | `getCurrent` · `getCurrentUsage` · `getUsage` |
 | `client.webhooks()` | Исходящие вебхуки организации (Svix): адреса, каталог событий, доставки и проверка подписи | `listEndpoints / listEndpointsAll` · `createEndpoint` · `getEndpoint` · `updateEndpoint` · `deleteEndpoint` · `listEndpointAttempts / listEndpointAttemptsAll` · `rotateEndpointSecret` · `testEndpoint` · `listEventTypes` · `listMessages / listMessagesAll` · `listMessageAttempts / listMessageAttemptsAll` · `resendMessage` · `getUsage` |
-| `client.chat()` | Диалоги с ИИ-бухгалтером: вопросы, потоковый чат (SSE), подсчёт токенов и история | `list / listAll` · `create / createStream` · `countTokens` · `get` · `update` · `delete` · `answer / answerStream` · `listEvents` · `stop` |
-| `client.proposals()` | Предложения документов ИИ-бухгалтера: просмотр, одобрение записи в 1С и отклонение | `list / listAll` · `approveBatch` · `get` · `approve` · `reject` |
+| `client.chat()` | Диалоги с ИИ-бухгалтером: вопросы, потоковый чат (SSE), подсчёт токенов и история | `list / listAll` · `create / createStream` · `countTokens` · `listMentions` · `listSuggestions` · `get` · `update` · `delete` · `answer / answerStream` · `listEvents` · `stop` |
+| `client.proposals()` | Предложения документов ИИ-бухгалтера: просмотр, одобрение записи в 1С и отклонение | `list / listAll` · `approveBatch` · `get` · `approve` · `reject` · `requestApproval` |
 | `client.feed()` | Лента событий и предложений компании (страницы и живой поток SSE) | `get / getAll` · `listEvents` |
 | `client.batches()` | Пачки обработки банковских выписок, входящих ЭСФ и DirectBank | `list / listAll` · `createBankStatement` · `createEsfPurchases` · `get` · `listEvents` · `stop` · `getSummary` · `listStatements / listStatementsAll` · `pollDirectbank` |
 | `client.esf()` | Входящие и исходящие электронные счета-фактуры (ИС ЭСФ) | `getIncoming / getIncomingAll` · `getOutgoing / getOutgoingAll` |
@@ -282,7 +282,7 @@ boolean valid = TungoMoney.isValidBinIin("990140000017");  // true
 
 ## Версии и поддержка
 
-Библиотека следует [семантическому версионированию](https://semver.org/lang/ru/). Пока старшая версия равна 0, промежуточный выпуск может содержать несовместимые изменения; они всегда перечислены в [истории изменений](https://github.com/TungoAI/tungo-sdk-java/blob/main/CHANGELOG.md). Этот README описывает версию 0.2.0.
+Библиотека следует [семантическому версионированию](https://semver.org/lang/ru/). Пока старшая версия равна 0, промежуточный выпуск может содержать несовместимые изменения; они всегда перечислены в [истории изменений](https://github.com/TungoAI/tungo-sdk-java/blob/main/CHANGELOG.md). Этот README описывает версию 0.3.0.
 
 Код создаётся генератором: пишите о проблемах и идеях в [обращения](https://github.com/TungoAI/tungo-sdk-java/issues), а не присылайте правки к созданным файлам. Об уязвимости сообщайте по [политике безопасности](https://github.com/TungoAI/tungo-sdk-java/blob/main/SECURITY.md).
 

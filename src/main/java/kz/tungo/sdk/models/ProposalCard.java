@@ -36,6 +36,10 @@ public final class ProposalCard {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final ProposalApproval approval;
 
+    @JsonProperty("approval_request")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ProposalApprovalRequest approvalRequest;
+
     @JsonProperty("blocker_count")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long blockerCount;
@@ -104,6 +108,10 @@ public final class ProposalCard {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ProposalLine> lines;
 
+    @JsonProperty("origin")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ProposalOrigin origin;
+
     @JsonProperty("postings")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ProposalPosting> postings;
@@ -119,6 +127,10 @@ public final class ProposalCard {
     @JsonProperty("status")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final ProposalStatus status;
+
+    @JsonProperty("status_reason")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final ProposalCardStatusReason statusReason;
 
     @JsonProperty("status_title")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -155,6 +167,7 @@ public final class ProposalCard {
         @JsonProperty("actions") List<ProposalAction> actions,
         @JsonProperty("advance_offset") ProposalAdvanceOffset advanceOffset,
         @JsonProperty("approval") ProposalApproval approval,
+        @JsonProperty("approval_request") ProposalApprovalRequest approvalRequest,
         @JsonProperty("blocker_count") Long blockerCount,
         @JsonProperty("blockers") List<String> blockers,
         @JsonProperty("counterparty") ProposalParty counterparty,
@@ -172,10 +185,12 @@ public final class ProposalCard {
         @JsonProperty("level_title") String levelTitle,
         @JsonProperty("line_count") Long lineCount,
         @JsonProperty("lines") List<ProposalLine> lines,
+        @JsonProperty("origin") ProposalOrigin origin,
         @JsonProperty("postings") List<ProposalPosting> postings,
         @JsonProperty("result") ProposalResult result,
         @JsonProperty("source") ProposalSource source,
         @JsonProperty("status") ProposalStatus status,
+        @JsonProperty("status_reason") ProposalCardStatusReason statusReason,
         @JsonProperty("status_title") String statusTitle,
         @JsonProperty("summary") String summary,
         @JsonProperty("title") String title,
@@ -186,6 +201,7 @@ public final class ProposalCard {
         this.actions = Internal.requiredList(actions, "actions");
         this.advanceOffset = advanceOffset;
         this.approval = approval;
+        this.approvalRequest = approvalRequest;
         this.blockerCount = blockerCount;
         this.blockers = Internal.requiredList(blockers, "blockers");
         this.counterparty = counterparty;
@@ -203,10 +219,12 @@ public final class ProposalCard {
         this.levelTitle = levelTitle;
         this.lineCount = lineCount;
         this.lines = Internal.requiredList(lines, "lines");
+        this.origin = origin;
         this.postings = Internal.requiredList(postings, "postings");
         this.result = result;
         this.source = source;
         this.status = status;
+        this.statusReason = statusReason;
         this.statusTitle = statusTitle;
         this.summary = summary;
         this.title = title;
@@ -262,6 +280,15 @@ public final class ProposalCard {
     }
 
     /**
+     * The <code>approval_request</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ProposalApprovalRequest approvalRequest() {
+        return approvalRequest;
+    }
+
+    /**
      * Сколько блокеров: больше 0 — одобрить нельзя, нужен ответ человека в чате
      *
      * @return the value; null only if the API omitted this required property
@@ -300,7 +327,8 @@ public final class ProposalCard {
 
     /**
      * Разговор чата, в котором ИИ подготовил предложение: «Открыть разговор» — GET
-     * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из чата (пачка, автоматизация, MCP)
+     * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из разговора человека (пачка из ручки,
+     * автоматизация, MCP)
      *
      * @return the value, or empty when it is absent or null
      */
@@ -419,6 +447,15 @@ public final class ProposalCard {
     }
 
     /**
+     * The <code>origin</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ProposalOrigin origin() {
+        return origin;
+    }
+
+    /**
      * Ожидаемые проводки — что получится в учёте после проведения
      *
      * @return the value, never null: a response without this required property does not decode
@@ -452,6 +489,16 @@ public final class ProposalCard {
      */
     public ProposalStatus status() {
         return status;
+    }
+
+    /**
+     * Причина отказа — у статусов rejected (отклонено) и failed (записать не удалось): последняя такая
+     * запись history. null — статус другой или причину не записали
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ProposalCardStatusReason> statusReason() {
+        return Optional.ofNullable(statusReason);
     }
 
     /**
@@ -545,6 +592,7 @@ public final class ProposalCard {
             && Objects.equals(actions, other.actions)
             && Objects.equals(advanceOffset, other.advanceOffset)
             && Objects.equals(approval, other.approval)
+            && Objects.equals(approvalRequest, other.approvalRequest)
             && Objects.equals(blockerCount, other.blockerCount)
             && Objects.equals(blockers, other.blockers)
             && Objects.equals(counterparty, other.counterparty)
@@ -562,10 +610,12 @@ public final class ProposalCard {
             && Objects.equals(levelTitle, other.levelTitle)
             && Objects.equals(lineCount, other.lineCount)
             && Objects.equals(lines, other.lines)
+            && Objects.equals(origin, other.origin)
             && Objects.equals(postings, other.postings)
             && Objects.equals(result, other.result)
             && Objects.equals(source, other.source)
             && Objects.equals(status, other.status)
+            && Objects.equals(statusReason, other.statusReason)
             && Objects.equals(statusTitle, other.statusTitle)
             && Objects.equals(summary, other.summary)
             && Objects.equals(title, other.title)
@@ -577,7 +627,7 @@ public final class ProposalCard {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, actions, advanceOffset, approval, blockerCount, blockers, counterparty, createdAt, dialogId, documentNumber, header, history, href, id, intent, kind, kindTitle, level, levelTitle, lineCount, lines, postings, result, source, status, statusTitle, summary, title, total, vat, warningCount, warnings);
+        return Objects.hash(additionalProperties, actions, advanceOffset, approval, approvalRequest, blockerCount, blockers, counterparty, createdAt, dialogId, documentNumber, header, history, href, id, intent, kind, kindTitle, level, levelTitle, lineCount, lines, origin, postings, result, source, status, statusReason, statusTitle, summary, title, total, vat, warningCount, warnings);
     }
 
     @Override
@@ -590,6 +640,7 @@ public final class ProposalCard {
         private List<ProposalAction> actions;
         private ProposalAdvanceOffset advanceOffset;
         private ProposalApproval approval;
+        private ProposalApprovalRequest approvalRequest;
         private Long blockerCount;
         private List<String> blockers;
         private ProposalParty counterparty;
@@ -607,10 +658,12 @@ public final class ProposalCard {
         private String levelTitle;
         private Long lineCount;
         private List<ProposalLine> lines;
+        private ProposalOrigin origin;
         private List<ProposalPosting> postings;
         private ProposalResult result;
         private ProposalSource source;
         private ProposalStatus status;
+        private ProposalCardStatusReason statusReason;
         private String statusTitle;
         private String summary;
         private String title;
@@ -627,6 +680,7 @@ public final class ProposalCard {
             this.actions = source.actions;
             this.advanceOffset = source.advanceOffset;
             this.approval = source.approval;
+            this.approvalRequest = source.approvalRequest;
             this.blockerCount = source.blockerCount;
             this.blockers = source.blockers;
             this.counterparty = source.counterparty;
@@ -644,10 +698,12 @@ public final class ProposalCard {
             this.levelTitle = source.levelTitle;
             this.lineCount = source.lineCount;
             this.lines = source.lines;
+            this.origin = source.origin;
             this.postings = source.postings;
             this.result = source.result;
             this.source = source.source;
             this.status = source.status;
+            this.statusReason = source.statusReason;
             this.statusTitle = source.statusTitle;
             this.summary = source.summary;
             this.title = source.title;
@@ -688,6 +744,17 @@ public final class ProposalCard {
          */
         public Builder approval(ProposalApproval approval) {
             this.approval = approval;
+            return this;
+        }
+
+        /**
+         * The <code>approval_request</code> property.
+         *
+         * @param approvalRequest the value (required)
+         * @return this builder
+         */
+        public Builder approvalRequest(ProposalApprovalRequest approvalRequest) {
+            this.approvalRequest = approvalRequest;
             return this;
         }
 
@@ -738,7 +805,8 @@ public final class ProposalCard {
 
         /**
          * Разговор чата, в котором ИИ подготовил предложение: «Открыть разговор» — GET
-         * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из чата (пачка, автоматизация, MCP)
+         * …/chat/&#123;dialog_id&#125; (если он ваш). null — не из разговора человека (пачка из ручки,
+         * автоматизация, MCP)
          *
          * @param dialogId the value; null sends an explicit JSON null
          * @return this builder
@@ -883,6 +951,17 @@ public final class ProposalCard {
         }
 
         /**
+         * The <code>origin</code> property.
+         *
+         * @param origin the value (required)
+         * @return this builder
+         */
+        public Builder origin(ProposalOrigin origin) {
+            this.origin = origin;
+            return this;
+        }
+
+        /**
          * Ожидаемые проводки — что получится в учёте после проведения
          *
          * @param postings the value (required)
@@ -923,6 +1002,18 @@ public final class ProposalCard {
          */
         public Builder status(ProposalStatus status) {
             this.status = status;
+            return this;
+        }
+
+        /**
+         * Причина отказа — у статусов rejected (отклонено) и failed (записать не удалось): последняя
+         * такая запись history. null — статус другой или причину не записали
+         *
+         * @param statusReason the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder statusReason(ProposalCardStatusReason statusReason) {
+            this.statusReason = statusReason;
             return this;
         }
 
@@ -1026,6 +1117,7 @@ public final class ProposalCard {
                 Internal.required(actions, "actions"),
                 advanceOffset,
                 Internal.required(approval, "approval"),
+                Internal.required(approvalRequest, "approval_request"),
                 Internal.required(blockerCount, "blocker_count"),
                 Internal.required(blockers, "blockers"),
                 counterparty,
@@ -1043,10 +1135,12 @@ public final class ProposalCard {
                 Internal.required(levelTitle, "level_title"),
                 Internal.required(lineCount, "line_count"),
                 Internal.required(lines, "lines"),
+                Internal.required(origin, "origin"),
                 Internal.required(postings, "postings"),
                 result,
                 Internal.required(source, "source"),
                 Internal.required(status, "status"),
+                statusReason,
                 Internal.required(statusTitle, "status_title"),
                 Internal.required(summary, "summary"),
                 Internal.required(title, "title"),

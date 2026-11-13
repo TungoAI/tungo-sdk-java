@@ -9,6 +9,8 @@ import kz.tungo.sdk.internal.HttpEngine;
 import kz.tungo.sdk.models.ApproveBatchCompanyProposalsResponse;
 import kz.tungo.sdk.models.ApproveRequest;
 import kz.tungo.sdk.models.BatchApproveRequest;
+import kz.tungo.sdk.models.ProposalApprovalRequestBody;
+import kz.tungo.sdk.models.ProposalApprovalRequestResult;
 import kz.tungo.sdk.models.ProposalCard;
 import kz.tungo.sdk.models.ProposalDecision;
 import kz.tungo.sdk.models.ProposalListItem;
@@ -311,5 +313,78 @@ public final class ProposalsResourceAsync {
      */
     public CompletableFuture<ProposalDecision> reject(String companyId, String id, RejectRequest body) {
         return engine.async(() -> sync.reject(companyId, id, body));
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param body the request body; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ProposalApprovalRequestResult>> requestApprovalWithResponse(
+        String companyId,
+        String id,
+        ProposalApprovalRequestBody body,
+        RequestOptions options) {
+        return engine.async(() -> sync.requestApprovalWithResponse(companyId, id, body, options));
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param body the request body; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ProposalApprovalRequestResult> requestApproval(
+        String companyId,
+        String id,
+        ProposalApprovalRequestBody body,
+        RequestOptions options) {
+        return engine.async(() -> sync.requestApproval(companyId, id, body, options));
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param body the request body; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ProposalApprovalRequestResult> requestApproval(
+        String companyId,
+        String id,
+        ProposalApprovalRequestBody body) {
+        return engine.async(() -> sync.requestApproval(companyId, id, body));
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ProposalApprovalRequestResult> requestApproval(String companyId, String id) {
+        return engine.async(() -> sync.requestApproval(companyId, id));
     }
 }

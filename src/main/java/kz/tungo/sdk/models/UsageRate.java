@@ -26,6 +26,10 @@ public final class UsageRate {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long cacheReadPerMtokTiyn;
 
+    @JsonProperty("cache_write_1h_per_mtok_tiyn")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long cacheWrite1hPerMtokTiyn;
+
     @JsonProperty("cache_write_per_mtok_tiyn")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long cacheWritePerMtokTiyn;
@@ -46,22 +50,30 @@ public final class UsageRate {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long outputPerMtokTiyn;
 
+    @JsonProperty("title")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String title;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private UsageRate(
         @JsonProperty("cache_read_per_mtok_tiyn") Long cacheReadPerMtokTiyn,
+        @JsonProperty("cache_write_1h_per_mtok_tiyn") Long cacheWrite1hPerMtokTiyn,
         @JsonProperty("cache_write_per_mtok_tiyn") Long cacheWritePerMtokTiyn,
         @JsonProperty("effective_from") String effectiveFrom,
         @JsonProperty("input_per_mtok_tiyn") Long inputPerMtokTiyn,
         @JsonProperty("model") String model,
-        @JsonProperty("output_per_mtok_tiyn") Long outputPerMtokTiyn) {
+        @JsonProperty("output_per_mtok_tiyn") Long outputPerMtokTiyn,
+        @JsonProperty("title") String title) {
         this.cacheReadPerMtokTiyn = cacheReadPerMtokTiyn;
+        this.cacheWrite1hPerMtokTiyn = cacheWrite1hPerMtokTiyn;
         this.cacheWritePerMtokTiyn = cacheWritePerMtokTiyn;
         this.effectiveFrom = effectiveFrom;
         this.inputPerMtokTiyn = inputPerMtokTiyn;
         this.model = model;
         this.outputPerMtokTiyn = outputPerMtokTiyn;
+        this.title = title;
     }
 
     /**
@@ -92,7 +104,18 @@ public final class UsageRate {
     }
 
     /**
-     * Цена 1 млн токенов записи в кэш модели в тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+     * Цена 1 млн токенов записи в кэш модели на 1 час (дороже: так кэшируются правила и инструменты) в
+     * тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long cacheWrite1hPerMtokTiyn() {
+        return cacheWrite1hPerMtokTiyn;
+    }
+
+    /**
+     * Цена 1 млн токенов записи в кэш модели на 5 минут в тиынах (1 ₸ = 100 тиын; показывать значение
+     * / 100 ₸)
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -120,7 +143,8 @@ public final class UsageRate {
     }
 
     /**
-     * Модель ИИ (техническое имя)
+     * Модель ИИ: tungo-1-flash, tungo-1, tungo-1-deep (tungo-search — поиск по нормам, tungo-legacy —
+     * прежняя)
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -135,6 +159,15 @@ public final class UsageRate {
      */
     public Long outputPerMtokTiyn() {
         return outputPerMtokTiyn;
+    }
+
+    /**
+     * Название модели для людей
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public String title() {
+        return title;
     }
 
     /**
@@ -163,16 +196,18 @@ public final class UsageRate {
         UsageRate other = (UsageRate) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(cacheReadPerMtokTiyn, other.cacheReadPerMtokTiyn)
+            && Objects.equals(cacheWrite1hPerMtokTiyn, other.cacheWrite1hPerMtokTiyn)
             && Objects.equals(cacheWritePerMtokTiyn, other.cacheWritePerMtokTiyn)
             && Objects.equals(effectiveFrom, other.effectiveFrom)
             && Objects.equals(inputPerMtokTiyn, other.inputPerMtokTiyn)
             && Objects.equals(model, other.model)
-            && Objects.equals(outputPerMtokTiyn, other.outputPerMtokTiyn);
+            && Objects.equals(outputPerMtokTiyn, other.outputPerMtokTiyn)
+            && Objects.equals(title, other.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, cacheReadPerMtokTiyn, cacheWritePerMtokTiyn, effectiveFrom, inputPerMtokTiyn, model, outputPerMtokTiyn);
+        return Objects.hash(additionalProperties, cacheReadPerMtokTiyn, cacheWrite1hPerMtokTiyn, cacheWritePerMtokTiyn, effectiveFrom, inputPerMtokTiyn, model, outputPerMtokTiyn, title);
     }
 
     @Override
@@ -183,11 +218,13 @@ public final class UsageRate {
     /** Builder of {@link UsageRate}. */
     public static final class Builder {
         private Long cacheReadPerMtokTiyn;
+        private Long cacheWrite1hPerMtokTiyn;
         private Long cacheWritePerMtokTiyn;
         private String effectiveFrom;
         private Long inputPerMtokTiyn;
         private String model;
         private Long outputPerMtokTiyn;
+        private String title;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -195,11 +232,13 @@ public final class UsageRate {
 
         private Builder(UsageRate source) {
             this.cacheReadPerMtokTiyn = source.cacheReadPerMtokTiyn;
+            this.cacheWrite1hPerMtokTiyn = source.cacheWrite1hPerMtokTiyn;
             this.cacheWritePerMtokTiyn = source.cacheWritePerMtokTiyn;
             this.effectiveFrom = source.effectiveFrom;
             this.inputPerMtokTiyn = source.inputPerMtokTiyn;
             this.model = source.model;
             this.outputPerMtokTiyn = source.outputPerMtokTiyn;
+            this.title = source.title;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -216,8 +255,20 @@ public final class UsageRate {
         }
 
         /**
-         * Цена 1 млн токенов записи в кэш модели в тиынах (1 ₸ = 100 тиын; показывать значение / 100
-         * ₸)
+         * Цена 1 млн токенов записи в кэш модели на 1 час (дороже: так кэшируются правила и
+         * инструменты) в тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+         *
+         * @param cacheWrite1hPerMtokTiyn the value (required)
+         * @return this builder
+         */
+        public Builder cacheWrite1hPerMtokTiyn(Long cacheWrite1hPerMtokTiyn) {
+            this.cacheWrite1hPerMtokTiyn = cacheWrite1hPerMtokTiyn;
+            return this;
+        }
+
+        /**
+         * Цена 1 млн токенов записи в кэш модели на 5 минут в тиынах (1 ₸ = 100 тиын; показывать
+         * значение / 100 ₸)
          *
          * @param cacheWritePerMtokTiyn the value (required)
          * @return this builder
@@ -251,7 +302,8 @@ public final class UsageRate {
         }
 
         /**
-         * Модель ИИ (техническое имя)
+         * Модель ИИ: tungo-1-flash, tungo-1, tungo-1-deep (tungo-search — поиск по нормам,
+         * tungo-legacy — прежняя)
          *
          * @param model the value (required)
          * @return this builder
@@ -269,6 +321,17 @@ public final class UsageRate {
          */
         public Builder outputPerMtokTiyn(Long outputPerMtokTiyn) {
             this.outputPerMtokTiyn = outputPerMtokTiyn;
+            return this;
+        }
+
+        /**
+         * Название модели для людей
+         *
+         * @param title the value (required)
+         * @return this builder
+         */
+        public Builder title(String title) {
+            this.title = title;
             return this;
         }
 
@@ -293,11 +356,13 @@ public final class UsageRate {
         public UsageRate build() {
             UsageRate built = new UsageRate(
                 Internal.required(cacheReadPerMtokTiyn, "cache_read_per_mtok_tiyn"),
+                Internal.required(cacheWrite1hPerMtokTiyn, "cache_write_1h_per_mtok_tiyn"),
                 Internal.required(cacheWritePerMtokTiyn, "cache_write_per_mtok_tiyn"),
                 Internal.required(effectiveFrom, "effective_from"),
                 Internal.required(inputPerMtokTiyn, "input_per_mtok_tiyn"),
                 Internal.required(model, "model"),
-                Internal.required(outputPerMtokTiyn, "output_per_mtok_tiyn"));
+                Internal.required(outputPerMtokTiyn, "output_per_mtok_tiyn"),
+                Internal.required(title, "title"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

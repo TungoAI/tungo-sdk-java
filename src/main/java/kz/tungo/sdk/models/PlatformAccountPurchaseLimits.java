@@ -34,16 +34,22 @@ public final class PlatformAccountPurchaseLimits {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long minTiyn;
 
+    @JsonProperty("today_tiyn")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long todayTiyn;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private PlatformAccountPurchaseLimits(
         @JsonProperty("daily_max_tiyn") Long dailyMaxTiyn,
         @JsonProperty("max_tiyn") Long maxTiyn,
-        @JsonProperty("min_tiyn") Long minTiyn) {
+        @JsonProperty("min_tiyn") Long minTiyn,
+        @JsonProperty("today_tiyn") Long todayTiyn) {
         this.dailyMaxTiyn = dailyMaxTiyn;
         this.maxTiyn = maxTiyn;
         this.minTiyn = minTiyn;
+        this.todayTiyn = todayTiyn;
     }
 
     /**
@@ -92,6 +98,16 @@ public final class PlatformAccountPurchaseLimits {
     }
 
     /**
+     * Сколько уже пополнено сегодня (сутки по Алматы; платежи без итога тоже в счёте) — тот же счёт,
+     * что у предела daily_max_tiyn в тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long todayTiyn() {
+        return todayTiyn;
+    }
+
+    /**
      * Returns the properties of the JSON object that this version of the SDK does not model.
      *
      * @return an unmodifiable map of property names to raw JSON values
@@ -118,12 +134,13 @@ public final class PlatformAccountPurchaseLimits {
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(dailyMaxTiyn, other.dailyMaxTiyn)
             && Objects.equals(maxTiyn, other.maxTiyn)
-            && Objects.equals(minTiyn, other.minTiyn);
+            && Objects.equals(minTiyn, other.minTiyn)
+            && Objects.equals(todayTiyn, other.todayTiyn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, dailyMaxTiyn, maxTiyn, minTiyn);
+        return Objects.hash(additionalProperties, dailyMaxTiyn, maxTiyn, minTiyn, todayTiyn);
     }
 
     @Override
@@ -136,6 +153,7 @@ public final class PlatformAccountPurchaseLimits {
         private Long dailyMaxTiyn;
         private Long maxTiyn;
         private Long minTiyn;
+        private Long todayTiyn;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -145,6 +163,7 @@ public final class PlatformAccountPurchaseLimits {
             this.dailyMaxTiyn = source.dailyMaxTiyn;
             this.maxTiyn = source.maxTiyn;
             this.minTiyn = source.minTiyn;
+            this.todayTiyn = source.todayTiyn;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -182,6 +201,18 @@ public final class PlatformAccountPurchaseLimits {
         }
 
         /**
+         * Сколько уже пополнено сегодня (сутки по Алматы; платежи без итога тоже в счёте) — тот же
+         * счёт, что у предела daily_max_tiyn в тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+         *
+         * @param todayTiyn the value (required)
+         * @return this builder
+         */
+        public Builder todayTiyn(Long todayTiyn) {
+            this.todayTiyn = todayTiyn;
+            return this;
+        }
+
+        /**
          * Sets a property this version of the SDK does not model.
          *
          * @param name the JSON property name
@@ -203,7 +234,8 @@ public final class PlatformAccountPurchaseLimits {
             PlatformAccountPurchaseLimits built = new PlatformAccountPurchaseLimits(
                 Internal.required(dailyMaxTiyn, "daily_max_tiyn"),
                 Internal.required(maxTiyn, "max_tiyn"),
-                Internal.required(minTiyn, "min_tiyn"));
+                Internal.required(minTiyn, "min_tiyn"),
+                Internal.required(todayTiyn, "today_tiyn"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

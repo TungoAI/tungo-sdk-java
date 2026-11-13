@@ -64,6 +64,10 @@ public final class ChatDialog {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String title;
 
+    @JsonProperty("title_source")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ChatTitleSource titleSource;
+
     @JsonProperty("turn")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Double turn;
@@ -86,6 +90,7 @@ public final class ChatDialog {
         @JsonProperty("pd_restored") Boolean pdRestored,
         @JsonProperty("running") Boolean running,
         @JsonProperty("title") String title,
+        @JsonProperty("title_source") ChatTitleSource titleSource,
         @JsonProperty("turn") Double turn,
         @JsonProperty("updated_at") String updatedAt) {
         this.awaiting = awaiting;
@@ -98,6 +103,7 @@ public final class ChatDialog {
         this.pdRestored = pdRestored;
         this.running = running;
         this.title = title;
+        this.titleSource = titleSource;
         this.turn = turn;
         this.updatedAt = updatedAt;
     }
@@ -205,12 +211,21 @@ public final class ChatDialog {
     }
 
     /**
-     * Заголовок — первый вопрос одной строкой
+     * Название одной строкой: человека, иначе от ИИ, иначе первый вопрос. Откуда оно — title_source
      *
      * @return the value; null only if the API omitted this required property
      */
     public String title() {
         return title;
+    }
+
+    /**
+     * The <code>title_source</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ChatTitleSource titleSource() {
+        return titleSource;
     }
 
     /**
@@ -266,13 +281,14 @@ public final class ChatDialog {
             && Objects.equals(pdRestored, other.pdRestored)
             && Objects.equals(running, other.running)
             && Objects.equals(title, other.title)
+            && Objects.equals(titleSource, other.titleSource)
             && Objects.equals(turn, other.turn)
             && Objects.equals(updatedAt, other.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, awaiting, closed, createdAt, id, masked, messageCount, messages, pdRestored, running, title, turn, updatedAt);
+        return Objects.hash(additionalProperties, awaiting, closed, createdAt, id, masked, messageCount, messages, pdRestored, running, title, titleSource, turn, updatedAt);
     }
 
     @Override
@@ -292,6 +308,7 @@ public final class ChatDialog {
         private Boolean pdRestored;
         private Boolean running;
         private String title;
+        private ChatTitleSource titleSource;
         private Double turn;
         private String updatedAt;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -310,6 +327,7 @@ public final class ChatDialog {
             this.pdRestored = source.pdRestored;
             this.running = source.running;
             this.title = source.title;
+            this.titleSource = source.titleSource;
             this.turn = source.turn;
             this.updatedAt = source.updatedAt;
             this.additionalProperties.putAll(source.additionalProperties);
@@ -418,13 +436,25 @@ public final class ChatDialog {
         }
 
         /**
-         * Заголовок — первый вопрос одной строкой
+         * Название одной строкой: человека, иначе от ИИ, иначе первый вопрос. Откуда оно —
+         * title_source
          *
          * @param title the value (required)
          * @return this builder
          */
         public Builder title(String title) {
             this.title = title;
+            return this;
+        }
+
+        /**
+         * The <code>title_source</code> property.
+         *
+         * @param titleSource the value (required)
+         * @return this builder
+         */
+        public Builder titleSource(ChatTitleSource titleSource) {
+            this.titleSource = titleSource;
             return this;
         }
 
@@ -480,6 +510,7 @@ public final class ChatDialog {
                 Internal.required(pdRestored, "pd_restored"),
                 Internal.required(running, "running"),
                 Internal.required(title, "title"),
+                Internal.required(titleSource, "title_source"),
                 Internal.required(turn, "turn"),
                 Internal.required(updatedAt, "updated_at"));
             built.additionalProperties.putAll(additionalProperties);

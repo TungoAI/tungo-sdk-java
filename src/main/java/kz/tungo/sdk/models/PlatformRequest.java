@@ -39,6 +39,10 @@ public final class PlatformRequest {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final String companyId;
 
+    @JsonProperty("cost_tiyn")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final Long costTiyn;
+
     @JsonProperty("duration_ms")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long durationMs;
@@ -79,6 +83,7 @@ public final class PlatformRequest {
         @JsonProperty("at") String at,
         @JsonProperty("client_request_id") String clientRequestId,
         @JsonProperty("company_id") String companyId,
+        @JsonProperty("cost_tiyn") Long costTiyn,
         @JsonProperty("duration_ms") Long durationMs,
         @JsonProperty("id") String id,
         @JsonProperty("ip") String ip,
@@ -91,6 +96,7 @@ public final class PlatformRequest {
         this.at = at;
         this.clientRequestId = clientRequestId;
         this.companyId = companyId;
+        this.costTiyn = costTiyn;
         this.durationMs = durationMs;
         this.id = id;
         this.ip = ip;
@@ -153,6 +159,17 @@ public final class PlatformRequest {
      */
     public Optional<String> companyId() {
         return Optional.ofNullable(companyId);
+    }
+
+    /**
+     * Цена запроса в тиынах — сколько списано с баланса платформы за вызовы модели этого запроса (ход
+     * ИИ; у хода потоком — когда он закончится). null — запрос модель не вызывал; у запросов до
+     * появления этого поля тоже null
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<Long> costTiyn() {
+        return Optional.ofNullable(costTiyn);
     }
 
     /**
@@ -257,6 +274,7 @@ public final class PlatformRequest {
             && Objects.equals(at, other.at)
             && Objects.equals(clientRequestId, other.clientRequestId)
             && Objects.equals(companyId, other.companyId)
+            && Objects.equals(costTiyn, other.costTiyn)
             && Objects.equals(durationMs, other.durationMs)
             && Objects.equals(id, other.id)
             && Objects.equals(ip, other.ip)
@@ -269,7 +287,7 @@ public final class PlatformRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, apiKeyId, at, clientRequestId, companyId, durationMs, id, ip, method, path, query, requestId, status);
+        return Objects.hash(additionalProperties, apiKeyId, at, clientRequestId, companyId, costTiyn, durationMs, id, ip, method, path, query, requestId, status);
     }
 
     @Override
@@ -283,6 +301,7 @@ public final class PlatformRequest {
         private String at;
         private String clientRequestId;
         private String companyId;
+        private Long costTiyn;
         private Long durationMs;
         private String id;
         private String ip;
@@ -301,6 +320,7 @@ public final class PlatformRequest {
             this.at = source.at;
             this.clientRequestId = source.clientRequestId;
             this.companyId = source.companyId;
+            this.costTiyn = source.costTiyn;
             this.durationMs = source.durationMs;
             this.id = source.id;
             this.ip = source.ip;
@@ -353,6 +373,19 @@ public final class PlatformRequest {
          */
         public Builder companyId(String companyId) {
             this.companyId = companyId;
+            return this;
+        }
+
+        /**
+         * Цена запроса в тиынах — сколько списано с баланса платформы за вызовы модели этого запроса
+         * (ход ИИ; у хода потоком — когда он закончится). null — запрос модель не вызывал; у запросов
+         * до появления этого поля тоже null
+         *
+         * @param costTiyn the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder costTiyn(Long costTiyn) {
+            this.costTiyn = costTiyn;
             return this;
         }
 
@@ -469,6 +502,7 @@ public final class PlatformRequest {
                 Internal.required(at, "at"),
                 clientRequestId,
                 companyId,
+                costTiyn,
                 Internal.required(durationMs, "duration_ms"),
                 Internal.required(id, "id"),
                 ip,

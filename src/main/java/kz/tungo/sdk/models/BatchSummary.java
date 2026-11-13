@@ -61,6 +61,10 @@ public final class BatchSummary {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Boolean running;
 
+    @JsonProperty("statement")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final BatchStatement statement;
+
     @JsonProperty("title")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String title;
@@ -82,6 +86,7 @@ public final class BatchSummary {
         @JsonProperty("proposals") List<BatchSummaryProposal> proposals,
         @JsonProperty("reason") String reason,
         @JsonProperty("running") Boolean running,
+        @JsonProperty("statement") BatchStatement statement,
         @JsonProperty("title") String title,
         @JsonProperty("totals") BatchSummaryTotals totals) {
         this.approve = approve;
@@ -93,6 +98,7 @@ public final class BatchSummary {
         this.proposals = Internal.requiredList(proposals, "proposals");
         this.reason = reason;
         this.running = running;
+        this.statement = statement;
         this.title = title;
         this.totals = totals;
     }
@@ -197,6 +203,16 @@ public final class BatchSummary {
     }
 
     /**
+     * Данные файла выписки (счёт, банк, период, остатки); null — задание не по файлу выписки (ЭСФ,
+     * DirectBank, одобрение) или заведено до появления поля
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<BatchStatement> statement() {
+        return Optional.ofNullable(statement);
+    }
+
+    /**
      * Название задания
      *
      * @return the value; null only if the API omitted this required property
@@ -248,13 +264,14 @@ public final class BatchSummary {
             && Objects.equals(proposals, other.proposals)
             && Objects.equals(reason, other.reason)
             && Objects.equals(running, other.running)
+            && Objects.equals(statement, other.statement)
             && Objects.equals(title, other.title)
             && Objects.equals(totals, other.totals);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, approve, canApprove, finishedAt, jobId, kind, manualRows, proposals, reason, running, title, totals);
+        return Objects.hash(additionalProperties, approve, canApprove, finishedAt, jobId, kind, manualRows, proposals, reason, running, statement, title, totals);
     }
 
     @Override
@@ -273,6 +290,7 @@ public final class BatchSummary {
         private List<BatchSummaryProposal> proposals;
         private String reason;
         private Boolean running;
+        private BatchStatement statement;
         private String title;
         private BatchSummaryTotals totals;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -290,6 +308,7 @@ public final class BatchSummary {
             this.proposals = source.proposals;
             this.reason = source.reason;
             this.running = source.running;
+            this.statement = source.statement;
             this.title = source.title;
             this.totals = source.totals;
             this.additionalProperties.putAll(source.additionalProperties);
@@ -395,6 +414,18 @@ public final class BatchSummary {
         }
 
         /**
+         * Данные файла выписки (счёт, банк, период, остатки); null — задание не по файлу выписки (ЭСФ,
+         * DirectBank, одобрение) или заведено до появления поля
+         *
+         * @param statement the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder statement(BatchStatement statement) {
+            this.statement = statement;
+            return this;
+        }
+
+        /**
          * Название задания
          *
          * @param title the value (required)
@@ -445,6 +476,7 @@ public final class BatchSummary {
                 Internal.required(proposals, "proposals"),
                 reason,
                 Internal.required(running, "running"),
+                statement,
                 Internal.required(title, "title"),
                 Internal.required(totals, "totals"));
             built.additionalProperties.putAll(additionalProperties);

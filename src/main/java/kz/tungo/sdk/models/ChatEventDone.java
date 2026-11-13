@@ -18,7 +18,8 @@ import java.util.Optional;
 import kz.tungo.sdk.internal.Json;
 
 /**
- * Конец хода — приходит после записи хода в историю. Дальше событий не будет
+ * Конец хода — приходит после записи хода в историю. Дальше событий хода не будет; в первом ходе
+ * разговора за ним может прийти одно title
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,

@@ -17,12 +17,17 @@ import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
 /**
- * Уточняющий вопрос ИИ с вариантами. Вариант «свой ответ» есть всегда и в options не входит
+ * Вопрос с вариантами: уточняющий вопрос ИИ или подтверждение действия (confirm). Вариант «свой ответ»
+ * есть всегда и в options не входит
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE)
 public final class ChatChoiceQuestion {
+    @JsonProperty("confirm")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean confirm;
+
     @JsonProperty("header")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String header;
@@ -43,10 +48,12 @@ public final class ChatChoiceQuestion {
 
     @JsonCreator
     private ChatChoiceQuestion(
+        @JsonProperty("confirm") Boolean confirm,
         @JsonProperty("header") String header,
         @JsonProperty("multi_select") Boolean multiSelect,
         @JsonProperty("options") List<ChatChoiceOption> options,
         @JsonProperty("question") String question) {
+        this.confirm = confirm;
         this.header = header;
         this.multiSelect = multiSelect;
         this.options = Internal.requiredList(options, "options");
@@ -69,6 +76,17 @@ public final class ChatChoiceQuestion {
      */
     public Builder toBuilder() {
         return new Builder(this);
+    }
+
+    /**
+     * true — это не уточнение, а подтверждение действия: вопрос задала программа, действие выполнится
+     * только по кнопке согласия (первый вариант). Пропуск, свой текст и закрытие — отказ: кнопку
+     * «Пропустить» не показывать. false — обычный уточняющий вопрос ИИ
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean confirm() {
+        return confirm;
     }
 
     /**
@@ -132,6 +150,7 @@ public final class ChatChoiceQuestion {
         }
         ChatChoiceQuestion other = (ChatChoiceQuestion) o;
         return additionalProperties.equals(other.additionalProperties)
+            && Objects.equals(confirm, other.confirm)
             && Objects.equals(header, other.header)
             && Objects.equals(multiSelect, other.multiSelect)
             && Objects.equals(options, other.options)
@@ -140,7 +159,7 @@ public final class ChatChoiceQuestion {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, header, multiSelect, options, question);
+        return Objects.hash(additionalProperties, confirm, header, multiSelect, options, question);
     }
 
     @Override
@@ -150,6 +169,7 @@ public final class ChatChoiceQuestion {
 
     /** Builder of {@link ChatChoiceQuestion}. */
     public static final class Builder {
+        private Boolean confirm;
         private String header;
         private Boolean multiSelect;
         private List<ChatChoiceOption> options;
@@ -160,11 +180,25 @@ public final class ChatChoiceQuestion {
         }
 
         private Builder(ChatChoiceQuestion source) {
+            this.confirm = source.confirm;
             this.header = source.header;
             this.multiSelect = source.multiSelect;
             this.options = source.options;
             this.question = source.question;
             this.additionalProperties.putAll(source.additionalProperties);
+        }
+
+        /**
+         * true — это не уточнение, а подтверждение действия: вопрос задала программа, действие
+         * выполнится только по кнопке согласия (первый вариант). Пропуск, свой текст и закрытие —
+         * отказ: кнопку «Пропустить» не показывать. false — обычный уточняющий вопрос ИИ
+         *
+         * @param confirm the value (required)
+         * @return this builder
+         */
+        public Builder confirm(Boolean confirm) {
+            this.confirm = confirm;
+            return this;
         }
 
         /**
@@ -231,6 +265,7 @@ public final class ChatChoiceQuestion {
          */
         public ChatChoiceQuestion build() {
             ChatChoiceQuestion built = new ChatChoiceQuestion(
+                Internal.required(confirm, "confirm"),
                 Internal.required(header, "header"),
                 Internal.required(multiSelect, "multi_select"),
                 Internal.required(options, "options"),

@@ -20,9 +20,10 @@ import java.util.Objects;
  * ChatEventTool}, <code>proposal</code> {@link ChatEventProposal}, <code>citation</code> {@link
  * ChatEventCitation}, <code>question</code> {@link ChatEventQuestion}, <code>choice</code> {@link
  * ChatEventChoice}, <code>error</code> {@link ChatEventError}, <code>batch</code> {@link
- * ChatEventBatch}, <code>batch_report</code> {@link ChatEventBatchReport}, <code>done</code> {@link
- * ChatEventDone}. A value with a tag this version of the SDK does not know is decoded as {@link
- * Unknown}. Use <code>instanceof</code> or {@link #accept(Visitor)}.
+ * ChatEventBatch}, <code>batch_report</code> {@link ChatEventBatchReport}, <code>next</code> {@link
+ * ChatEventNext}, <code>done</code> {@link ChatEventDone}, <code>title</code> {@link ChatEventTitle}.
+ * A value with a tag this version of the SDK does not know is decoded as {@link Unknown}. Use
+ * <code>instanceof</code> or {@link #accept(Visitor)}.
  */
 @JsonDeserialize(using = ChatEvent.Deserializer.class)
 public interface ChatEvent {
@@ -171,12 +172,32 @@ public interface ChatEvent {
         }
 
         /**
+         * Handles the <code>next</code> variant.
+         *
+         * @param value the value
+         * @return the result
+         */
+        default R visitNext(ChatEventNext value) {
+            return visitDefault(value);
+        }
+
+        /**
          * Handles the <code>done</code> variant.
          *
          * @param value the value
          * @return the result
          */
         default R visitDone(ChatEventDone value) {
+            return visitDefault(value);
+        }
+
+        /**
+         * Handles the <code>title</code> variant.
+         *
+         * @param value the value
+         * @return the result
+         */
+        default R visitTitle(ChatEventTitle value) {
             return visitDefault(value);
         }
 
@@ -290,8 +311,12 @@ public interface ChatEvent {
                         return context.readTreeAsValue(node, ChatEventBatch.class);
                     case "batch_report":
                         return context.readTreeAsValue(node, ChatEventBatchReport.class);
+                    case "next":
+                        return context.readTreeAsValue(node, ChatEventNext.class);
                     case "done":
                         return context.readTreeAsValue(node, ChatEventDone.class);
+                    case "title":
+                        return context.readTreeAsValue(node, ChatEventTitle.class);
                     default:
                         break;
                 }

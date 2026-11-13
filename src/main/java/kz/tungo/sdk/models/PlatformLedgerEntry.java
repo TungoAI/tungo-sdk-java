@@ -39,6 +39,10 @@ public final class PlatformLedgerEntry {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long balanceAfterTiyn;
 
+    @JsonProperty("documents")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final PlatformLedgerEntryDocuments documents;
+
     @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String id;
@@ -71,6 +75,7 @@ public final class PlatformLedgerEntry {
         @JsonProperty("api_key_id") String apiKeyId,
         @JsonProperty("at") String at,
         @JsonProperty("balance_after_tiyn") Long balanceAfterTiyn,
+        @JsonProperty("documents") PlatformLedgerEntryDocuments documents,
         @JsonProperty("id") String id,
         @JsonProperty("kind") PlatformLedgerEntryKind kind,
         @JsonProperty("model") String model,
@@ -81,6 +86,7 @@ public final class PlatformLedgerEntry {
         this.apiKeyId = apiKeyId;
         this.at = at;
         this.balanceAfterTiyn = balanceAfterTiyn;
+        this.documents = documents;
         this.id = id;
         this.kind = kind;
         this.model = model;
@@ -142,6 +148,16 @@ public final class PlatformLedgerEntry {
      */
     public Long balanceAfterTiyn() {
         return balanceAfterTiyn;
+    }
+
+    /**
+     * Документы пополнения (kind = purchase) из его платежа. null — у остальных видов и у ключа не на
+     * все компании. Файл PDF ядро не формирует: чек выпускает касса, ссылка появляется в receipt_url
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<PlatformLedgerEntryDocuments> documents() {
+        return Optional.ofNullable(documents);
     }
 
     /**
@@ -228,6 +244,7 @@ public final class PlatformLedgerEntry {
             && Objects.equals(apiKeyId, other.apiKeyId)
             && Objects.equals(at, other.at)
             && Objects.equals(balanceAfterTiyn, other.balanceAfterTiyn)
+            && Objects.equals(documents, other.documents)
             && Objects.equals(id, other.id)
             && Objects.equals(kind, other.kind)
             && Objects.equals(model, other.model)
@@ -238,7 +255,7 @@ public final class PlatformLedgerEntry {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, amountTiyn, apiKeyId, at, balanceAfterTiyn, id, kind, model, note, paymentId, requestId);
+        return Objects.hash(additionalProperties, amountTiyn, apiKeyId, at, balanceAfterTiyn, documents, id, kind, model, note, paymentId, requestId);
     }
 
     @Override
@@ -252,6 +269,7 @@ public final class PlatformLedgerEntry {
         private String apiKeyId;
         private String at;
         private Long balanceAfterTiyn;
+        private PlatformLedgerEntryDocuments documents;
         private String id;
         private PlatformLedgerEntryKind kind;
         private String model;
@@ -268,6 +286,7 @@ public final class PlatformLedgerEntry {
             this.apiKeyId = source.apiKeyId;
             this.at = source.at;
             this.balanceAfterTiyn = source.balanceAfterTiyn;
+            this.documents = source.documents;
             this.id = source.id;
             this.kind = source.kind;
             this.model = source.model;
@@ -319,6 +338,19 @@ public final class PlatformLedgerEntry {
          */
         public Builder balanceAfterTiyn(Long balanceAfterTiyn) {
             this.balanceAfterTiyn = balanceAfterTiyn;
+            return this;
+        }
+
+        /**
+         * Документы пополнения (kind = purchase) из его платежа. null — у остальных видов и у ключа не
+         * на все компании. Файл PDF ядро не формирует: чек выпускает касса, ссылка появляется в
+         * receipt_url
+         *
+         * @param documents the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder documents(PlatformLedgerEntryDocuments documents) {
+            this.documents = documents;
             return this;
         }
 
@@ -414,6 +446,7 @@ public final class PlatformLedgerEntry {
                 apiKeyId,
                 Internal.required(at, "at"),
                 Internal.required(balanceAfterTiyn, "balance_after_tiyn"),
+                documents,
                 Internal.required(id, "id"),
                 Internal.required(kind, "kind"),
                 model,

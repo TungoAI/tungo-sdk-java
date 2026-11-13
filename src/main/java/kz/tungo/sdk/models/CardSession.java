@@ -35,16 +35,22 @@ public final class CardSession {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String scriptUrl;
 
+    @JsonProperty("test_mode")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean testMode;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private CardSession(
         @JsonProperty("payment_id") String paymentId,
         @JsonProperty("payment_object") Map<String, JsonNode> paymentObject,
-        @JsonProperty("script_url") String scriptUrl) {
+        @JsonProperty("script_url") String scriptUrl,
+        @JsonProperty("test_mode") Boolean testMode) {
         this.paymentId = paymentId;
         this.paymentObject = Internal.requiredMap(paymentObject, "payment_object");
         this.scriptUrl = scriptUrl;
+        this.testMode = testMode;
     }
 
     /**
@@ -96,6 +102,16 @@ public final class CardSession {
     }
 
     /**
+     * true — тестовый терминал ePay: настоящие деньги не списываются, платят тестовыми картами.
+     * Показать на форме пометку «тестовая оплата»
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean testMode() {
+        return testMode;
+    }
+
+    /**
      * Returns the properties of the JSON object that this version of the SDK does not model.
      *
      * @return an unmodifiable map of property names to raw JSON values
@@ -122,12 +138,13 @@ public final class CardSession {
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(paymentId, other.paymentId)
             && Objects.equals(paymentObject, other.paymentObject)
-            && Objects.equals(scriptUrl, other.scriptUrl);
+            && Objects.equals(scriptUrl, other.scriptUrl)
+            && Objects.equals(testMode, other.testMode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, paymentId, paymentObject, scriptUrl);
+        return Objects.hash(additionalProperties, paymentId, paymentObject, scriptUrl, testMode);
     }
 
     @Override
@@ -140,6 +157,7 @@ public final class CardSession {
         private String paymentId;
         private Map<String, JsonNode> paymentObject;
         private String scriptUrl;
+        private Boolean testMode;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -149,6 +167,7 @@ public final class CardSession {
             this.paymentId = source.paymentId;
             this.paymentObject = source.paymentObject;
             this.scriptUrl = source.scriptUrl;
+            this.testMode = source.testMode;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -189,6 +208,18 @@ public final class CardSession {
         }
 
         /**
+         * true — тестовый терминал ePay: настоящие деньги не списываются, платят тестовыми картами.
+         * Показать на форме пометку «тестовая оплата»
+         *
+         * @param testMode the value (required)
+         * @return this builder
+         */
+        public Builder testMode(Boolean testMode) {
+            this.testMode = testMode;
+            return this;
+        }
+
+        /**
          * Sets a property this version of the SDK does not model.
          *
          * @param name the JSON property name
@@ -210,7 +241,8 @@ public final class CardSession {
             CardSession built = new CardSession(
                 Internal.required(paymentId, "payment_id"),
                 Internal.required(paymentObject, "payment_object"),
-                Internal.required(scriptUrl, "script_url"));
+                Internal.required(scriptUrl, "script_url"),
+                Internal.required(testMode, "test_mode"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

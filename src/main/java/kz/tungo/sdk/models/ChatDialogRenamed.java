@@ -30,14 +30,20 @@ public final class ChatDialogRenamed {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String title;
 
+    @JsonProperty("title_source")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ChatTitleSource titleSource;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private ChatDialogRenamed(
         @JsonProperty("id") String id,
-        @JsonProperty("title") String title) {
+        @JsonProperty("title") String title,
+        @JsonProperty("title_source") ChatTitleSource titleSource) {
         this.id = id;
         this.title = title;
+        this.titleSource = titleSource;
     }
 
     /**
@@ -78,6 +84,15 @@ public final class ChatDialogRenamed {
     }
 
     /**
+     * The <code>title_source</code> property.
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public ChatTitleSource titleSource() {
+        return titleSource;
+    }
+
+    /**
      * Returns the properties of the JSON object that this version of the SDK does not model.
      *
      * @return an unmodifiable map of property names to raw JSON values
@@ -103,12 +118,13 @@ public final class ChatDialogRenamed {
         ChatDialogRenamed other = (ChatDialogRenamed) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(id, other.id)
-            && Objects.equals(title, other.title);
+            && Objects.equals(title, other.title)
+            && Objects.equals(titleSource, other.titleSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, id, title);
+        return Objects.hash(additionalProperties, id, title, titleSource);
     }
 
     @Override
@@ -120,6 +136,7 @@ public final class ChatDialogRenamed {
     public static final class Builder {
         private String id;
         private String title;
+        private ChatTitleSource titleSource;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -128,6 +145,7 @@ public final class ChatDialogRenamed {
         private Builder(ChatDialogRenamed source) {
             this.id = source.id;
             this.title = source.title;
+            this.titleSource = source.titleSource;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -155,6 +173,17 @@ public final class ChatDialogRenamed {
         }
 
         /**
+         * The <code>title_source</code> property.
+         *
+         * @param titleSource the value (required)
+         * @return this builder
+         */
+        public Builder titleSource(ChatTitleSource titleSource) {
+            this.titleSource = titleSource;
+            return this;
+        }
+
+        /**
          * Sets a property this version of the SDK does not model.
          *
          * @param name the JSON property name
@@ -175,7 +204,8 @@ public final class ChatDialogRenamed {
         public ChatDialogRenamed build() {
             ChatDialogRenamed built = new ChatDialogRenamed(
                 Internal.required(id, "id"),
-                Internal.required(title, "title"));
+                Internal.required(title, "title"),
+                Internal.required(titleSource, "title_source"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

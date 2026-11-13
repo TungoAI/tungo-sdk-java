@@ -123,7 +123,7 @@ class AsyncClientTest {
                 assertEquals("Привет", result.text());
                 assertEquals("d-1", result.dialogId().orElseThrow());
             }
-            server.enqueueJson(200, "{\"answer\":\"42\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"proposals\":[],\"questions\":[]}");
+            server.enqueueJson(200, "{\"answer\":\"42\",\"dialog_id\":\"d\",\"turn_no\":1,\"citations\":[],\"errors\":[],\"followups\":[],\"proposals\":[],\"questions\":[]}");
             assertEquals("42", client.async().ask("co_1", "q").get(20, TimeUnit.SECONDS).answer());
         }
     }

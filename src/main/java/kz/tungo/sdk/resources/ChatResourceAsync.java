@@ -14,13 +14,17 @@ import kz.tungo.sdk.models.ChatDialogList;
 import kz.tungo.sdk.models.ChatDialogPatch;
 import kz.tungo.sdk.models.ChatDialogRenamed;
 import kz.tungo.sdk.models.ChatDialogSummary;
+import kz.tungo.sdk.models.ChatMentionSearch;
 import kz.tungo.sdk.models.ChatMessageRequest;
 import kz.tungo.sdk.models.ChatStopResult;
+import kz.tungo.sdk.models.ChatSuggestions;
 import kz.tungo.sdk.models.ChatTokenCount;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import kz.tungo.sdk.models.ChatTurnResult;
 import kz.tungo.sdk.params.ChatListEventsParams;
+import kz.tungo.sdk.params.ChatListMentionsParams;
 import kz.tungo.sdk.params.ChatListParams;
+import kz.tungo.sdk.params.ChatListSuggestionsParams;
 
 /**
  * Диалоги с ИИ-бухгалтером: вопросы, потоковый чат (SSE), подсчёт токенов и история.
@@ -215,6 +219,126 @@ public final class ChatResourceAsync {
      */
     public CompletableFuture<ChatTokenCount> countTokens(String companyId, ChatTokenCountRequest body) {
         return engine.async(() -> sync.countTokens(companyId, body));
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatMentionSearch>> listMentionsWithResponse(
+        String companyId,
+        ChatListMentionsParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.listMentionsWithResponse(companyId, params, options));
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMentionSearch> listMentions(
+        String companyId,
+        ChatListMentionsParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.listMentions(companyId, params, options));
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMentionSearch> listMentions(String companyId, ChatListMentionsParams params) {
+        return engine.async(() -> sync.listMentions(companyId, params));
+    }
+
+    /**
+     * Что можно упомянуть через «&#64;».
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatMentionSearch> listMentions(String companyId) {
+        return engine.async(() -> sync.listMentions(companyId));
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatSuggestions>> listSuggestionsWithResponse(
+        String companyId,
+        ChatListSuggestionsParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.listSuggestionsWithResponse(companyId, params, options));
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatSuggestions> listSuggestions(
+        String companyId,
+        ChatListSuggestionsParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.listSuggestions(companyId, params, options));
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatSuggestions> listSuggestions(String companyId, ChatListSuggestionsParams params) {
+        return engine.async(() -> sync.listSuggestions(companyId, params));
+    }
+
+    /**
+     * Подсказки пустого чата.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/suggestions</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatSuggestions> listSuggestions(String companyId) {
+        return engine.async(() -> sync.listSuggestions(companyId));
     }
 
     /**

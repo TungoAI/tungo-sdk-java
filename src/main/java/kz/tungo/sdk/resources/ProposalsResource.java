@@ -13,6 +13,8 @@ import kz.tungo.sdk.internal.RequestSpec;
 import kz.tungo.sdk.models.ApproveBatchCompanyProposalsResponse;
 import kz.tungo.sdk.models.ApproveRequest;
 import kz.tungo.sdk.models.BatchApproveRequest;
+import kz.tungo.sdk.models.ProposalApprovalRequestBody;
+import kz.tungo.sdk.models.ProposalApprovalRequestResult;
 import kz.tungo.sdk.models.ProposalCard;
 import kz.tungo.sdk.models.ProposalDecision;
 import kz.tungo.sdk.models.ProposalListItem;
@@ -344,15 +346,90 @@ public final class ProposalsResource {
         return reject(companyId, id, body, RequestOptions.none());
     }
 
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param body the request body; may be null
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ProposalApprovalRequestResult> requestApprovalWithResponse(
+        String companyId,
+        String id,
+        ProposalApprovalRequestBody body,
+        RequestOptions options) {
+        return engine.execute(requestApprovalRequest(companyId, id, body), options, ProposalApprovalRequestResult.class);
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param body the request body; may be null
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ProposalApprovalRequestResult requestApproval(
+        String companyId,
+        String id,
+        ProposalApprovalRequestBody body,
+        RequestOptions options) {
+        return requestApprovalWithResponse(companyId, id, body, options).body();
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param body the request body; may be null
+     * @return the decoded response
+     */
+    public ProposalApprovalRequestResult requestApproval(
+        String companyId,
+        String id,
+        ProposalApprovalRequestBody body) {
+        return requestApproval(companyId, id, body, RequestOptions.none());
+    }
+
+    /**
+     * Отправить на одобрение.
+     * <p><code>POST /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/request-approval</code>,
+     * permission <code>proposals.create</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @return the decoded response
+     */
+    public ProposalApprovalRequestResult requestApproval(String companyId, String id) {
+        return requestApproval(companyId, id, null, RequestOptions.none());
+    }
+
     private static RequestSpec listRequest(String companyId, ProposalsListParams params) {
         QueryString query = new QueryString();
         if (params != null) {
+            query.add("approval_requested", params.approvalRequested().orElse(null));
+            query.add("batch_id", params.batchId().orElse(null));
             query.add("cursor", params.cursor().orElse(null));
             query.add("date_from", params.dateFrom().orElse(null));
             query.add("date_to", params.dateTo().orElse(null));
             query.add("kind", params.kind().orElse(null));
             query.add("limit", params.limit().orElse(null));
             query.add("q", params.q().orElse(null));
+            query.add("source", params.source().orElse(null));
             query.add("status", params.status().orElse(null));
         }
         return RequestSpec.of("GET", "/v1/companies/{co}/proposals", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/proposals")
@@ -378,6 +455,11 @@ public final class ProposalsResource {
     private static RequestSpec rejectRequest(String companyId, String id, RejectRequest body) {
         return RequestSpec.of("POST", "/v1/companies/{co}/proposals/{id}/reject", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/proposals/" + PathSegments.encode("id", id) + "/reject")
             .jsonBody(Objects.requireNonNull(body, "body"));
+    }
+
+    private static RequestSpec requestApprovalRequest(String companyId, String id, ProposalApprovalRequestBody body) {
+        return RequestSpec.of("POST", "/v1/companies/{co}/proposals/{id}/request-approval", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/proposals/" + PathSegments.encode("id", id) + "/request-approval")
+            .jsonBody(body);
     }
 
 }
