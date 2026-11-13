@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -360,6 +361,7 @@ public class ApiException extends TungoException {
         Details() {
         }
 
+        @SuppressWarnings("deprecation") // JsonNode.fields(), see the loop below
         void fill(JsonNode error) {
             envelope = isText(error.get("type")) && isText(error.get("message"));
             if (isText(error.get("type"))) {
@@ -380,7 +382,11 @@ public class ApiException extends TungoException {
                     }
                 }
             }
-            for (Map.Entry<String, JsonNode> entry : error.properties()) {
+            // fields() rather than properties(): properties() exists only from Jackson 2.15, and an
+            // application that pins an older Jackson would fail with NoSuchMethodError here.
+            Iterator<Map.Entry<String, JsonNode>> entries = error.fields();
+            while (entries.hasNext()) {
+                Map.Entry<String, JsonNode> entry = entries.next();
                 String name = entry.getKey();
                 if (!name.equals("type") && !name.equals("message") && !name.equals("code") && !name.equals("fields")) {
                     extra.put(name, entry.getValue());

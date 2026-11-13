@@ -30,7 +30,7 @@ It is generated from the API's OpenAPI contract, so its methods and models alway
 
 ## Requirements
 
-Java 11 or later. The library uses the JDK's `java.net.http.HttpClient` and depends only on [Jackson](https://github.com/FasterXML/jackson) (`jackson-databind` with `jackson-core` and `jackson-annotations`). CI runs on Java 11, 17, 21 and 25.
+Java 11 or later. The library uses the JDK's `java.net.http.HttpClient` and depends only on [Jackson](https://github.com/FasterXML/jackson) (`jackson-databind` with `jackson-core` and `jackson-annotations`), version 2.14 or later; the build declares 2.22.4. CI runs on Java 11, 17, 21 and 25.
 
 ## Installation
 
@@ -217,7 +217,7 @@ ChatStreamResult result = client.askStream("co_...", "Что с НДС за кв
 System.out.println(result.text() + " (" + result.stopReason().orElse("?") + ")");
 ```
 
-A stream holds a connection: always close it (try-with-resources). The same types serve `chat().answerStream`, `chat().listEvents`, `batches().listEvents` and `feed().listEvents` (an `EventStream<FeedItem>`). A stream has no total timeout, only the idle timeout (120 s by default). Iterating simply ends when the server closes the stream, but `accumulate()` returns only a finished turn: if the stream ends before its `done` event (a cut connection, an early `close()`), it throws `DecodeException` instead of returning the partial text. A success response that is not `text/event-stream` is a `DecodeException` as well.
+A stream holds a connection: always close it (try-with-resources). The same types serve `chat().answerStream`, `chat().listEvents`, `batches().listEvents` and `feed().listEvents` (an `EventStream<FeedItem>`). A stream has no total timeout, only the idle timeout (120 s by default). Iterating simply ends when the server closes the stream, but `accumulate()` returns only a finished turn: if the stream ends before its `done` event (a cut connection, an early `close()`), it throws `DecodeException` instead of returning the partial text. A success response that is not `text/event-stream` is a `DecodeException` as well. The exception is a finished chat turn that the API replays for a repeated `Idempotency-Key` (`application/json` with `Idempotent-Replayed: true`): its stored result arrives as the events of that turn, ending with `done`.
 
 ## Webhooks
 
