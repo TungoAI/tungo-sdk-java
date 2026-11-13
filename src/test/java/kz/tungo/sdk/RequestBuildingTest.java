@@ -13,6 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import kz.tungo.sdk.errors.ValidationException;
 import kz.tungo.sdk.internal.Json;
+import kz.tungo.sdk.models.ApproveRequest;
 import kz.tungo.sdk.models.AutomationHookPatch;
 import kz.tungo.sdk.models.ChatDialogPatch;
 import kz.tungo.sdk.models.ChatMessageRequest;
@@ -24,6 +25,24 @@ import org.junit.jupiter.api.Test;
 
 class RequestBuildingTest {
     private static final String PAGE = "{\"data\":[],\"counts\":{},\"next_cursor\":null}";
+
+    @Test
+    void theIdempotencyKeyOfAnApprovalBodyIsTheHeader() {
+        // The API prefers the header over the documented body field: a generated header would make
+        // a repeat of the same click a new approval.
+        try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
+            server.always((request, exchange) -> exchange.json(200, "{\"message\":\"ok\",\"ok\":true,\"repeated\":false}"));
+            ApproveRequest body = ApproveRequest.builder().idempotencyKey(" click-7 ").build();
+            client.proposals().approve("co_1", "P-1", body);
+            client.proposals().approve("co_1", "P-1", body);
+            client.proposals().approve("co_1", "P-1", body, RequestOptions.builder().idempotencyKey("own").build());
+            client.proposals().approve("co_1", "P-1", ApproveRequest.builder().build());
+            assertEquals("click-7", server.request(0).header("idempotency-key"));
+            assertEquals("click-7", server.request(1).header("idempotency-key"));
+            assertEquals("own", server.request(2).header("idempotency-key"));
+            assertEquals(36, server.request(3).header("idempotency-key").length());
+        }
+    }
 
     @Test
     void pathParametersAreEncodedAsOneSegment() {

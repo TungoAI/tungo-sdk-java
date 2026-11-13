@@ -11,15 +11,22 @@ import kz.tungo.sdk.internal.Json;
  * immutable.
  */
 public final class HookRequest {
+    /** The header a hook reads its signature from unless it was created with its own. */
+    public static final String DEFAULT_SIGNATURE_HEADER = "X-Signature";
+
+    private static final java.util.regex.Pattern SIGNATURE_HEADER = java.util.regex.Pattern.compile("[A-Za-z0-9-]{1,64}");
+
     private final byte[] body;
     private final String contentType;
     private final String secret;
+    private final String signatureHeader;
     private final String eventId;
 
     private HookRequest(Builder b) {
         this.body = b.body;
         this.contentType = b.contentType;
         this.secret = b.secret;
+        this.signatureHeader = b.signatureHeader;
         this.eventId = b.eventId;
     }
 
@@ -83,7 +90,16 @@ public final class HookRequest {
     }
 
     /**
-     * Returns the value of the {@code X-Signature} header.
+     * Returns the name of the header the signature is sent in: the hook's {@code signature_header}.
+     *
+     * @return the header name, {@code X-Signature} unless set on the builder
+     */
+    public String signatureHeader() {
+        return signatureHeader;
+    }
+
+    /**
+     * Returns the value of the signature header ({@link #signatureHeader()}).
      *
      * @return {@code sha256=<hex>} computed over the body, if a secret was given
      */
@@ -102,6 +118,7 @@ public final class HookRequest {
         private final byte[] body;
         private final String contentType;
         private String secret;
+        private String signatureHeader = DEFAULT_SIGNATURE_HEADER;
         private String eventId;
 
         private Builder(byte[] body, String contentType) {
@@ -111,7 +128,7 @@ public final class HookRequest {
 
         /**
          * Signs the body with the hook secret: the request carries
-         * {@code X-Signature: sha256=<hex>}.
+         * {@code X-Signature: sha256=<hex>}, or the header set with {@link #signatureHeader(String)}.
          *
          * @param secret the hook secret; null sends the request unsigned
          * @return this builder
@@ -122,6 +139,28 @@ public final class HookRequest {
                 throw new kz.tungo.sdk.errors.ValidationException("The hook secret must not be empty");
             }
             this.secret = secret;
+            return this;
+        }
+
+        /**
+         * Sets the header the hook reads its signature from: the {@code signature_header} it was
+         * created with. The default is {@code X-Signature}.
+         *
+         * @param name the header name; null restores {@code X-Signature}
+         * @return this builder
+         * @throws kz.tungo.sdk.errors.ValidationException when the name is not 1 to 64 Latin
+         *     letters, digits or hyphens
+         */
+        public Builder signatureHeader(String name) {
+            if (name == null) {
+                this.signatureHeader = DEFAULT_SIGNATURE_HEADER;
+                return this;
+            }
+            if (!SIGNATURE_HEADER.matcher(name).matches()) {
+                throw new kz.tungo.sdk.errors.ValidationException(
+                    "The signature header must be 1 to 64 Latin letters, digits or hyphens, like the hook's signature_header");
+            }
+            this.signatureHeader = name;
             return this;
         }
 

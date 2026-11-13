@@ -190,6 +190,23 @@ class WebhooksTest {
     }
 
     @Test
+    void aHookWithItsOwnSignatureHeaderIsSignedInThatHeader() {
+        try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
+            server.always((request, exchange) -> exchange.json(202, "{\"accepted\":true,\"run_ids\":[]}"));
+            HookRequest hook = HookRequest.json(Map.of("a", 1)).secret("hksec_1").signatureHeader("x-shop-signature").build();
+            client.sendHook("tok", hook);
+            client.automations().postHook("tok", hook);
+            for (int i = 0; i < 2; i++) {
+                MockServer.Request request = server.request(i);
+                assertNull(request.header("x-signature"), "the hook reads only its own signature_header");
+                assertTrue(TungoWebhooks.verifyHookSignature(request.body, request.header("x-shop-signature"), "hksec_1"));
+            }
+            assertEquals("X-Signature", HookRequest.json("x").build().signatureHeader());
+            assertThrows(ValidationException.class, () -> HookRequest.json("x").signatureHeader("bad header"));
+        }
+    }
+
+    @Test
     void sendHookFollowsTheRetryRules() {
         try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
             String busy = TestSupport.envelope("unavailable_error", "busy", "Busy");

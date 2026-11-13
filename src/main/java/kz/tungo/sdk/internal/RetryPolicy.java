@@ -2,9 +2,12 @@ package kz.tungo.sdk.internal;
 
 import java.net.http.HttpHeaders;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,7 +34,19 @@ public final class RetryPolicy {
     private static final Pattern NON_NEGATIVE_NUMBER = Pattern.compile("^[0-9]+(\\.[0-9]+)?$");
     private static final DateTimeFormatter ASCTIME =
         DateTimeFormatter.ofPattern("EEE MMM ppd HH:mm:ss yyyy", Locale.US).withZone(java.time.ZoneOffset.UTC);
-    private static final DateTimeFormatter RFC850 =
+    /**
+     * The obsolete RFC 850 date, {@code Sunday, 06-Nov-94 08:49:37 GMT}. Its year has two digits:
+     * RFC 9110 section 5.6.7 reads one that would be more than 50 years in the future as the most
+     * recent past year with those digits, so the century window starts 49 years back.
+     */
+    private static final DateTimeFormatter RFC850 = new DateTimeFormatterBuilder()
+        .appendPattern("EEEE, dd-MMM-")
+        .appendValueReduced(ChronoField.YEAR, 2, 2, LocalDate.now(java.time.ZoneOffset.UTC).minusYears(49))
+        .appendPattern(" HH:mm:ss 'GMT'")
+        .toFormatter(Locale.US)
+        .withZone(java.time.ZoneOffset.UTC);
+    /** The same form with a four-digit year, which some senders write. */
+    private static final DateTimeFormatter RFC850_FULL_YEAR =
         DateTimeFormatter.ofPattern("EEEE, dd-MMM-uuuu HH:mm:ss 'GMT'", Locale.US).withZone(java.time.ZoneOffset.UTC);
 
     private RetryPolicy() {
@@ -148,6 +163,11 @@ public final class RetryPolicy {
         }
         try {
             return ZonedDateTime.parse(value, RFC850).toInstant();
+        } catch (DateTimeParseException ignored) {
+            // try a four-digit year below
+        }
+        try {
+            return ZonedDateTime.parse(value, RFC850_FULL_YEAR).toInstant();
         } catch (DateTimeParseException ignored) {
             // try asctime below
         }

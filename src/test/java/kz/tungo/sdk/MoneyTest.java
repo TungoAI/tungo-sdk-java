@@ -11,6 +11,24 @@ import org.junit.jupiter.api.Test;
 
 class MoneyTest {
     @Test
+    void bigDecimalWithAHugeExponentIsBoundedBeforeItIsWrittenOut() {
+        // A BigDecimal parsed from user text may carry any exponent: no two-billion-character
+        // string, no OutOfMemoryError, only 0 or a ValidationException.
+        long started = System.nanoTime();
+        assertEquals(0, TungoMoney.toTiyn(new BigDecimal("1E-2000000000")));
+        assertEquals(0, TungoMoney.toTiyn(new BigDecimal("-1E-999999999")));
+        assertEquals(0, TungoMoney.toTiyn(new BigDecimal("0E-2000000000")));
+        assertEquals(0, TungoMoney.toTiyn(new BigDecimal("9.99E-4")));
+        assertEquals(1, TungoMoney.toTiyn(new BigDecimal("5E-3")));
+        assertEquals(-1, TungoMoney.toTiyn(new BigDecimal("-5E-3")));
+        assertEquals(10050, TungoMoney.toTiyn(new BigDecimal("1.005E2")));
+        assertEquals(9223372036854775800L, TungoMoney.toTiyn(new BigDecimal("9.2233720368547758E16")));
+        assertThrows(ValidationException.class, () -> TungoMoney.toTiyn(new BigDecimal("1E+999999999")));
+        assertThrows(ValidationException.class, () -> TungoMoney.toTiyn(new BigDecimal("-1E19")));
+        assertTrue(System.nanoTime() - started < 2_000_000_000L, "the conversion must stay cheap");
+    }
+
+    @Test
     void roundsHalfAwayFromZeroExactly() {
         assertEquals(101, TungoMoney.toTiyn("1.005"));
         assertEquals(29, TungoMoney.toTiyn("0.285"));

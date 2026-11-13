@@ -109,6 +109,24 @@ class StrictnessTest {
     }
 
     @Test
+    void retryAfterAcceptsTheObsoleteRfc850DateWithItsTwoDigitYear() {
+        // RFC 9110 requires recipients to accept "Sunday, 06-Nov-94 08:49:37 GMT".
+        Instant now = Instant.parse("2026-11-09T15:00:00Z");
+        String[][] cases = {
+            {"Monday, 09-Nov-26 15:00:10 GMT", "10.0"},
+            {"Monday, 09-Nov-26 15:02:00 GMT", "120.0"},
+            {"Monday, 09-Nov-2026 15:00:10 GMT", "10.0"},
+            {"Sunday, 06-Nov-94 08:49:37 GMT", "0.0"},
+        };
+        for (String[] c : cases) {
+            Double seconds = RetryPolicy.parseRetryAfter(
+                TestSupport.headers(TestSupport.json("{\"Retry-After\":\"" + c[0] + "\"}")), now);
+            assertNotNull(seconds, c[0]);
+            assertEquals(Double.parseDouble(c[1]), seconds, 1e-9, c[0]);
+        }
+    }
+
+    @Test
     void aZeroOrPastRetryAfterMeansTheNormalBackoff() {
         assertEquals(0.375, RetryPolicy.delaySeconds(0.0, 0, 0.0), 1e-9);
         assertEquals(0.75, RetryPolicy.delaySeconds(-3.0, 1, 0.0), 1e-9);

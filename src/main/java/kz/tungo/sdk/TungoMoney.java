@@ -62,7 +62,15 @@ public final class TungoMoney {
         if (amount == null) {
             throw new ValidationException("The amount must not be null");
         }
-        if (amount.precision() - amount.scale() > 40) {
+        // Bound the exponent before writing the value out: new BigDecimal("1E-2000000000") would
+        // otherwise become a two-billion-character string. precision() - scale() is the number of
+        // digits before the point: below 10^-3 an amount rounds to zero tiyn, and at 10^19 tenge
+        // and above it cannot fit into 64-bit tiyn.
+        long integerDigits = (long) amount.precision() - amount.scale();
+        if (amount.signum() == 0 || integerDigits < -2) {
+            return 0;
+        }
+        if (integerDigits > 19) {
             throw new ValidationException("The amount does not fit into 64-bit tiyn");
         }
         return toTiyn(amount.toPlainString());

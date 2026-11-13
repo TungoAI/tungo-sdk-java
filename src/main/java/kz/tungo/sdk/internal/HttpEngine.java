@@ -447,6 +447,9 @@ public final class HttpEngine implements AutoCloseable {
             idempotencyKey = spec.defaultIdempotencyKey;
         }
         if (idempotencyKey == null && spec.idempotencyHeader != null) {
+            idempotencyKey = bodyIdempotencyKey(spec);
+        }
+        if (idempotencyKey == null && spec.idempotencyHeader != null) {
             idempotencyKey = UUID.randomUUID().toString();
         }
         boolean retrySafe = RetryPolicy.isRetrySafe(spec.method, idempotencyKey != null);
@@ -683,5 +686,37 @@ public final class HttpEngine implements AutoCloseable {
                 httpExecutor.shutdownNow();
             }
         }
+    }
+
+    /**
+     * The {@code idempotency_key} field of a JSON object body (approving a proposal documents it as
+     * the same as the header), trimmed like the API trims it. The API prefers the header over the
+     * field, so a generated header would make the caller's own key useless. A key that cannot
+     * travel in a header (outside printable ASCII) is ignored here.
+     */
+    static String bodyIdempotencyKey(RequestSpec spec) {
+        if (spec.body == null || !"application/json".equals(spec.contentType)) {
+            return null;
+        }
+        JsonNode value;
+        try {
+            value = Json.MAPPER.readTree(spec.body).get("idempotency_key");
+        } catch (IOException | RuntimeException e) {
+            return null;
+        }
+        if (value == null || !value.isTextual()) {
+            return null;
+        }
+        String key = value.asText().strip();
+        if (key.isEmpty()) {
+            return null;
+        }
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            if (c < 0x20 || c > 0x7e) {
+                return null;
+            }
+        }
+        return key;
     }
 }
