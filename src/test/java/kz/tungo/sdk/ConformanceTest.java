@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
@@ -381,12 +383,20 @@ class ConformanceTest {
                 JsonNode expect = c.get("expect");
                 ChatStreamAccumulator acc = new ChatStreamAccumulator();
                 List<String> types = new ArrayList<>();
+                List<JsonNode> nexts = new ArrayList<>();
                 ChatStreamResult result;
                 Optional<ApiException> error;
                 try (ChatStream stream = client.chat().createStream("co_1", ChatMessageRequest.builder().message("m").build())) {
                     for (ChatEvent event : stream) {
                         acc.add(event);
                         types.add(event.type());
+                        if ("next".equals(event.type())) {
+                            JsonNode tree = Json.toTree(event);
+                            ObjectNode next = Json.MAPPER.createObjectNode();
+                            next.set("followups", tree.get("followups"));
+                            next.set("action", tree.hasNonNull("action") ? tree.get("action") : NullNode.getInstance());
+                            nexts.add(next);
+                        }
                     }
                     if (!types.contains("done")) {
                         // The stream was cut off: the raw events and the text so far are there, but
@@ -424,6 +434,9 @@ class ConformanceTest {
                     List<String> expectedTypes = new ArrayList<>();
                     expect.get("event_types").forEach(t -> expectedTypes.add(t.asText()));
                     assertEquals(expectedTypes, types, n);
+                }
+                if (expect.has("next")) {
+                    assertEquals(List.of(expect.get("next")), nexts, n);
                 }
                 if (expect.get("error").isNull()) {
                     assertFalse(error.isPresent(), n);

@@ -240,8 +240,8 @@ public final class HttpEngine implements AutoCloseable {
 
     /**
      * Turns a replayed ChatTurnResult into the event stream of the turn it stands for: text (the
-     * answer), proposal, question, citation, error and choice events, then done. The dialog id and
-     * the turn number, which a replay carries only in the body, are added to {@code headers} as
+     * answer), proposal, question, citation, error, choice and next events, then done. The dialog id
+     * and the turn number, which a replay carries only in the body, are added to {@code headers} as
      * X-Dialog-Id and X-Turn-No when they are missing.
      *
      * @return the event stream, or null when the body is not a chat turn result
@@ -308,6 +308,17 @@ public final class HttpEngine implements AutoCloseable {
             if (choiceId != null) {
                 done.set("choice_id", choiceId);
             }
+        }
+        // A live turn ends its finished answer with next right before done; the stored result keeps
+        // it as followups and next_action.
+        JsonNode followups = result.path("followups");
+        JsonNode action = result.path("next_action");
+        boolean hasFollowups = followups.isArray() && !followups.isEmpty();
+        if (hasFollowups || action.isObject()) {
+            ObjectNode next = Json.MAPPER.createObjectNode();
+            next.set("followups", hasFollowups ? followups.deepCopy() : Json.MAPPER.createArrayNode());
+            next.set("action", action.isObject() ? action.deepCopy() : NullNode.getInstance());
+            emit(out, "next", next);
         }
         emit(out, "done", done);
         return out.toString().getBytes(StandardCharsets.UTF_8);
