@@ -31,6 +31,10 @@ public final class PlatformAutoReload {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Boolean enabled;
 
+    @JsonProperty("monthly_count_max")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long monthlyCountMax;
+
     @JsonProperty("monthly_limit_tiyn")
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final Long monthlyLimitTiyn;
@@ -45,10 +49,12 @@ public final class PlatformAutoReload {
     private PlatformAutoReload(
         @JsonProperty("amount_tiyn") Long amountTiyn,
         @JsonProperty("enabled") Boolean enabled,
+        @JsonProperty("monthly_count_max") Long monthlyCountMax,
         @JsonProperty("monthly_limit_tiyn") Long monthlyLimitTiyn,
         @JsonProperty("threshold_tiyn") Long thresholdTiyn) {
         this.amountTiyn = amountTiyn;
         this.enabled = enabled;
+        this.monthlyCountMax = monthlyCountMax;
         this.monthlyLimitTiyn = monthlyLimitTiyn;
         this.thresholdTiyn = thresholdTiyn;
     }
@@ -87,6 +93,16 @@ public final class PlatformAutoReload {
      */
     public Boolean enabled() {
         return enabled;
+    }
+
+    /**
+     * Автопополнений за календарный месяц по Алматы не больше этого; месячный потолок трат исчерпан —
+     * автопополнения нет
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long monthlyCountMax() {
+        return monthlyCountMax;
     }
 
     /**
@@ -136,13 +152,14 @@ public final class PlatformAutoReload {
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(amountTiyn, other.amountTiyn)
             && Objects.equals(enabled, other.enabled)
+            && Objects.equals(monthlyCountMax, other.monthlyCountMax)
             && Objects.equals(monthlyLimitTiyn, other.monthlyLimitTiyn)
             && Objects.equals(thresholdTiyn, other.thresholdTiyn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, amountTiyn, enabled, monthlyLimitTiyn, thresholdTiyn);
+        return Objects.hash(additionalProperties, amountTiyn, enabled, monthlyCountMax, monthlyLimitTiyn, thresholdTiyn);
     }
 
     @Override
@@ -154,6 +171,7 @@ public final class PlatformAutoReload {
     public static final class Builder {
         private Long amountTiyn;
         private Boolean enabled;
+        private Long monthlyCountMax;
         private Long monthlyLimitTiyn;
         private Long thresholdTiyn;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -164,6 +182,7 @@ public final class PlatformAutoReload {
         private Builder(PlatformAutoReload source) {
             this.amountTiyn = source.amountTiyn;
             this.enabled = source.enabled;
+            this.monthlyCountMax = source.monthlyCountMax;
             this.monthlyLimitTiyn = source.monthlyLimitTiyn;
             this.thresholdTiyn = source.thresholdTiyn;
             this.additionalProperties.putAll(source.additionalProperties);
@@ -189,6 +208,18 @@ public final class PlatformAutoReload {
          */
         public Builder enabled(Boolean enabled) {
             this.enabled = enabled;
+            return this;
+        }
+
+        /**
+         * Автопополнений за календарный месяц по Алматы не больше этого; месячный потолок трат
+         * исчерпан — автопополнения нет
+         *
+         * @param monthlyCountMax the value (required)
+         * @return this builder
+         */
+        public Builder monthlyCountMax(Long monthlyCountMax) {
+            this.monthlyCountMax = monthlyCountMax;
             return this;
         }
 
@@ -238,6 +269,7 @@ public final class PlatformAutoReload {
             PlatformAutoReload built = new PlatformAutoReload(
                 amountTiyn,
                 Internal.required(enabled, "enabled"),
+                Internal.required(monthlyCountMax, "monthly_count_max"),
                 monthlyLimitTiyn,
                 thresholdTiyn);
             built.additionalProperties.putAll(additionalProperties);

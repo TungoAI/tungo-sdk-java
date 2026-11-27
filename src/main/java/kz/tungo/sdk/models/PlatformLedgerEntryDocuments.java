@@ -72,7 +72,8 @@ public final class PlatformLedgerEntryDocuments {
     }
 
     /**
-     * Номер акта выполненных работ (ACT-…), когда платёж прошёл; null — нет
+     * Устарело: номер акта (ACT-…) только у старых платежей; у новых — null, акт ежемесячный (GET
+     * /v1/workspaces/&#123;ws&#125;/documents)
      *
      * @return the value, or empty when it is absent or null
      */
@@ -170,7 +171,8 @@ public final class PlatformLedgerEntryDocuments {
         }
 
         /**
-         * Номер акта выполненных работ (ACT-…), когда платёж прошёл; null — нет
+         * Устарело: номер акта (ACT-…) только у старых платежей; у новых — null, акт ежемесячный (GET
+         * /v1/workspaces/&#123;ws&#125;/documents)
          *
          * @param actNumber the value; null sends an explicit JSON null
          * @return this builder

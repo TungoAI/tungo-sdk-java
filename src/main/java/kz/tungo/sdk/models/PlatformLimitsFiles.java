@@ -22,6 +22,18 @@ import kz.tungo.sdk.internal.Json;
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE)
 public final class PlatformLimitsFiles {
+    @JsonProperty("archive_bytes")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long archiveBytes;
+
+    @JsonProperty("archive_files")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long archiveFiles;
+
+    @JsonProperty("archives_per_message")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long archivesPerMessage;
+
     @JsonProperty("attachment_bytes")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long attachmentBytes;
@@ -58,10 +70,17 @@ public final class PlatformLimitsFiles {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long requestBytes;
 
+    @JsonProperty("upload_part_bytes")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long uploadPartBytes;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
     private PlatformLimitsFiles(
+        @JsonProperty("archive_bytes") Long archiveBytes,
+        @JsonProperty("archive_files") Long archiveFiles,
+        @JsonProperty("archives_per_message") Long archivesPerMessage,
         @JsonProperty("attachment_bytes") Long attachmentBytes,
         @JsonProperty("attachments_per_message") Long attachmentsPerMessage,
         @JsonProperty("attachments_total_bytes") Long attachmentsTotalBytes,
@@ -70,7 +89,11 @@ public final class PlatformLimitsFiles {
         @JsonProperty("hook_event_bytes") Long hookEventBytes,
         @JsonProperty("image_bytes") Long imageBytes,
         @JsonProperty("pdf_pages") Long pdfPages,
-        @JsonProperty("request_bytes") Long requestBytes) {
+        @JsonProperty("request_bytes") Long requestBytes,
+        @JsonProperty("upload_part_bytes") Long uploadPartBytes) {
+        this.archiveBytes = archiveBytes;
+        this.archiveFiles = archiveFiles;
+        this.archivesPerMessage = archivesPerMessage;
         this.attachmentBytes = attachmentBytes;
         this.attachmentsPerMessage = attachmentsPerMessage;
         this.attachmentsTotalBytes = attachmentsTotalBytes;
@@ -80,6 +103,7 @@ public final class PlatformLimitsFiles {
         this.imageBytes = imageBytes;
         this.pdfPages = pdfPages;
         this.requestBytes = requestBytes;
+        this.uploadPartBytes = uploadPartBytes;
     }
 
     /**
@@ -98,6 +122,34 @@ public final class PlatformLimitsFiles {
      */
     public Builder toBuilder() {
         return new Builder(this);
+    }
+
+    /**
+     * Один архив, байт; в attachments_total_bytes не входит. Больше attachment_bytes — только
+     * загрузкой по частям (POST …/chat/uploads)
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long archiveBytes() {
+        return archiveBytes;
+    }
+
+    /**
+     * Файлов в архиве вместе с вложенными архивами
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long archiveFiles() {
+        return archiveFiles;
+    }
+
+    /**
+     * Архивов (.zip, .rar, .7z) в одном сообщении
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long archivesPerMessage() {
+        return archivesPerMessage;
     }
 
     /**
@@ -183,6 +235,16 @@ public final class PlatformLimitsFiles {
     }
 
     /**
+     * Часть загрузки архива (PUT …/chat/uploads/&#123;upload_id&#125;/parts/&#123;n&#125;), байт;
+     * последняя — остаток
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long uploadPartBytes() {
+        return uploadPartBytes;
+    }
+
+    /**
      * Returns the properties of the JSON object that this version of the SDK does not model.
      *
      * @return an unmodifiable map of property names to raw JSON values
@@ -207,6 +269,9 @@ public final class PlatformLimitsFiles {
         }
         PlatformLimitsFiles other = (PlatformLimitsFiles) o;
         return additionalProperties.equals(other.additionalProperties)
+            && Objects.equals(archiveBytes, other.archiveBytes)
+            && Objects.equals(archiveFiles, other.archiveFiles)
+            && Objects.equals(archivesPerMessage, other.archivesPerMessage)
             && Objects.equals(attachmentBytes, other.attachmentBytes)
             && Objects.equals(attachmentsPerMessage, other.attachmentsPerMessage)
             && Objects.equals(attachmentsTotalBytes, other.attachmentsTotalBytes)
@@ -215,12 +280,13 @@ public final class PlatformLimitsFiles {
             && Objects.equals(hookEventBytes, other.hookEventBytes)
             && Objects.equals(imageBytes, other.imageBytes)
             && Objects.equals(pdfPages, other.pdfPages)
-            && Objects.equals(requestBytes, other.requestBytes);
+            && Objects.equals(requestBytes, other.requestBytes)
+            && Objects.equals(uploadPartBytes, other.uploadPartBytes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, attachmentBytes, attachmentsPerMessage, attachmentsTotalBytes, bankStatementRequestBytes, chatRequestBytes, hookEventBytes, imageBytes, pdfPages, requestBytes);
+        return Objects.hash(additionalProperties, archiveBytes, archiveFiles, archivesPerMessage, attachmentBytes, attachmentsPerMessage, attachmentsTotalBytes, bankStatementRequestBytes, chatRequestBytes, hookEventBytes, imageBytes, pdfPages, requestBytes, uploadPartBytes);
     }
 
     @Override
@@ -230,6 +296,9 @@ public final class PlatformLimitsFiles {
 
     /** Builder of {@link PlatformLimitsFiles}. */
     public static final class Builder {
+        private Long archiveBytes;
+        private Long archiveFiles;
+        private Long archivesPerMessage;
         private Long attachmentBytes;
         private Long attachmentsPerMessage;
         private Long attachmentsTotalBytes;
@@ -239,12 +308,16 @@ public final class PlatformLimitsFiles {
         private Long imageBytes;
         private Long pdfPages;
         private Long requestBytes;
+        private Long uploadPartBytes;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
         }
 
         private Builder(PlatformLimitsFiles source) {
+            this.archiveBytes = source.archiveBytes;
+            this.archiveFiles = source.archiveFiles;
+            this.archivesPerMessage = source.archivesPerMessage;
             this.attachmentBytes = source.attachmentBytes;
             this.attachmentsPerMessage = source.attachmentsPerMessage;
             this.attachmentsTotalBytes = source.attachmentsTotalBytes;
@@ -254,7 +327,42 @@ public final class PlatformLimitsFiles {
             this.imageBytes = source.imageBytes;
             this.pdfPages = source.pdfPages;
             this.requestBytes = source.requestBytes;
+            this.uploadPartBytes = source.uploadPartBytes;
             this.additionalProperties.putAll(source.additionalProperties);
+        }
+
+        /**
+         * Один архив, байт; в attachments_total_bytes не входит. Больше attachment_bytes — только
+         * загрузкой по частям (POST …/chat/uploads)
+         *
+         * @param archiveBytes the value (required)
+         * @return this builder
+         */
+        public Builder archiveBytes(Long archiveBytes) {
+            this.archiveBytes = archiveBytes;
+            return this;
+        }
+
+        /**
+         * Файлов в архиве вместе с вложенными архивами
+         *
+         * @param archiveFiles the value (required)
+         * @return this builder
+         */
+        public Builder archiveFiles(Long archiveFiles) {
+            this.archiveFiles = archiveFiles;
+            return this;
+        }
+
+        /**
+         * Архивов (.zip, .rar, .7z) в одном сообщении
+         *
+         * @param archivesPerMessage the value (required)
+         * @return this builder
+         */
+        public Builder archivesPerMessage(Long archivesPerMessage) {
+            this.archivesPerMessage = archivesPerMessage;
+            return this;
         }
 
         /**
@@ -358,6 +466,18 @@ public final class PlatformLimitsFiles {
         }
 
         /**
+         * Часть загрузки архива (PUT …/chat/uploads/&#123;upload_id&#125;/parts/&#123;n&#125;), байт;
+         * последняя — остаток
+         *
+         * @param uploadPartBytes the value (required)
+         * @return this builder
+         */
+        public Builder uploadPartBytes(Long uploadPartBytes) {
+            this.uploadPartBytes = uploadPartBytes;
+            return this;
+        }
+
+        /**
          * Sets a property this version of the SDK does not model.
          *
          * @param name the JSON property name
@@ -377,6 +497,9 @@ public final class PlatformLimitsFiles {
          */
         public PlatformLimitsFiles build() {
             PlatformLimitsFiles built = new PlatformLimitsFiles(
+                Internal.required(archiveBytes, "archive_bytes"),
+                Internal.required(archiveFiles, "archive_files"),
+                Internal.required(archivesPerMessage, "archives_per_message"),
                 Internal.required(attachmentBytes, "attachment_bytes"),
                 Internal.required(attachmentsPerMessage, "attachments_per_message"),
                 Internal.required(attachmentsTotalBytes, "attachments_total_bytes"),
@@ -385,7 +508,8 @@ public final class PlatformLimitsFiles {
                 Internal.required(hookEventBytes, "hook_event_bytes"),
                 Internal.required(imageBytes, "image_bytes"),
                 Internal.required(pdfPages, "pdf_pages"),
-                Internal.required(requestBytes, "request_bytes"));
+                Internal.required(requestBytes, "request_bytes"),
+                Internal.required(uploadPartBytes, "upload_part_bytes"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

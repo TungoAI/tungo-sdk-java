@@ -16,6 +16,8 @@ import kz.tungo.sdk.models.ChatDialogRated;
 import kz.tungo.sdk.models.ChatDialogRatingBody;
 import kz.tungo.sdk.models.ChatDialogRenamed;
 import kz.tungo.sdk.models.ChatDialogSummary;
+import kz.tungo.sdk.models.ChatFileItem;
+import kz.tungo.sdk.models.ChatFileList;
 import kz.tungo.sdk.models.ChatMentionSearch;
 import kz.tungo.sdk.models.ChatMessageRated;
 import kz.tungo.sdk.models.ChatMessageRatingBody;
@@ -24,11 +26,16 @@ import kz.tungo.sdk.models.ChatRatingDismissed;
 import kz.tungo.sdk.models.ChatRatingOptions;
 import kz.tungo.sdk.models.ChatStopResult;
 import kz.tungo.sdk.models.ChatSuggestions;
+import kz.tungo.sdk.models.ChatThinkingTranslation;
 import kz.tungo.sdk.models.ChatTokenCount;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import kz.tungo.sdk.models.ChatTurnResult;
+import kz.tungo.sdk.models.ChatUpload;
+import kz.tungo.sdk.models.ChatUploadCreate;
+import kz.tungo.sdk.models.ChatUploadPart;
 import kz.tungo.sdk.params.ChatGetRatingOptionsParams;
 import kz.tungo.sdk.params.ChatListEventsParams;
+import kz.tungo.sdk.params.ChatListFilesParams;
 import kz.tungo.sdk.params.ChatListMentionsParams;
 import kz.tungo.sdk.params.ChatListParams;
 import kz.tungo.sdk.params.ChatListSuggestionsParams;
@@ -229,6 +236,48 @@ public final class ChatResourceAsync {
     }
 
     /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns one page; see <code>listFilesAll</code> for a lazy iterator over every page.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of one page of results; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<Page<ChatFileItem, ChatFileList>> listFiles(
+        String companyId,
+        ChatListFilesParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.listFiles(companyId, params, options));
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns one page; see <code>listFilesAll</code> for a lazy iterator over every page.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return a future of one page of results; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<Page<ChatFileItem, ChatFileList>> listFiles(String companyId, ChatListFilesParams params) {
+        return engine.async(() -> sync.listFiles(companyId, params));
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns one page; see <code>listFilesAll</code> for a lazy iterator over every page.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return a future of one page of results; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<Page<ChatFileItem, ChatFileList>> listFiles(String companyId) {
+        return engine.async(() -> sync.listFiles(companyId));
+    }
+
+    /**
      * Что можно упомянуть через «&#64;».
      * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
      * <code>chat.use</code>.
@@ -406,6 +455,158 @@ public final class ChatResourceAsync {
      */
     public CompletableFuture<ChatSuggestions> listSuggestions(String companyId) {
         return engine.async(() -> sync.listSuggestions(companyId));
+    }
+
+    /**
+     * Начать загрузку архива к сообщению.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/uploads</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatUpload>> createUploadWithResponse(
+        String companyId,
+        ChatUploadCreate body,
+        RequestOptions options) {
+        return engine.async(() -> sync.createUploadWithResponse(companyId, body, options));
+    }
+
+    /**
+     * Начать загрузку архива к сообщению.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/uploads</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatUpload> createUpload(String companyId, ChatUploadCreate body, RequestOptions options) {
+        return engine.async(() -> sync.createUpload(companyId, body, options));
+    }
+
+    /**
+     * Начать загрузку архива к сообщению.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/uploads</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param body the request body
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatUpload> createUpload(String companyId, ChatUploadCreate body) {
+        return engine.async(() -> sync.createUpload(companyId, body));
+    }
+
+    /**
+     * Отменить загрузку архива.
+     * <p><code>DELETE /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param options per-request options; may be null
+     * @return a future of response details (status, headers, request id, rate limit); it fails with
+     *     the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<Void>> deleteUploadWithResponse(
+        String companyId,
+        String upload,
+        RequestOptions options) {
+        return engine.async(() -> sync.deleteUploadWithResponse(companyId, upload, options));
+    }
+
+    /**
+     * Отменить загрузку архива.
+     * <p><code>DELETE /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param options per-request options; may be null
+     * @return a future completed when the call succeeds
+     */
+    public CompletableFuture<Void> deleteUpload(String companyId, String upload, RequestOptions options) {
+        return engine.async(() -> {
+            sync.deleteUpload(companyId, upload, options);
+            return null;
+        });
+    }
+
+    /**
+     * Отменить загрузку архива.
+     * <p><code>DELETE /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @return a future completed when the call succeeds
+     */
+    public CompletableFuture<Void> deleteUpload(String companyId, String upload) {
+        return engine.async(() -> {
+            sync.deleteUpload(companyId, upload);
+            return null;
+        });
+    }
+
+    /**
+     * Часть архива.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;/parts/&#123;n&#125;</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param n Номер части с 0
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatUploadPart>> putUploadPartWithResponse(
+        String companyId,
+        String upload,
+        String n,
+        RequestOptions options) {
+        return engine.async(() -> sync.putUploadPartWithResponse(companyId, upload, n, options));
+    }
+
+    /**
+     * Часть архива.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;/parts/&#123;n&#125;</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param n Номер части с 0
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatUploadPart> putUploadPart(
+        String companyId,
+        String upload,
+        String n,
+        RequestOptions options) {
+        return engine.async(() -> sync.putUploadPart(companyId, upload, n, options));
+    }
+
+    /**
+     * Часть архива.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;/parts/&#123;n&#125;</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param n Номер части с 0
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatUploadPart> putUploadPart(String companyId, String upload, String n) {
+        return engine.async(() -> sync.putUploadPart(companyId, upload, n));
     }
 
     /**
@@ -990,5 +1191,64 @@ public final class ChatResourceAsync {
      */
     public CompletableFuture<ChatStopResult> stop(String companyId, String id) {
         return engine.async(() -> sync.stop(companyId, id));
+    }
+
+    /**
+     * Перевести размышление на русский.
+     * <p><code>POST
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/thinking/&#123;tid&#125;/translate</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param tid id блока размышления не по-русски (16 hex): тот же в событии thinking и в истории
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<ChatThinkingTranslation>> translateThinkingWithResponse(
+        String companyId,
+        String id,
+        String tid,
+        RequestOptions options) {
+        return engine.async(() -> sync.translateThinkingWithResponse(companyId, id, tid, options));
+    }
+
+    /**
+     * Перевести размышление на русский.
+     * <p><code>POST
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/thinking/&#123;tid&#125;/translate</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param tid id блока размышления не по-русски (16 hex): тот же в событии thinking и в истории
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatThinkingTranslation> translateThinking(
+        String companyId,
+        String id,
+        String tid,
+        RequestOptions options) {
+        return engine.async(() -> sync.translateThinking(companyId, id, tid, options));
+    }
+
+    /**
+     * Перевести размышление на русский.
+     * <p><code>POST
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/thinking/&#123;tid&#125;/translate</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param tid id блока размышления не по-русски (16 hex): тот же в событии thinking и в истории
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ChatThinkingTranslation> translateThinking(String companyId, String id, String tid) {
+        return engine.async(() -> sync.translateThinking(companyId, id, tid));
     }
 }

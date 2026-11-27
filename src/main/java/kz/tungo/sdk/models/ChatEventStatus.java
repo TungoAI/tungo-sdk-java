@@ -26,6 +26,10 @@ import kz.tungo.sdk.internal.Json;
     creatorVisibility = JsonAutoDetect.Visibility.NONE)
 @JsonDeserialize(using = JsonDeserializer.None.class)
 public final class ChatEventStatus implements ChatEvent {
+    @JsonProperty("chars")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long chars;
+
     @JsonProperty("code")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final ChatEventStatusCode code;
@@ -42,9 +46,11 @@ public final class ChatEventStatus implements ChatEvent {
 
     @JsonCreator
     private ChatEventStatus(
+        @JsonProperty("chars") Long chars,
         @JsonProperty("code") ChatEventStatusCode code,
         @JsonProperty("text") String text,
         @JsonProperty("type") String type) {
+        this.chars = chars;
         this.code = code;
         this.text = text;
         this.type = type != null ? type : "status";
@@ -69,10 +75,25 @@ public final class ChatEventStatus implements ChatEvent {
     }
 
     /**
+     * Только у code = writing: сколько знаков ответа уже написано (не убывает в пределах одного
+     * ответа). Текста ответа в событии нет — он придёт событием text
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<Long> chars() {
+        return Optional.ofNullable(chars);
+    }
+
+    /**
      * Что происходит: - `compacting` — сервер сжимает историю длинного разговора - `escalating` —
-     * ответ перепроверяется более сильной моделью — ход займёт дольше - `elsewhere` — ответ готовится
-     * на другом сервере Tungo — он появится целиком, когда будет готов (событие done со stop_reason
-     * elsewhere)
+     * ответ перепроверяется более сильной моделью — ход займёт дольше - `checking_norm` — ответ
+     * сослался на норму, не открыв её: та же модель открывает норму и пишет ответ заново — показанный
+     * текст заменит ответ события done - `writing` — ответ пишется, но его текст придержан до проверки
+     * ссылок на нормы: chars — сколько знаков текста этого витка уже написано (растёт, не чаще ~5
+     * событий в секунду), самого текста в событии нет. Текст витка придёт событием text целиком после
+     * проверки; checking_norm или escalating — ответ пишется заново, показанный счёт сбросить -
+     * `elsewhere` — ответ готовится на другом сервере Tungo — он появится целиком, когда будет готов
+     * (событие done со stop_reason elsewhere)
      *
      * @return the value, or empty when it is absent or null
      */
@@ -129,6 +150,7 @@ public final class ChatEventStatus implements ChatEvent {
         }
         ChatEventStatus other = (ChatEventStatus) o;
         return additionalProperties.equals(other.additionalProperties)
+            && Objects.equals(chars, other.chars)
             && Objects.equals(code, other.code)
             && Objects.equals(text, other.text)
             && Objects.equals(type, other.type);
@@ -136,7 +158,7 @@ public final class ChatEventStatus implements ChatEvent {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, code, text, type);
+        return Objects.hash(additionalProperties, chars, code, text, type);
     }
 
     @Override
@@ -146,6 +168,7 @@ public final class ChatEventStatus implements ChatEvent {
 
     /** Builder of {@link ChatEventStatus}. */
     public static final class Builder {
+        private Long chars;
         private ChatEventStatusCode code;
         private String text;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -154,16 +177,34 @@ public final class ChatEventStatus implements ChatEvent {
         }
 
         private Builder(ChatEventStatus source) {
+            this.chars = source.chars;
             this.code = source.code;
             this.text = source.text;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
         /**
+         * Только у code = writing: сколько знаков ответа уже написано (не убывает в пределах одного
+         * ответа). Текста ответа в событии нет — он придёт событием text
+         *
+         * @param chars the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder chars(Long chars) {
+            this.chars = chars;
+            return this;
+        }
+
+        /**
          * Что происходит: - `compacting` — сервер сжимает историю длинного разговора - `escalating` —
-         * ответ перепроверяется более сильной моделью — ход займёт дольше - `elsewhere` — ответ
-         * готовится на другом сервере Tungo — он появится целиком, когда будет готов (событие done со
-         * stop_reason elsewhere)
+         * ответ перепроверяется более сильной моделью — ход займёт дольше - `checking_norm` — ответ
+         * сослался на норму, не открыв её: та же модель открывает норму и пишет ответ заново —
+         * показанный текст заменит ответ события done - `writing` — ответ пишется, но его текст
+         * придержан до проверки ссылок на нормы: chars — сколько знаков текста этого витка уже
+         * написано (растёт, не чаще ~5 событий в секунду), самого текста в событии нет. Текст витка
+         * придёт событием text целиком после проверки; checking_norm или escalating — ответ пишется
+         * заново, показанный счёт сбросить - `elsewhere` — ответ готовится на другом сервере Tungo —
+         * он появится целиком, когда будет готов (событие done со stop_reason elsewhere)
          *
          * @param code the value; null leaves the property out
          * @return this builder
@@ -204,6 +245,7 @@ public final class ChatEventStatus implements ChatEvent {
          */
         public ChatEventStatus build() {
             ChatEventStatus built = new ChatEventStatus(
+                chars,
                 code,
                 Internal.required(text, "text"),
                 "status");

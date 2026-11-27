@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
 /**
@@ -31,7 +30,7 @@ public final class AutomationTriggerHook implements AutomationTrigger {
     private final AutomationEventFilter filter;
 
     @JsonProperty("hook_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private final String hookId;
 
     @JsonProperty("kind")
@@ -78,12 +77,13 @@ public final class AutomationTriggerHook implements AutomationTrigger {
     }
 
     /**
-     * Хук, события которого запускают сценарий (hk_…)
+     * Хук, события которого запускают сценарий; null — хук удалён: событиями сценарий больше не
+     * запускается, пока ему не назначат другой хук (PUT …/scenarios/&#123;id&#125;) (hk_…)
      *
-     * @return the value; null only if the API omitted this required property
+     * @return the value, or empty when it is absent or null
      */
-    public String hookId() {
-        return hookId;
+    public Optional<String> hookId() {
+        return Optional.ofNullable(hookId);
     }
 
     /**
@@ -168,9 +168,10 @@ public final class AutomationTriggerHook implements AutomationTrigger {
         }
 
         /**
-         * Хук, события которого запускают сценарий (hk_…)
+         * Хук, события которого запускают сценарий; null — хук удалён: событиями сценарий больше не
+         * запускается, пока ему не назначат другой хук (PUT …/scenarios/&#123;id&#125;) (hk_…)
          *
-         * @param hookId the value (required)
+         * @param hookId the value; null sends an explicit JSON null
          * @return this builder
          */
         public Builder hookId(String hookId) {
@@ -194,12 +195,11 @@ public final class AutomationTriggerHook implements AutomationTrigger {
          * Builds the <code>AutomationTriggerHook</code>.
          *
          * @return the immutable object
-         * @throws IllegalStateException when a required property is not set
          */
         public AutomationTriggerHook build() {
             AutomationTriggerHook built = new AutomationTriggerHook(
                 filter,
-                Internal.required(hookId, "hook_id"),
+                hookId,
                 "hook");
             built.additionalProperties.putAll(additionalProperties);
             return built;

@@ -14,11 +14,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
 /**
- * Размышление модели (по-русски), кусками — можно показать свёрнутым блоком
+ * Размышление модели кусками — можно показать свёрнутым блоком. Блок не по-русски приходит целиком в
+ * конце блока: original и translate_id
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,
@@ -29,6 +31,14 @@ public final class ChatEventThinking implements ChatEvent {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String delta;
 
+    @JsonProperty("original")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String original;
+
+    @JsonProperty("translate_id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String translateId;
+
     @JsonProperty("type")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String type;
@@ -38,8 +48,12 @@ public final class ChatEventThinking implements ChatEvent {
     @JsonCreator
     private ChatEventThinking(
         @JsonProperty("delta") String delta,
+        @JsonProperty("original") String original,
+        @JsonProperty("translate_id") String translateId,
         @JsonProperty("type") String type) {
         this.delta = delta;
+        this.original = original;
+        this.translateId = translateId;
         this.type = type != null ? type : "thinking";
     }
 
@@ -62,12 +76,32 @@ public final class ChatEventThinking implements ChatEvent {
     }
 
     /**
-     * Новый кусок размышления
+     * Новый кусок размышления по-русски; у блока не по-русски — пометка «Обдумываю…» (пусто, если она
+     * уже стоит)
      *
      * @return the value; null only if the API omitted this required property
      */
     public String delta() {
         return delta;
+    }
+
+    /**
+     * Блок не по-русски целиком, как его написала модель
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> original() {
+        return Optional.ofNullable(original);
+    }
+
+    /**
+     * id блока для перевода: POST …/chat/&#123;id&#125;/thinking/&#123;translate_id&#125;/translate —
+     * после ответа, когда человек раскрыл шаги
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<String> translateId() {
+        return Optional.ofNullable(translateId);
     }
 
     /**
@@ -111,12 +145,14 @@ public final class ChatEventThinking implements ChatEvent {
         ChatEventThinking other = (ChatEventThinking) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(delta, other.delta)
+            && Objects.equals(original, other.original)
+            && Objects.equals(translateId, other.translateId)
             && Objects.equals(type, other.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, delta, type);
+        return Objects.hash(additionalProperties, delta, original, translateId, type);
     }
 
     @Override
@@ -127,6 +163,8 @@ public final class ChatEventThinking implements ChatEvent {
     /** Builder of {@link ChatEventThinking}. */
     public static final class Builder {
         private String delta;
+        private String original;
+        private String translateId;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -134,17 +172,44 @@ public final class ChatEventThinking implements ChatEvent {
 
         private Builder(ChatEventThinking source) {
             this.delta = source.delta;
+            this.original = source.original;
+            this.translateId = source.translateId;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
         /**
-         * Новый кусок размышления
+         * Новый кусок размышления по-русски; у блока не по-русски — пометка «Обдумываю…» (пусто, если
+         * она уже стоит)
          *
          * @param delta the value (required)
          * @return this builder
          */
         public Builder delta(String delta) {
             this.delta = delta;
+            return this;
+        }
+
+        /**
+         * Блок не по-русски целиком, как его написала модель
+         *
+         * @param original the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder original(String original) {
+            this.original = original;
+            return this;
+        }
+
+        /**
+         * id блока для перевода: POST
+         * …/chat/&#123;id&#125;/thinking/&#123;translate_id&#125;/translate — после ответа, когда
+         * человек раскрыл шаги
+         *
+         * @param translateId the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder translateId(String translateId) {
+            this.translateId = translateId;
             return this;
         }
 
@@ -169,6 +234,8 @@ public final class ChatEventThinking implements ChatEvent {
         public ChatEventThinking build() {
             ChatEventThinking built = new ChatEventThinking(
                 Internal.required(delta, "delta"),
+                original,
+                translateId,
                 "thinking");
             built.additionalProperties.putAll(additionalProperties);
             return built;

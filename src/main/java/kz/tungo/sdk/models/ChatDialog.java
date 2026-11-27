@@ -44,6 +44,10 @@ public final class ChatDialog {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Double masked;
 
+    @JsonProperty("memory")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean memory;
+
     @JsonProperty("message_count")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Double messageCount;
@@ -93,6 +97,7 @@ public final class ChatDialog {
         @JsonProperty("created_at") String createdAt,
         @JsonProperty("id") String id,
         @JsonProperty("masked") Double masked,
+        @JsonProperty("memory") Boolean memory,
         @JsonProperty("message_count") Double messageCount,
         @JsonProperty("messages") List<ChatMessage> messages,
         @JsonProperty("pd_restored") Boolean pdRestored,
@@ -108,6 +113,7 @@ public final class ChatDialog {
         this.createdAt = createdAt;
         this.id = id;
         this.masked = masked;
+        this.memory = memory;
         this.messageCount = messageCount;
         this.messages = Internal.requiredList(messages, "messages");
         this.pdRestored = pdRestored;
@@ -183,6 +189,16 @@ public final class ChatDialog {
      */
     public Double masked() {
         return masked;
+    }
+
+    /**
+     * false — разговор «без памяти» (выбран при создании): без памяти ИИ и поиска по прошлым
+     * разговорам — показать пометку в шапке
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean memory() {
+        return memory;
     }
 
     /**
@@ -310,6 +326,7 @@ public final class ChatDialog {
             && Objects.equals(createdAt, other.createdAt)
             && Objects.equals(id, other.id)
             && Objects.equals(masked, other.masked)
+            && Objects.equals(memory, other.memory)
             && Objects.equals(messageCount, other.messageCount)
             && Objects.equals(messages, other.messages)
             && Objects.equals(pdRestored, other.pdRestored)
@@ -324,7 +341,7 @@ public final class ChatDialog {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, awaiting, closed, createdAt, id, masked, messageCount, messages, pdRestored, rating, ratingPrompt, running, title, titleSource, turn, updatedAt);
+        return Objects.hash(additionalProperties, awaiting, closed, createdAt, id, masked, memory, messageCount, messages, pdRestored, rating, ratingPrompt, running, title, titleSource, turn, updatedAt);
     }
 
     @Override
@@ -339,6 +356,7 @@ public final class ChatDialog {
         private String createdAt;
         private String id;
         private Double masked;
+        private Boolean memory;
         private Double messageCount;
         private List<ChatMessage> messages;
         private Boolean pdRestored;
@@ -360,6 +378,7 @@ public final class ChatDialog {
             this.createdAt = source.createdAt;
             this.id = source.id;
             this.masked = source.masked;
+            this.memory = source.memory;
             this.messageCount = source.messageCount;
             this.messages = source.messages;
             this.pdRestored = source.pdRestored;
@@ -427,6 +446,18 @@ public final class ChatDialog {
          */
         public Builder masked(Double masked) {
             this.masked = masked;
+            return this;
+        }
+
+        /**
+         * false — разговор «без памяти» (выбран при создании): без памяти ИИ и поиска по прошлым
+         * разговорам — показать пометку в шапке
+         *
+         * @param memory the value (required)
+         * @return this builder
+         */
+        public Builder memory(Boolean memory) {
+            this.memory = memory;
             return this;
         }
 
@@ -571,6 +602,7 @@ public final class ChatDialog {
                 Internal.required(createdAt, "created_at"),
                 Internal.required(id, "id"),
                 Internal.required(masked, "masked"),
+                Internal.required(memory, "memory"),
                 Internal.required(messageCount, "message_count"),
                 Internal.required(messages, "messages"),
                 Internal.required(pdRestored, "pd_restored"),

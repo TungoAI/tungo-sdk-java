@@ -71,6 +71,10 @@ public final class ChatAssistantMessage implements ChatMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String thinking;
 
+    @JsonProperty("thinking_parts")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<ChatThinkingPart> thinkingParts;
+
     @JsonProperty("turn_no")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long turnNo;
@@ -90,6 +94,7 @@ public final class ChatAssistantMessage implements ChatMessage {
         @JsonProperty("role") String role,
         @JsonProperty("state") ChatAssistantMessageState state,
         @JsonProperty("thinking") String thinking,
+        @JsonProperty("thinking_parts") List<ChatThinkingPart> thinkingParts,
         @JsonProperty("turn_no") Long turnNo) {
         this.at = at;
         this.blocks = Internal.requiredList(blocks, "blocks");
@@ -102,6 +107,7 @@ public final class ChatAssistantMessage implements ChatMessage {
         this.role = role != null ? role : "assistant";
         this.state = state;
         this.thinking = thinking;
+        this.thinkingParts = Internal.requiredList(thinkingParts, "thinking_parts");
         this.turnNo = turnNo;
     }
 
@@ -217,12 +223,22 @@ public final class ChatAssistantMessage implements ChatMessage {
     }
 
     /**
-     * Размышления модели за ход одним текстом; пусто — не было
+     * Размышления модели за ход одним текстом; блок не по-русски без перевода — пометкой «Обдумываю…»;
+     * пусто — не было
      *
      * @return the value; null only if the API omitted this required property
      */
     public String thinking() {
         return thinking;
+    }
+
+    /**
+     * Те же размышления по блокам: блок не по-русски без перевода — оригиналом с translate_id
+     *
+     * @return the value, never null: a response without this required property does not decode
+     */
+    public List<ChatThinkingPart> thinkingParts() {
+        return thinkingParts;
     }
 
     /**
@@ -276,12 +292,13 @@ public final class ChatAssistantMessage implements ChatMessage {
             && Objects.equals(role, other.role)
             && Objects.equals(state, other.state)
             && Objects.equals(thinking, other.thinking)
+            && Objects.equals(thinkingParts, other.thinkingParts)
             && Objects.equals(turnNo, other.turnNo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, at, blocks, citations, followups, id, nextAction, proposalIds, rating, role, state, thinking, turnNo);
+        return Objects.hash(additionalProperties, at, blocks, citations, followups, id, nextAction, proposalIds, rating, role, state, thinking, thinkingParts, turnNo);
     }
 
     @Override
@@ -301,6 +318,7 @@ public final class ChatAssistantMessage implements ChatMessage {
         private ChatMessageRating rating;
         private ChatAssistantMessageState state;
         private String thinking;
+        private List<ChatThinkingPart> thinkingParts;
         private Long turnNo;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
@@ -318,6 +336,7 @@ public final class ChatAssistantMessage implements ChatMessage {
             this.rating = source.rating;
             this.state = source.state;
             this.thinking = source.thinking;
+            this.thinkingParts = source.thinkingParts;
             this.turnNo = source.turnNo;
             this.additionalProperties.putAll(source.additionalProperties);
         }
@@ -424,13 +443,25 @@ public final class ChatAssistantMessage implements ChatMessage {
         }
 
         /**
-         * Размышления модели за ход одним текстом; пусто — не было
+         * Размышления модели за ход одним текстом; блок не по-русски без перевода — пометкой
+         * «Обдумываю…»; пусто — не было
          *
          * @param thinking the value (required)
          * @return this builder
          */
         public Builder thinking(String thinking) {
             this.thinking = thinking;
+            return this;
+        }
+
+        /**
+         * Те же размышления по блокам: блок не по-русски без перевода — оригиналом с translate_id
+         *
+         * @param thinkingParts the value (required)
+         * @return this builder
+         */
+        public Builder thinkingParts(List<ChatThinkingPart> thinkingParts) {
+            this.thinkingParts = thinkingParts;
             return this;
         }
 
@@ -477,6 +508,7 @@ public final class ChatAssistantMessage implements ChatMessage {
                 "assistant",
                 Internal.required(state, "state"),
                 Internal.required(thinking, "thinking"),
+                Internal.required(thinkingParts, "thinking_parts"),
                 Internal.required(turnNo, "turn_no"));
             built.additionalProperties.putAll(additionalProperties);
             return built;

@@ -22,6 +22,8 @@ import kz.tungo.sdk.resources.EsfResourceAsync;
 import kz.tungo.sdk.resources.FormsResourceAsync;
 import kz.tungo.sdk.resources.OnecResourceAsync;
 import kz.tungo.sdk.resources.AutomationsResourceAsync;
+import kz.tungo.sdk.resources.VerificationResourceAsync;
+import kz.tungo.sdk.resources.ReleasesResourceAsync;
 
 /**
  * The asynchronous view of a {@link TungoClient}: every method returns a
@@ -49,6 +51,8 @@ public final class TungoAsyncClient {
     private final FormsResourceAsync forms;
     private final OnecResourceAsync onec;
     private final AutomationsResourceAsync automations;
+    private final VerificationResourceAsync verification;
+    private final ReleasesResourceAsync releases;
 
     TungoAsyncClient(TungoClient sync, HttpEngine engine) {
         this.sync = sync;
@@ -66,6 +70,8 @@ public final class TungoAsyncClient {
         this.forms = new FormsResourceAsync(sync.forms(), engine);
         this.onec = new OnecResourceAsync(sync.onec(), engine);
         this.automations = new AutomationsResourceAsync(sync.automations(), engine);
+        this.verification = new VerificationResourceAsync(sync.verification(), engine);
+        this.releases = new ReleasesResourceAsync(sync.releases(), engine);
     }
 
     /**
@@ -193,6 +199,25 @@ public final class TungoAsyncClient {
      */
     public AutomationsResourceAsync automations() {
         return automations;
+    }
+
+    /**
+     * Публичная проверка электронной подписи документов Tungo: по коду, по файлу, по блоку QR и ключи
+     * подписи (без ключа API).
+     *
+     * @return the <code>verification</code> resource
+     */
+    public VerificationResourceAsync verification() {
+        return verification;
+    }
+
+    /**
+     * Публичный список загрузок: расширение 1С и Tungo Connector (без ключа API).
+     *
+     * @return the <code>releases</code> resource
+     */
+    public ReleasesResourceAsync releases() {
+        return releases;
     }
 
     /**

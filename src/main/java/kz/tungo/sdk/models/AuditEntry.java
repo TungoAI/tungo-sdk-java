@@ -129,23 +129,26 @@ public final class AuditEntry {
      * `company.onec_connector_rotated` — Ключ программы в офисе заменён -
      * `company.onec_connector_rotate_refused` — Отказ в повторе смены ключа программы в офисе: прежний
      * ключ без метки той смены - `company.onec_connector_revoked` — Программа в офисе отвязана -
-     * `company.onec_connector_link_approved` — Привязка программы в офисе одобрена в кабинете -
-     * `connector.link_created` — Программа в офисе запросила привязку через браузер -
-     * `connector.link_denied` — Привязка программы в офисе отклонена - `company.onec_link_approved` —
-     * Вход в Tungo из 1С подтверждён - `company.onec_link_revoked` — Вход в Tungo из 1С отозван -
-     * `onec_link.wrong_match` — Вход в Tungo из 1С отменён: на сайте нажато не то число сверки -
-     * `company.profile_rebuild` — Справка о компании пересобрана - `workspace.member_joined` —
-     * Сотрудник вступил в организацию - `workspace.member_role_changed` — Роль сотрудника в
-     * организации изменена - `workspace.member_removed` — Сотрудник удалён из организации -
-     * `workspace.member_access_revoked` — Доступы сотрудника к компаниям сняты -
-     * `workspace.invitation_created` — Отправлено приглашение - `workspace.invitation_cancelled` —
-     * Приглашение отменено - `workspace.policies_updated` — Политики организации изменены -
-     * `workspace.scim_token_created` — Выпущен токен SCIM - `workspace.scim_token_revoked` — Токен
-     * SCIM отозван - `workspace.scim_user_provisioned` — SCIM: сотрудник заведён -
-     * `workspace.scim_user_deprovisioned` — SCIM: сотрудник отключён - `workspace.scim_user_deleted` —
-     * SCIM: сотрудник удалён - `workspace.updated` — Название или настройки организации изменены -
-     * `workspace.sso_provider_updated` — SSO: настройки сервера входа изменены -
-     * `workspace.sso_provider_deleted` — SSO: сервер входа отключён -
+     * `company.onec_connector_unpaired` — Программа в офисе отключена на самом компьютере -
+     * `company.onec_connector_replaced` — Программа в офисе заменена новой привязкой: прежний
+     * компьютер отключён - `company.onec_connector_link_approved` — Привязка программы в офисе
+     * одобрена в кабинете - `connector.link_created` — Программа в офисе запросила привязку через
+     * браузер - `connector.link_denied` — Привязка программы в офисе отклонена -
+     * `company.onec_link_approved` — Вход в Tungo из 1С подтверждён - `company.onec_link_revoked` —
+     * Вход в Tungo из 1С отозван - `onec_link.wrong_match` — Вход в Tungo из 1С отменён: на сайте
+     * нажато не то число сверки - `onec_link.limit_refused` — Вход в Tungo из 1С не подтверждён: у
+     * аккаунта слишком много действующих входов из 1С - `company.profile_rebuild` — Справка о компании
+     * пересобрана - `workspace.member_joined` — Сотрудник вступил в организацию -
+     * `workspace.member_role_changed` — Роль сотрудника в организации изменена -
+     * `workspace.member_removed` — Сотрудник удалён из организации - `workspace.member_access_revoked`
+     * — Доступы сотрудника к компаниям сняты - `workspace.invitation_created` — Отправлено приглашение
+     * - `workspace.invitation_cancelled` — Приглашение отменено - `workspace.policies_updated` —
+     * Политики организации изменены - `workspace.scim_token_created` — Выпущен токен SCIM -
+     * `workspace.scim_token_revoked` — Токен SCIM отозван - `workspace.scim_user_provisioned` — SCIM:
+     * сотрудник заведён - `workspace.scim_user_deprovisioned` — SCIM: сотрудник отключён -
+     * `workspace.scim_user_deleted` — SCIM: сотрудник удалён - `workspace.updated` — Название или
+     * настройки организации изменены - `workspace.sso_provider_updated` — SSO: настройки сервера входа
+     * изменены - `workspace.sso_provider_deleted` — SSO: сервер входа отключён -
      * `workspace.sso_domain_verification_requested` — SSO: запрошено подтверждение домена -
      * `workspace.sso_domain_verified` — SSO: домен подтверждён - `workspace.ownership_transferred` —
      * Владение организацией передано - `workspace.deleted` — Организация удалена - `workspace.created`
@@ -177,6 +180,7 @@ public final class AuditEntry {
      * Срок хранения чатов изменён - `workspace.training_consent` — Согласие на обучение изменено
      * (владелец) - `workspace.audit_exported` — Журнал организации выгружен -
      * `workspace.compliance_updated` — Выгрузка для проверок включена или выключена -
+     * `workspace.card_payments_updated` — Оплата счетов Enterprise картой включена или выключена -
      * `workspace.compliance_read` — Прочитаны разговоры через выгрузку для проверок -
      * `api_key.created` — Выпущен ключ API - `api_key.updated` — Ключ API изменён - `api_key.rolled` —
      * Секрет ключа API заменён - `api_key.revoked` — Ключ API отозван - `api_key.transferred` — Ключ
@@ -192,7 +196,10 @@ public final class AuditEntry {
      * Карта отключена - `billing.refund.succeeded` — Деньги возвращены - `billing.manual_charge` —
      * Админ платформы списал деньги с карты вручную - `subscription.created` — Подписка оформлена -
      * `subscription.changed` — Тариф изменён - `subscription.cancel_scheduled` — Подписка отменена с
-     * конца периода - `subscription.resumed` — Отмена подписки снята - `extra_usage.configured` —
+     * конца периода - `subscription.resumed` — Отмена подписки снята - `subscription.terminated` —
+     * Подписка закрыта сразу (одобрен возврат по заявке) - `billing.refund_request.submitted` — Подана
+     * заявка на возврат - `billing.refund_request.approved` — Заявка на возврат одобрена -
+     * `billing.refund_request.rejected` — Заявка на возврат отклонена - `extra_usage.configured` —
      * Настройки доп. использования изменены - `extra_usage.adjusted` — Баланс доп. использования
      * скорректирован - `platform.configured` — Настройки платформы изменены - `platform.adjusted` —
      * Баланс платформы скорректирован - `extra_usage.member_cap_set` — Личный потолок доп.
@@ -236,16 +243,18 @@ public final class AuditEntry {
      * `admin.user.limit_resets_revoked` — Выданные сбросы лимита отозваны (платформа) -
      * `usage.limit_reset_applied` — Применён сброс лимита - `referral.claimed` — Регистрация по
      * приглашению друга - `referral.rewarded` — За приглашённого друга выдан сброс лимита -
-     * `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён (платформа) -
-     * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` —
-     * Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран
-     * вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными
-     * данными - `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к
-     * оценкам разговора - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или
-     * заменена (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена
-     * (платформа) - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными
-     * данными - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
-     * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
+     * `referral.reward_revoked` — Сброс лимита за оплату приглашённого друга отозван: оплата
+     * возвращена - `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён
+     * (платформа) - `admin.training.exported` — Выгрузка для обучения (платформа) -
+     * `admin.setting.changed` — Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и
+     * итогов ходов ИИ убран вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла
+     * разговор с персональными данными - `admin.dialog.viewed_without_consent` — Поддержка открыла
+     * разговор без согласия клиента (экстренный доступ) - `admin.dialog.rating_comments_viewed` —
+     * Поддержка открыла комментарии человека к оценкам разговора - `admin.dialog.label_set` — Оценка
+     * ответа для обучения поставлена или заменена (платформа) - `admin.dialog.label_removed` — Оценка
+     * ответа для обучения удалена (платформа) - `admin.journal.pd_viewed` — Поддержка открыла журнал
+     * ИИ-бухгалтера с персональными данными - `admin.company.pd_viewed` — Поддержка открыла карточку
+     * компании-ИП с ИИН - `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
      * `admin.payment.pd_viewed` — Поддержка открыла платёж с реквизитами плательщика и обменом с
      * банком - `site.post_published` — Статья блога опубликована на сайте (платформа) -
      * `site.post_unpublished` — Статья блога снята с сайта (платформа) - `site.post_deleted` —
@@ -261,14 +270,18 @@ public final class AuditEntry {
      * ответила на обращение - `admin.support.note_added` — Поддержка добавила внутреннюю заметку к
      * обращению - `admin.support.ticket_updated` — Поддержка изменила обращение: состояние, категорию,
      * приоритет или исполнителя - `admin.support.attachment_viewed` — Поддержка скачала вложение
-     * обращения - `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника»
-     * (платформа) - `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж:
-     * отправлен в банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
-     * `billing.payment.authorized` — Платёж: одобрен банком - `billing.payment.succeeded` — Платёж:
-     * оплачен - `billing.payment.verified` — Платёж: карта проверена - `billing.payment.failed` —
-     * Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён -
-     * `billing.payment.partially_refunded` — Платёж: возвращён частично - `billing.payment.refunded` —
-     * Платёж: возвращён
+     * обращения - `admin.staff_access.granted` — Доступы: сотруднику открыты служебные службы
+     * (Cloudflare Access, учётки внутри) (платформа) - `admin.staff_access.revoked` — Доступы: у
+     * сотрудника забраны служебные службы, сессии Access отозваны (платформа) -
+     * `admin.staff_access.retried` — Доступы: повторены несделанные шаги выдачи или отзыва (платформа)
+     * - `admin.staff_access.mail_resent` — Доступы: письмо сотруднику отправлено ещё раз (платформа) -
+     * `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника» (платформа) -
+     * `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж: отправлен в банк -
+     * `billing.payment.requires_action` — Платёж: ждёт 3-D Secure - `billing.payment.authorized` —
+     * Платёж: одобрен банком - `billing.payment.succeeded` — Платёж: оплачен -
+     * `billing.payment.verified` — Платёж: карта проверена - `billing.payment.failed` — Платёж: не
+     * прошёл - `billing.payment.cancelled` — Платёж: отменён - `billing.payment.partially_refunded` —
+     * Платёж: возвращён частично - `billing.payment.refunded` — Платёж: возвращён
      *
      * @return the value; null only if the API omitted this required property
      */
@@ -472,14 +485,17 @@ public final class AuditEntry {
          * `company.onec_connector_rotated` — Ключ программы в офисе заменён -
          * `company.onec_connector_rotate_refused` — Отказ в повторе смены ключа программы в офисе:
          * прежний ключ без метки той смены - `company.onec_connector_revoked` — Программа в офисе
-         * отвязана - `company.onec_connector_link_approved` — Привязка программы в офисе одобрена в
-         * кабинете - `connector.link_created` — Программа в офисе запросила привязку через браузер -
-         * `connector.link_denied` — Привязка программы в офисе отклонена -
+         * отвязана - `company.onec_connector_unpaired` — Программа в офисе отключена на самом
+         * компьютере - `company.onec_connector_replaced` — Программа в офисе заменена новой привязкой:
+         * прежний компьютер отключён - `company.onec_connector_link_approved` — Привязка программы в
+         * офисе одобрена в кабинете - `connector.link_created` — Программа в офисе запросила привязку
+         * через браузер - `connector.link_denied` — Привязка программы в офисе отклонена -
          * `company.onec_link_approved` — Вход в Tungo из 1С подтверждён - `company.onec_link_revoked`
          * — Вход в Tungo из 1С отозван - `onec_link.wrong_match` — Вход в Tungo из 1С отменён: на
-         * сайте нажато не то число сверки - `company.profile_rebuild` — Справка о компании пересобрана
-         * - `workspace.member_joined` — Сотрудник вступил в организацию -
-         * `workspace.member_role_changed` — Роль сотрудника в организации изменена -
+         * сайте нажато не то число сверки - `onec_link.limit_refused` — Вход в Tungo из 1С не
+         * подтверждён: у аккаунта слишком много действующих входов из 1С - `company.profile_rebuild` —
+         * Справка о компании пересобрана - `workspace.member_joined` — Сотрудник вступил в организацию
+         * - `workspace.member_role_changed` — Роль сотрудника в организации изменена -
          * `workspace.member_removed` — Сотрудник удалён из организации -
          * `workspace.member_access_revoked` — Доступы сотрудника к компаниям сняты -
          * `workspace.invitation_created` — Отправлено приглашение - `workspace.invitation_cancelled` —
@@ -522,7 +538,8 @@ public final class AuditEntry {
          * изменены - `workspace.retention_updated` — Срок хранения чатов изменён -
          * `workspace.training_consent` — Согласие на обучение изменено (владелец) -
          * `workspace.audit_exported` — Журнал организации выгружен - `workspace.compliance_updated` —
-         * Выгрузка для проверок включена или выключена - `workspace.compliance_read` — Прочитаны
+         * Выгрузка для проверок включена или выключена - `workspace.card_payments_updated` — Оплата
+         * счетов Enterprise картой включена или выключена - `workspace.compliance_read` — Прочитаны
          * разговоры через выгрузку для проверок - `api_key.created` — Выпущен ключ API -
          * `api_key.updated` — Ключ API изменён - `api_key.rolled` — Секрет ключа API заменён -
          * `api_key.revoked` — Ключ API отозван - `api_key.transferred` — Ключ API передан другому
@@ -539,34 +556,38 @@ public final class AuditEntry {
          * возвращены - `billing.manual_charge` — Админ платформы списал деньги с карты вручную -
          * `subscription.created` — Подписка оформлена - `subscription.changed` — Тариф изменён -
          * `subscription.cancel_scheduled` — Подписка отменена с конца периода - `subscription.resumed`
-         * — Отмена подписки снята - `extra_usage.configured` — Настройки доп. использования изменены -
-         * `extra_usage.adjusted` — Баланс доп. использования скорректирован - `platform.configured` —
-         * Настройки платформы изменены - `platform.adjusted` — Баланс платформы скорректирован -
-         * `extra_usage.member_cap_set` — Личный потолок доп. использования изменён -
-         * `extra_usage.alert_thresholds_set` — Пороги оповещений о потолке организации изменены -
-         * `company.spend_cap_set` — Месячный потолок компании изменён - `team.analytics_exported` —
-         * Аналитика команды выгружена в CSV - `team.spend_exported` — Расходы по людям выгружены в CSV
-         * - `ai_budget.member_set` — Лимит ИИ сотрудника задан - `ai_budget.member_reset` — Лимит ИИ
-         * сотрудника сброшен - `spend.cap_threshold_reached` — Расход дошёл до порога потолка -
-         * `spend.company_cap_reached` — Компания упёрлась в месячный потолок - `plan.created` — Тариф
-         * заведён (платформа) - `plan.updated` — Тариф изменён (платформа) - `usage_rate.added` — Цена
-         * расхода добавлена (платформа) - `user.terms.accepted` — Приняты условия -
-         * `account.deletion_code_sent` — Запрошен код удаления аккаунта - `account.deletion_scheduled`
-         * — Аккаунт помечен к удалению - `account.deletion_cancelled` — Удаление аккаунта отменено -
-         * `account.deleted` — Аккаунт удалён и обезличен - `langfuse.traces_purged` — Трассы ИИ
-         * удалены из Langfuse: по сроку хранения, с аккаунтом или после отзыва согласия -
-         * `admin.dialog.langfuse_dataset` — Ход разговора отправлен в набор Langfuse (платформа) -
-         * `admin.dialog.langfuse_annotation` — Ход разговора отправлен в очередь разметки Langfuse
-         * (платформа) - `account.email_code_sent` — Запрошен код подтверждения почты (аккаунт
-         * Telegram) - `account.email_bound` — Почта привязана к аккаунту Telegram -
-         * `account.telegram_merged` — Telegram привязан к аккаунту с подтверждённой почтой, аккаунт
-         * Telegram закрыт - `account.google_linked` — Вход через Google привязал Google к аккаунту с
-         * той же почтой (sessions_closed — почта не была подтверждена: прежние сессии закрыты) -
-         * `account.telegram_merge_refused` — Склейка аккаунта Telegram с аккаунтом почты отклонена
-         * (данные, другой Telegram или почта закрыта) - `admin.ads.conversions_released` — Удержанные
-         * рекламные конверсии отправлены вручную - `admin.ads.conversions_rejected` — Рекламные
-         * конверсии отклонены - `admin.ads.signups_exported` — Выгрузка рекламных регистраций с IP и
-         * User-Agent (CSV) - `admin.access.signed_in` — Вход в админку по пропуску Cloudflare Access -
+         * — Отмена подписки снята - `subscription.terminated` — Подписка закрыта сразу (одобрен
+         * возврат по заявке) - `billing.refund_request.submitted` — Подана заявка на возврат -
+         * `billing.refund_request.approved` — Заявка на возврат одобрена -
+         * `billing.refund_request.rejected` — Заявка на возврат отклонена - `extra_usage.configured` —
+         * Настройки доп. использования изменены - `extra_usage.adjusted` — Баланс доп. использования
+         * скорректирован - `platform.configured` — Настройки платформы изменены - `platform.adjusted`
+         * — Баланс платформы скорректирован - `extra_usage.member_cap_set` — Личный потолок доп.
+         * использования изменён - `extra_usage.alert_thresholds_set` — Пороги оповещений о потолке
+         * организации изменены - `company.spend_cap_set` — Месячный потолок компании изменён -
+         * `team.analytics_exported` — Аналитика команды выгружена в CSV - `team.spend_exported` —
+         * Расходы по людям выгружены в CSV - `ai_budget.member_set` — Лимит ИИ сотрудника задан -
+         * `ai_budget.member_reset` — Лимит ИИ сотрудника сброшен - `spend.cap_threshold_reached` —
+         * Расход дошёл до порога потолка - `spend.company_cap_reached` — Компания упёрлась в месячный
+         * потолок - `plan.created` — Тариф заведён (платформа) - `plan.updated` — Тариф изменён
+         * (платформа) - `usage_rate.added` — Цена расхода добавлена (платформа) -
+         * `user.terms.accepted` — Приняты условия - `account.deletion_code_sent` — Запрошен код
+         * удаления аккаунта - `account.deletion_scheduled` — Аккаунт помечен к удалению -
+         * `account.deletion_cancelled` — Удаление аккаунта отменено - `account.deleted` — Аккаунт
+         * удалён и обезличен - `langfuse.traces_purged` — Трассы ИИ удалены из Langfuse: по сроку
+         * хранения, с аккаунтом или после отзыва согласия - `admin.dialog.langfuse_dataset` — Ход
+         * разговора отправлен в набор Langfuse (платформа) - `admin.dialog.langfuse_annotation` — Ход
+         * разговора отправлен в очередь разметки Langfuse (платформа) - `account.email_code_sent` —
+         * Запрошен код подтверждения почты (аккаунт Telegram) - `account.email_bound` — Почта
+         * привязана к аккаунту Telegram - `account.telegram_merged` — Telegram привязан к аккаунту с
+         * подтверждённой почтой, аккаунт Telegram закрыт - `account.google_linked` — Вход через Google
+         * привязал Google к аккаунту с той же почтой (sessions_closed — почта не была подтверждена:
+         * прежние сессии закрыты) - `account.telegram_merge_refused` — Склейка аккаунта Telegram с
+         * аккаунтом почты отклонена (данные, другой Telegram или почта закрыта) -
+         * `admin.ads.conversions_released` — Удержанные рекламные конверсии отправлены вручную -
+         * `admin.ads.conversions_rejected` — Рекламные конверсии отклонены -
+         * `admin.ads.signups_exported` — Выгрузка рекламных регистраций с IP и User-Agent (CSV) -
+         * `admin.access.signed_in` — Вход в админку по пропуску Cloudflare Access -
          * `admin.access.refused` — Вход в админку по пропуску Cloudflare Access отклонён -
          * `admin.two_factor.verified` — Администратор платформы подтвердил вход вторым фактором -
          * `admin.two_factor.enable_requested` — Сотрудник платформы начал включать второй фактор (с
@@ -583,16 +604,19 @@ public final class AuditEntry {
          * - `admin.user.limit_resets_revoked` — Выданные сбросы лимита отозваны (платформа) -
          * `usage.limit_reset_applied` — Применён сброс лимита - `referral.claimed` — Регистрация по
          * приглашению друга - `referral.rewarded` — За приглашённого друга выдан сброс лимита -
-         * `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён (платформа) -
-         * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` —
-         * Настройка платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран
-         * вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными
-         * данными - `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к
-         * оценкам разговора - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или
-         * заменена (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена
-         * (платформа) - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с
-         * персональными данными - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с
-         * ИИН - `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
+         * `referral.reward_revoked` — Сброс лимита за оплату приглашённого друга отозван: оплата
+         * возвращена - `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён
+         * (платформа) - `admin.training.exported` — Выгрузка для обучения (платформа) -
+         * `admin.setting.changed` — Настройка платформы изменена - `admin.logs.purged` — Журнал
+         * запросов и итогов ходов ИИ убран вручную (платформа) - `admin.dialog.pd_viewed` — Поддержка
+         * открыла разговор с персональными данными - `admin.dialog.viewed_without_consent` — Поддержка
+         * открыла разговор без согласия клиента (экстренный доступ) -
+         * `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к оценкам
+         * разговора - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена
+         * (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа)
+         * - `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными данными
+         * - `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
+         * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН -
          * `admin.payment.pd_viewed` — Поддержка открыла платёж с реквизитами плательщика и обменом с
          * банком - `site.post_published` — Статья блога опубликована на сайте (платформа) -
          * `site.post_unpublished` — Статья блога снята с сайта (платформа) - `site.post_deleted` —
@@ -609,9 +633,14 @@ public final class AuditEntry {
          * Поддержка добавила внутреннюю заметку к обращению - `admin.support.ticket_updated` —
          * Поддержка изменила обращение: состояние, категорию, приоритет или исполнителя -
          * `admin.support.attachment_viewed` — Поддержка скачала вложение обращения -
-         * `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника» (платформа)
-         * - `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж: отправлен в
-         * банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
+         * `admin.staff_access.granted` — Доступы: сотруднику открыты служебные службы (Cloudflare
+         * Access, учётки внутри) (платформа) - `admin.staff_access.revoked` — Доступы: у сотрудника
+         * забраны служебные службы, сессии Access отозваны (платформа) - `admin.staff_access.retried`
+         * — Доступы: повторены несделанные шаги выдачи или отзыва (платформа) -
+         * `admin.staff_access.mail_resent` — Доступы: письмо сотруднику отправлено ещё раз (платформа)
+         * - `canary.triggered` — Сработала приманка: украденный ключ или почта «сотрудника»
+         * (платформа) - `billing.payment.new` — Платёж: создан - `billing.payment.pending` — Платёж:
+         * отправлен в банк - `billing.payment.requires_action` — Платёж: ждёт 3-D Secure -
          * `billing.payment.authorized` — Платёж: одобрен банком - `billing.payment.succeeded` —
          * Платёж: оплачен - `billing.payment.verified` — Платёж: карта проверена -
          * `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён

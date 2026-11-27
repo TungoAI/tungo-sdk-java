@@ -40,6 +40,10 @@ public final class ChatTurnResult {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ChatTurnError> errors;
 
+    @JsonProperty("files")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final List<ChatTurnFile> files;
+
     @JsonProperty("followups")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<String> followups;
@@ -80,6 +84,7 @@ public final class ChatTurnResult {
         @JsonProperty("citations") List<ChatCitation> citations,
         @JsonProperty("dialog_id") String dialogId,
         @JsonProperty("errors") List<ChatTurnError> errors,
+        @JsonProperty("files") List<ChatTurnFile> files,
         @JsonProperty("followups") List<String> followups,
         @JsonProperty("next_action") ChatNextAction nextAction,
         @JsonProperty("pending_question") ChatPendingQuestion pendingQuestion,
@@ -92,6 +97,7 @@ public final class ChatTurnResult {
         this.citations = Internal.requiredList(citations, "citations");
         this.dialogId = dialogId;
         this.errors = Internal.requiredList(errors, "errors");
+        this.files = Internal.requiredList(files, "files");
         this.followups = Internal.requiredList(followups, "followups");
         this.nextAction = nextAction;
         this.pendingQuestion = pendingQuestion;
@@ -155,6 +161,15 @@ public final class ChatTurnResult {
      */
     public List<ChatTurnError> errors() {
         return errors;
+    }
+
+    /**
+     * Файлы (Excel, Word, PDF, CSV), которые ИИ собрал в этом ходе
+     *
+     * @return the value, never null: a response without this required property does not decode
+     */
+    public List<ChatTurnFile> files() {
+        return files;
     }
 
     /**
@@ -260,6 +275,7 @@ public final class ChatTurnResult {
             && Objects.equals(citations, other.citations)
             && Objects.equals(dialogId, other.dialogId)
             && Objects.equals(errors, other.errors)
+            && Objects.equals(files, other.files)
             && Objects.equals(followups, other.followups)
             && Objects.equals(nextAction, other.nextAction)
             && Objects.equals(pendingQuestion, other.pendingQuestion)
@@ -272,7 +288,7 @@ public final class ChatTurnResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, answer, citations, dialogId, errors, followups, nextAction, pendingQuestion, proposals, questions, stopReason, turnNo, usage);
+        return Objects.hash(additionalProperties, answer, citations, dialogId, errors, files, followups, nextAction, pendingQuestion, proposals, questions, stopReason, turnNo, usage);
     }
 
     @Override
@@ -286,6 +302,7 @@ public final class ChatTurnResult {
         private List<ChatCitation> citations;
         private String dialogId;
         private List<ChatTurnError> errors;
+        private List<ChatTurnFile> files;
         private List<String> followups;
         private ChatNextAction nextAction;
         private ChatPendingQuestion pendingQuestion;
@@ -304,6 +321,7 @@ public final class ChatTurnResult {
             this.citations = source.citations;
             this.dialogId = source.dialogId;
             this.errors = source.errors;
+            this.files = source.files;
             this.followups = source.followups;
             this.nextAction = source.nextAction;
             this.pendingQuestion = source.pendingQuestion;
@@ -357,6 +375,17 @@ public final class ChatTurnResult {
          */
         public Builder errors(List<ChatTurnError> errors) {
             this.errors = errors;
+            return this;
+        }
+
+        /**
+         * Файлы (Excel, Word, PDF, CSV), которые ИИ собрал в этом ходе
+         *
+         * @param files the value (required)
+         * @return this builder
+         */
+        public Builder files(List<ChatTurnFile> files) {
+            this.files = files;
             return this;
         }
 
@@ -475,6 +504,7 @@ public final class ChatTurnResult {
                 Internal.required(citations, "citations"),
                 Internal.required(dialogId, "dialog_id"),
                 Internal.required(errors, "errors"),
+                Internal.required(files, "files"),
                 Internal.required(followups, "followups"),
                 nextAction,
                 pendingQuestion,

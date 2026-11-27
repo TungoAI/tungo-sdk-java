@@ -24,6 +24,8 @@ import kz.tungo.sdk.models.ChatDialogRatingBody;
 import kz.tungo.sdk.models.ChatDialogRenamed;
 import kz.tungo.sdk.models.ChatDialogSummary;
 import kz.tungo.sdk.models.ChatEvent;
+import kz.tungo.sdk.models.ChatFileItem;
+import kz.tungo.sdk.models.ChatFileList;
 import kz.tungo.sdk.models.ChatMentionSearch;
 import kz.tungo.sdk.models.ChatMessageRated;
 import kz.tungo.sdk.models.ChatMessageRatingBody;
@@ -32,11 +34,16 @@ import kz.tungo.sdk.models.ChatRatingDismissed;
 import kz.tungo.sdk.models.ChatRatingOptions;
 import kz.tungo.sdk.models.ChatStopResult;
 import kz.tungo.sdk.models.ChatSuggestions;
+import kz.tungo.sdk.models.ChatThinkingTranslation;
 import kz.tungo.sdk.models.ChatTokenCount;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import kz.tungo.sdk.models.ChatTurnResult;
+import kz.tungo.sdk.models.ChatUpload;
+import kz.tungo.sdk.models.ChatUploadCreate;
+import kz.tungo.sdk.models.ChatUploadPart;
 import kz.tungo.sdk.params.ChatGetRatingOptionsParams;
 import kz.tungo.sdk.params.ChatListEventsParams;
+import kz.tungo.sdk.params.ChatListFilesParams;
 import kz.tungo.sdk.params.ChatListMentionsParams;
 import kz.tungo.sdk.params.ChatListParams;
 import kz.tungo.sdk.params.ChatListSuggestionsParams;
@@ -269,6 +276,93 @@ public final class ChatResource {
     }
 
     /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns one page; see <code>listFilesAll</code> for a lazy iterator over every page.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return one page of results
+     */
+    public Page<ChatFileItem, ChatFileList> listFiles(
+        String companyId,
+        ChatListFilesParams params,
+        RequestOptions options) {
+        ApiResponse<ChatFileList> response = engine.execute(listFilesRequest(companyId, params), options, ChatFileList.class);
+        ChatFileList page = response.body();
+        return new Page<>(response, page.data(), page.nextCursor().orElse(null), params == null ? null : params.cursor().orElse(null),
+            cursor -> listFiles(companyId, (params == null ? ChatListFilesParams.builder() : params.toBuilder()).cursor(cursor).build(), options));
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns one page; see <code>listFilesAll</code> for a lazy iterator over every page.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return one page of results
+     */
+    public Page<ChatFileItem, ChatFileList> listFiles(String companyId, ChatListFilesParams params) {
+        return listFiles(companyId, params, RequestOptions.none());
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns one page; see <code>listFilesAll</code> for a lazy iterator over every page.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return one page of results
+     */
+    public Page<ChatFileItem, ChatFileList> listFiles(String companyId) {
+        return listFiles(companyId, null, RequestOptions.none());
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns a lazy iterable over the items of every page: the next page is requested only when
+     * the iteration reaches it, with the same filters.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a lazy iterable over the items of every page
+     */
+    public AutoPager<ChatFileItem> listFilesAll(String companyId, ChatListFilesParams params, RequestOptions options) {
+        return new AutoPager<>(() -> listFiles(companyId, params, options));
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns a lazy iterable over the items of every page: the next page is requested only when
+     * the iteration reaches it, with the same filters.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param params the query parameters; may be null
+     * @return a lazy iterable over the items of every page
+     */
+    public AutoPager<ChatFileItem> listFilesAll(String companyId, ChatListFilesParams params) {
+        return listFilesAll(companyId, params, RequestOptions.none());
+    }
+
+    /**
+     * Файлы от ИИ в своих разговорах, новые сверху.
+     * <p><code>GET /v1/companies/&#123;co&#125;/chat/files</code>, permission <code>chat.use</code>.
+     * <p>Returns a lazy iterable over the items of every page: the next page is requested only when
+     * the iteration reaches it, with the same filters.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @return a lazy iterable over the items of every page
+     */
+    public AutoPager<ChatFileItem> listFilesAll(String companyId) {
+        return listFilesAll(companyId, null, RequestOptions.none());
+    }
+
+    /**
      * Что можно упомянуть через «&#64;».
      * <p><code>GET /v1/companies/&#123;co&#125;/chat/mentions</code>, permission
      * <code>chat.use</code>.
@@ -437,6 +531,140 @@ public final class ChatResource {
      */
     public ChatSuggestions listSuggestions(String companyId) {
         return listSuggestions(companyId, null, RequestOptions.none());
+    }
+
+    /**
+     * Начать загрузку архива к сообщению.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/uploads</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatUpload> createUploadWithResponse(
+        String companyId,
+        ChatUploadCreate body,
+        RequestOptions options) {
+        return engine.execute(createUploadRequest(companyId, body), options, ChatUpload.class);
+    }
+
+    /**
+     * Начать загрузку архива к сообщению.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/uploads</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param body the request body
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatUpload createUpload(String companyId, ChatUploadCreate body, RequestOptions options) {
+        return createUploadWithResponse(companyId, body, options).body();
+    }
+
+    /**
+     * Начать загрузку архива к сообщению.
+     * <p><code>POST /v1/companies/&#123;co&#125;/chat/uploads</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param body the request body
+     * @return the decoded response
+     */
+    public ChatUpload createUpload(String companyId, ChatUploadCreate body) {
+        return createUpload(companyId, body, RequestOptions.none());
+    }
+
+    /**
+     * Отменить загрузку архива.
+     * <p><code>DELETE /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param options per-request options; may be null
+     * @return the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<Void> deleteUploadWithResponse(String companyId, String upload, RequestOptions options) {
+        return engine.executeEmpty(deleteUploadRequest(companyId, upload), options);
+    }
+
+    /**
+     * Отменить загрузку архива.
+     * <p><code>DELETE /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param options per-request options; may be null
+     */
+    public void deleteUpload(String companyId, String upload, RequestOptions options) {
+        deleteUploadWithResponse(companyId, upload, options);
+    }
+
+    /**
+     * Отменить загрузку архива.
+     * <p><code>DELETE /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;</code>, permission
+     * <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     */
+    public void deleteUpload(String companyId, String upload) {
+        deleteUpload(companyId, upload, RequestOptions.none());
+    }
+
+    /**
+     * Часть архива.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;/parts/&#123;n&#125;</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param n Номер части с 0
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatUploadPart> putUploadPartWithResponse(
+        String companyId,
+        String upload,
+        String n,
+        RequestOptions options) {
+        return engine.execute(putUploadPartRequest(companyId, upload, n), options, ChatUploadPart.class);
+    }
+
+    /**
+     * Часть архива.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;/parts/&#123;n&#125;</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param n Номер части с 0
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatUploadPart putUploadPart(String companyId, String upload, String n, RequestOptions options) {
+        return putUploadPartWithResponse(companyId, upload, n, options).body();
+    }
+
+    /**
+     * Часть архива.
+     * <p><code>PUT
+     * /v1/companies/&#123;co&#125;/chat/uploads/&#123;upload&#125;/parts/&#123;n&#125;</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param upload id загрузки (upl_…)
+     * @param n Номер части с 0
+     * @return the decoded response
+     */
+    public ChatUploadPart putUploadPart(String companyId, String upload, String n) {
+        return putUploadPart(companyId, upload, n, RequestOptions.none());
     }
 
     /**
@@ -974,6 +1202,60 @@ public final class ChatResource {
         return stop(companyId, id, RequestOptions.none());
     }
 
+    /**
+     * Перевести размышление на русский.
+     * <p><code>POST
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/thinking/&#123;tid&#125;/translate</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param tid id блока размышления не по-русски (16 hex): тот же в событии thinking и в истории
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<ChatThinkingTranslation> translateThinkingWithResponse(
+        String companyId,
+        String id,
+        String tid,
+        RequestOptions options) {
+        return engine.execute(translateThinkingRequest(companyId, id, tid), options, ChatThinkingTranslation.class);
+    }
+
+    /**
+     * Перевести размышление на русский.
+     * <p><code>POST
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/thinking/&#123;tid&#125;/translate</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param tid id блока размышления не по-русски (16 hex): тот же в событии thinking и в истории
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public ChatThinkingTranslation translateThinking(String companyId, String id, String tid, RequestOptions options) {
+        return translateThinkingWithResponse(companyId, id, tid, options).body();
+    }
+
+    /**
+     * Перевести размышление на русский.
+     * <p><code>POST
+     * /v1/companies/&#123;co&#125;/chat/&#123;id&#125;/thinking/&#123;tid&#125;/translate</code>,
+     * permission <code>chat.use</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id разговора: dialog_id из ответа (заголовок X-Dialog-Id, поле id в списке
+     *     разговоров). Обычно UUID; клиент мог задать свой (до 64 знаков A–Z, a–z, 0–9, _ и -)
+     * @param tid id блока размышления не по-русски (16 hex): тот же в событии thinking и в истории
+     * @return the decoded response
+     */
+    public ChatThinkingTranslation translateThinking(String companyId, String id, String tid) {
+        return translateThinking(companyId, id, tid, RequestOptions.none());
+    }
+
     private static RequestSpec listRequest(String companyId, ChatListParams params) {
         QueryString query = new QueryString();
         if (params != null) {
@@ -993,6 +1275,19 @@ public final class ChatResource {
     private static RequestSpec countTokensRequest(String companyId, ChatTokenCountRequest body) {
         return RequestSpec.of("POST", "/v1/companies/{co}/chat/count-tokens", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/count-tokens")
             .jsonBody(Objects.requireNonNull(body, "body"));
+    }
+
+    private static RequestSpec listFilesRequest(String companyId, ChatListFilesParams params) {
+        QueryString query = new QueryString();
+        if (params != null) {
+            query.add("cursor", params.cursor().orElse(null));
+            query.add("dialog_id", params.dialogId().orElse(null));
+            query.add("format", params.format().orElse(null));
+            query.add("limit", params.limit().orElse(null));
+            query.add("q", params.q().orElse(null));
+        }
+        return RequestSpec.of("GET", "/v1/companies/{co}/chat/files", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/files")
+            .query(query);
     }
 
     private static RequestSpec listMentionsRequest(String companyId, ChatListMentionsParams params) {
@@ -1022,6 +1317,19 @@ public final class ChatResource {
         }
         return RequestSpec.of("GET", "/v1/companies/{co}/chat/suggestions", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/suggestions")
             .query(query);
+    }
+
+    private static RequestSpec createUploadRequest(String companyId, ChatUploadCreate body) {
+        return RequestSpec.of("POST", "/v1/companies/{co}/chat/uploads", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/uploads")
+            .jsonBody(Objects.requireNonNull(body, "body"));
+    }
+
+    private static RequestSpec deleteUploadRequest(String companyId, String upload) {
+        return RequestSpec.of("DELETE", "/v1/companies/{co}/chat/uploads/{upload}", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/uploads/" + PathSegments.encode("upload", upload));
+    }
+
+    private static RequestSpec putUploadPartRequest(String companyId, String upload, String n) {
+        return RequestSpec.of("PUT", "/v1/companies/{co}/chat/uploads/{upload}/parts/{n}", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/uploads/" + PathSegments.encode("upload", upload) + "/parts/" + PathSegments.encode("n", n));
     }
 
     private static RequestSpec getRequest(String companyId, String id) {
@@ -1071,6 +1379,10 @@ public final class ChatResource {
 
     private static RequestSpec stopRequest(String companyId, String id) {
         return RequestSpec.of("POST", "/v1/companies/{co}/chat/{id}/stop", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/stop");
+    }
+
+    private static RequestSpec translateThinkingRequest(String companyId, String id, String tid) {
+        return RequestSpec.of("POST", "/v1/companies/{co}/chat/{id}/thinking/{tid}/translate", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/chat/" + PathSegments.encode("id", id) + "/thinking/" + PathSegments.encode("tid", tid) + "/translate");
     }
 
 }

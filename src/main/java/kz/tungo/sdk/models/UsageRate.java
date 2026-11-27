@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import kz.tungo.sdk.internal.Internal;
 import kz.tungo.sdk.internal.Json;
 
@@ -42,6 +43,10 @@ public final class UsageRate {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Long inputPerMtokTiyn;
 
+    @JsonProperty("long_context")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private final UsageRateLongContext longContext;
+
     @JsonProperty("model")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String model;
@@ -54,6 +59,10 @@ public final class UsageRate {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String title;
 
+    @JsonProperty("web_search_per_1k_tiyn")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long webSearchPer1kTiyn;
+
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
     @JsonCreator
@@ -63,17 +72,21 @@ public final class UsageRate {
         @JsonProperty("cache_write_per_mtok_tiyn") Long cacheWritePerMtokTiyn,
         @JsonProperty("effective_from") String effectiveFrom,
         @JsonProperty("input_per_mtok_tiyn") Long inputPerMtokTiyn,
+        @JsonProperty("long_context") UsageRateLongContext longContext,
         @JsonProperty("model") String model,
         @JsonProperty("output_per_mtok_tiyn") Long outputPerMtokTiyn,
-        @JsonProperty("title") String title) {
+        @JsonProperty("title") String title,
+        @JsonProperty("web_search_per_1k_tiyn") Long webSearchPer1kTiyn) {
         this.cacheReadPerMtokTiyn = cacheReadPerMtokTiyn;
         this.cacheWrite1hPerMtokTiyn = cacheWrite1hPerMtokTiyn;
         this.cacheWritePerMtokTiyn = cacheWritePerMtokTiyn;
         this.effectiveFrom = effectiveFrom;
         this.inputPerMtokTiyn = inputPerMtokTiyn;
+        this.longContext = longContext;
         this.model = model;
         this.outputPerMtokTiyn = outputPerMtokTiyn;
         this.title = title;
+        this.webSearchPer1kTiyn = webSearchPer1kTiyn;
     }
 
     /**
@@ -143,6 +156,16 @@ public final class UsageRate {
     }
 
     /**
+     * Длинный контекст: если вход вызова вместе с кэшем длиннее above_tokens, весь вызов считается по
+     * этим ценам (как в прайсе провайдера); null — у модели одна цена
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<UsageRateLongContext> longContext() {
+        return Optional.ofNullable(longContext);
+    }
+
+    /**
      * Модель ИИ: tungo-1-flash, tungo-1, tungo-1-deep (tungo-search — поиск по нормам, tungo-legacy —
      * прежняя)
      *
@@ -168,6 +191,16 @@ public final class UsageRate {
      */
     public String title() {
         return title;
+    }
+
+    /**
+     * Цена 1000 запросов поиска на официальных сайтах РК (когда нормы нет в базе знаний); 0 — модель
+     * не ищет в интернете в тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Long webSearchPer1kTiyn() {
+        return webSearchPer1kTiyn;
     }
 
     /**
@@ -200,14 +233,16 @@ public final class UsageRate {
             && Objects.equals(cacheWritePerMtokTiyn, other.cacheWritePerMtokTiyn)
             && Objects.equals(effectiveFrom, other.effectiveFrom)
             && Objects.equals(inputPerMtokTiyn, other.inputPerMtokTiyn)
+            && Objects.equals(longContext, other.longContext)
             && Objects.equals(model, other.model)
             && Objects.equals(outputPerMtokTiyn, other.outputPerMtokTiyn)
-            && Objects.equals(title, other.title);
+            && Objects.equals(title, other.title)
+            && Objects.equals(webSearchPer1kTiyn, other.webSearchPer1kTiyn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, cacheReadPerMtokTiyn, cacheWrite1hPerMtokTiyn, cacheWritePerMtokTiyn, effectiveFrom, inputPerMtokTiyn, model, outputPerMtokTiyn, title);
+        return Objects.hash(additionalProperties, cacheReadPerMtokTiyn, cacheWrite1hPerMtokTiyn, cacheWritePerMtokTiyn, effectiveFrom, inputPerMtokTiyn, longContext, model, outputPerMtokTiyn, title, webSearchPer1kTiyn);
     }
 
     @Override
@@ -222,9 +257,11 @@ public final class UsageRate {
         private Long cacheWritePerMtokTiyn;
         private String effectiveFrom;
         private Long inputPerMtokTiyn;
+        private UsageRateLongContext longContext;
         private String model;
         private Long outputPerMtokTiyn;
         private String title;
+        private Long webSearchPer1kTiyn;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
 
         private Builder() {
@@ -236,9 +273,11 @@ public final class UsageRate {
             this.cacheWritePerMtokTiyn = source.cacheWritePerMtokTiyn;
             this.effectiveFrom = source.effectiveFrom;
             this.inputPerMtokTiyn = source.inputPerMtokTiyn;
+            this.longContext = source.longContext;
             this.model = source.model;
             this.outputPerMtokTiyn = source.outputPerMtokTiyn;
             this.title = source.title;
+            this.webSearchPer1kTiyn = source.webSearchPer1kTiyn;
             this.additionalProperties.putAll(source.additionalProperties);
         }
 
@@ -302,6 +341,18 @@ public final class UsageRate {
         }
 
         /**
+         * Длинный контекст: если вход вызова вместе с кэшем длиннее above_tokens, весь вызов считается
+         * по этим ценам (как в прайсе провайдера); null — у модели одна цена
+         *
+         * @param longContext the value; null sends an explicit JSON null
+         * @return this builder
+         */
+        public Builder longContext(UsageRateLongContext longContext) {
+            this.longContext = longContext;
+            return this;
+        }
+
+        /**
          * Модель ИИ: tungo-1-flash, tungo-1, tungo-1-deep (tungo-search — поиск по нормам,
          * tungo-legacy — прежняя)
          *
@@ -336,6 +387,18 @@ public final class UsageRate {
         }
 
         /**
+         * Цена 1000 запросов поиска на официальных сайтах РК (когда нормы нет в базе знаний); 0 —
+         * модель не ищет в интернете в тиынах (1 ₸ = 100 тиын; показывать значение / 100 ₸)
+         *
+         * @param webSearchPer1kTiyn the value (required)
+         * @return this builder
+         */
+        public Builder webSearchPer1kTiyn(Long webSearchPer1kTiyn) {
+            this.webSearchPer1kTiyn = webSearchPer1kTiyn;
+            return this;
+        }
+
+        /**
          * Sets a property this version of the SDK does not model.
          *
          * @param name the JSON property name
@@ -360,9 +423,11 @@ public final class UsageRate {
                 Internal.required(cacheWritePerMtokTiyn, "cache_write_per_mtok_tiyn"),
                 Internal.required(effectiveFrom, "effective_from"),
                 Internal.required(inputPerMtokTiyn, "input_per_mtok_tiyn"),
+                longContext,
                 Internal.required(model, "model"),
                 Internal.required(outputPerMtokTiyn, "output_per_mtok_tiyn"),
-                Internal.required(title, "title"));
+                Internal.required(title, "title"),
+                Internal.required(webSearchPer1kTiyn, "web_search_per_1k_tiyn"));
             built.additionalProperties.putAll(additionalProperties);
             return built;
         }

@@ -41,6 +41,10 @@ public final class ChatMessageRequest {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final JsonNullable<ChatMessageRequestEffort> effort;
 
+    @JsonProperty("memory")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean memory;
+
     @JsonProperty("mentions")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ChatMention> mentions;
@@ -77,6 +81,7 @@ public final class ChatMessageRequest {
         @JsonProperty("capabilities") List<String> capabilities,
         @JsonProperty("dialog_id") JsonNullable<String> dialogId,
         @JsonProperty("effort") JsonNullable<ChatMessageRequestEffort> effort,
+        @JsonProperty("memory") Boolean memory,
         @JsonProperty("mentions") List<ChatMention> mentions,
         @JsonProperty("message") String message,
         @JsonProperty("mode") ChatMessageRequestMode mode,
@@ -88,6 +93,7 @@ public final class ChatMessageRequest {
         this.capabilities = Internal.list(capabilities);
         this.dialogId = dialogId != null ? dialogId : JsonNullable.undefined();
         this.effort = effort != null ? effort : JsonNullable.undefined();
+        this.memory = memory;
         this.mentions = Internal.list(mentions);
         this.message = message;
         this.mode = mode;
@@ -118,8 +124,11 @@ public final class ChatMessageRequest {
     /**
      * Файлы к вопросу. До 5 файлов, каждый до 10 МБ, все вместе до 14 МБ (до кодирования в base64).
      * Картинка — до 5 МБ, PDF — до 100 страниц. Форматы (по расширению имени): .pdf, .jpg, .jpeg,
-     * .png, .webp, .docx, .xlsx, .xls, .csv, .txt. Содержимое должно совпадать с расширением; иначе,
-     * как и при превышении пределов, — 400 с текстом причины
+     * .png, .webp, .svg, .docx, .doc, .xlsx, .xls, .csv, .txt, .zip, .rar, .7z. Архив (.zip, .rar,
+     * .7z) — 1 на сообщение, до 100 МБ: больше 10 МБ — только загрузкой по частям (POST
+     * …/chat/uploads) и ссылкой upload_id; файлы внутри проходят те же проверки, модель видит опись
+     * архива. Содержимое должно совпадать с расширением; иначе, как и при превышении пределов, — 400 с
+     * текстом причины
      *
      * @return the value, or empty when it is absent or null
      */
@@ -157,6 +166,17 @@ public final class ChatMessageRequest {
      */
     public JsonNullable<ChatMessageRequestEffort> effort() {
         return effort;
+    }
+
+    /**
+     * false — разговор «без памяти»: ИИ не видит, что запомнил раньше, ничего не запоминает и не ищет
+     * по прошлым разговорам, а сам разговор не попадает в поиск. Действует только в первом сообщении
+     * нового разговора и не меняется до его конца; по умолчанию true
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<Boolean> memory() {
+        return Optional.ofNullable(memory);
     }
 
     /**
@@ -258,6 +278,7 @@ public final class ChatMessageRequest {
             && Objects.equals(capabilities, other.capabilities)
             && Objects.equals(dialogId, other.dialogId)
             && Objects.equals(effort, other.effort)
+            && Objects.equals(memory, other.memory)
             && Objects.equals(mentions, other.mentions)
             && Objects.equals(message, other.message)
             && Objects.equals(mode, other.mode)
@@ -269,7 +290,7 @@ public final class ChatMessageRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, attachments, capabilities, dialogId, effort, mentions, message, mode, newDialog, proposalId, stream, turn);
+        return Objects.hash(additionalProperties, attachments, capabilities, dialogId, effort, memory, mentions, message, mode, newDialog, proposalId, stream, turn);
     }
 
     @Override
@@ -283,6 +304,7 @@ public final class ChatMessageRequest {
         private List<String> capabilities;
         private JsonNullable<String> dialogId = JsonNullable.undefined();
         private JsonNullable<ChatMessageRequestEffort> effort = JsonNullable.undefined();
+        private Boolean memory;
         private List<ChatMention> mentions;
         private String message;
         private ChatMessageRequestMode mode;
@@ -300,6 +322,7 @@ public final class ChatMessageRequest {
             this.capabilities = source.capabilities;
             this.dialogId = source.dialogId;
             this.effort = source.effort;
+            this.memory = source.memory;
             this.mentions = source.mentions;
             this.message = source.message;
             this.mode = source.mode;
@@ -313,8 +336,11 @@ public final class ChatMessageRequest {
         /**
          * Файлы к вопросу. До 5 файлов, каждый до 10 МБ, все вместе до 14 МБ (до кодирования в
          * base64). Картинка — до 5 МБ, PDF — до 100 страниц. Форматы (по расширению имени): .pdf,
-         * .jpg, .jpeg, .png, .webp, .docx, .xlsx, .xls, .csv, .txt. Содержимое должно совпадать с
-         * расширением; иначе, как и при превышении пределов, — 400 с текстом причины
+         * .jpg, .jpeg, .png, .webp, .svg, .docx, .doc, .xlsx, .xls, .csv, .txt, .zip, .rar, .7z. Архив
+         * (.zip, .rar, .7z) — 1 на сообщение, до 100 МБ: больше 10 МБ — только загрузкой по частям
+         * (POST …/chat/uploads) и ссылкой upload_id; файлы внутри проходят те же проверки, модель
+         * видит опись архива. Содержимое должно совпадать с расширением; иначе, как и при превышении
+         * пределов, — 400 с текстом причины
          *
          * @param attachments the value; null leaves the property out
          * @return this builder
@@ -389,6 +415,19 @@ public final class ChatMessageRequest {
          */
         public Builder effort(JsonNullable<ChatMessageRequestEffort> effort) {
             this.effort = effort != null ? effort : JsonNullable.undefined();
+            return this;
+        }
+
+        /**
+         * false — разговор «без памяти»: ИИ не видит, что запомнил раньше, ничего не запоминает и не
+         * ищет по прошлым разговорам, а сам разговор не попадает в поиск. Действует только в первом
+         * сообщении нового разговора и не меняется до его конца; по умолчанию true
+         *
+         * @param memory the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder memory(Boolean memory) {
+            this.memory = memory;
             return this;
         }
 
@@ -527,6 +566,7 @@ public final class ChatMessageRequest {
                 capabilities,
                 dialogId,
                 effort,
+                memory,
                 mentions,
                 message,
                 mode,

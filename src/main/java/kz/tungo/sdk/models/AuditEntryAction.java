@@ -23,22 +23,26 @@ import java.util.Objects;
  * `company.onec_connector_paired` — Программа в офисе привязана - `company.onec_connector_rotated` —
  * Ключ программы в офисе заменён - `company.onec_connector_rotate_refused` — Отказ в повторе смены
  * ключа программы в офисе: прежний ключ без метки той смены - `company.onec_connector_revoked` —
- * Программа в офисе отвязана - `company.onec_connector_link_approved` — Привязка программы в офисе
+ * Программа в офисе отвязана - `company.onec_connector_unpaired` — Программа в офисе отключена на
+ * самом компьютере - `company.onec_connector_replaced` — Программа в офисе заменена новой привязкой:
+ * прежний компьютер отключён - `company.onec_connector_link_approved` — Привязка программы в офисе
  * одобрена в кабинете - `connector.link_created` — Программа в офисе запросила привязку через браузер
  * - `connector.link_denied` — Привязка программы в офисе отклонена - `company.onec_link_approved` —
  * Вход в Tungo из 1С подтверждён - `company.onec_link_revoked` — Вход в Tungo из 1С отозван -
  * `onec_link.wrong_match` — Вход в Tungo из 1С отменён: на сайте нажато не то число сверки -
- * `company.profile_rebuild` — Справка о компании пересобрана - `workspace.member_joined` — Сотрудник
- * вступил в организацию - `workspace.member_role_changed` — Роль сотрудника в организации изменена -
- * `workspace.member_removed` — Сотрудник удалён из организации - `workspace.member_access_revoked` —
- * Доступы сотрудника к компаниям сняты - `workspace.invitation_created` — Отправлено приглашение -
- * `workspace.invitation_cancelled` — Приглашение отменено - `workspace.policies_updated` — Политики
- * организации изменены - `workspace.scim_token_created` — Выпущен токен SCIM -
- * `workspace.scim_token_revoked` — Токен SCIM отозван - `workspace.scim_user_provisioned` — SCIM:
- * сотрудник заведён - `workspace.scim_user_deprovisioned` — SCIM: сотрудник отключён -
- * `workspace.scim_user_deleted` — SCIM: сотрудник удалён - `workspace.updated` — Название или
- * настройки организации изменены - `workspace.sso_provider_updated` — SSO: настройки сервера входа
- * изменены - `workspace.sso_provider_deleted` — SSO: сервер входа отключён -
+ * `onec_link.limit_refused` — Вход в Tungo из 1С не подтверждён: у аккаунта слишком много действующих
+ * входов из 1С - `company.profile_rebuild` — Справка о компании пересобрана -
+ * `workspace.member_joined` — Сотрудник вступил в организацию - `workspace.member_role_changed` — Роль
+ * сотрудника в организации изменена - `workspace.member_removed` — Сотрудник удалён из организации -
+ * `workspace.member_access_revoked` — Доступы сотрудника к компаниям сняты -
+ * `workspace.invitation_created` — Отправлено приглашение - `workspace.invitation_cancelled` —
+ * Приглашение отменено - `workspace.policies_updated` — Политики организации изменены -
+ * `workspace.scim_token_created` — Выпущен токен SCIM - `workspace.scim_token_revoked` — Токен SCIM
+ * отозван - `workspace.scim_user_provisioned` — SCIM: сотрудник заведён -
+ * `workspace.scim_user_deprovisioned` — SCIM: сотрудник отключён - `workspace.scim_user_deleted` —
+ * SCIM: сотрудник удалён - `workspace.updated` — Название или настройки организации изменены -
+ * `workspace.sso_provider_updated` — SSO: настройки сервера входа изменены -
+ * `workspace.sso_provider_deleted` — SSO: сервер входа отключён -
  * `workspace.sso_domain_verification_requested` — SSO: запрошено подтверждение домена -
  * `workspace.sso_domain_verified` — SSO: домен подтверждён - `workspace.ownership_transferred` —
  * Владение организацией передано - `workspace.deleted` — Организация удалена - `workspace.created` —
@@ -68,6 +72,7 @@ import java.util.Objects;
  * `workspace.retention_updated` — Срок хранения чатов изменён - `workspace.training_consent` —
  * Согласие на обучение изменено (владелец) - `workspace.audit_exported` — Журнал организации выгружен
  * - `workspace.compliance_updated` — Выгрузка для проверок включена или выключена -
+ * `workspace.card_payments_updated` — Оплата счетов Enterprise картой включена или выключена -
  * `workspace.compliance_read` — Прочитаны разговоры через выгрузку для проверок - `api_key.created` —
  * Выпущен ключ API - `api_key.updated` — Ключ API изменён - `api_key.rolled` — Секрет ключа API
  * заменён - `api_key.revoked` — Ключ API отозван - `api_key.transferred` — Ключ API передан другому
@@ -83,7 +88,10 @@ import java.util.Objects;
  * Деньги возвращены - `billing.manual_charge` — Админ платформы списал деньги с карты вручную -
  * `subscription.created` — Подписка оформлена - `subscription.changed` — Тариф изменён -
  * `subscription.cancel_scheduled` — Подписка отменена с конца периода - `subscription.resumed` —
- * Отмена подписки снята - `extra_usage.configured` — Настройки доп. использования изменены -
+ * Отмена подписки снята - `subscription.terminated` — Подписка закрыта сразу (одобрен возврат по
+ * заявке) - `billing.refund_request.submitted` — Подана заявка на возврат -
+ * `billing.refund_request.approved` — Заявка на возврат одобрена - `billing.refund_request.rejected` —
+ * Заявка на возврат отклонена - `extra_usage.configured` — Настройки доп. использования изменены -
  * `extra_usage.adjusted` — Баланс доп. использования скорректирован - `platform.configured` —
  * Настройки платформы изменены - `platform.adjusted` — Баланс платформы скорректирован -
  * `extra_usage.member_cap_set` — Личный потолок доп. использования изменён -
@@ -125,13 +133,15 @@ import java.util.Objects;
  * `admin.user.limit_resets_revoked` — Выданные сбросы лимита отозваны (платформа) -
  * `usage.limit_reset_applied` — Применён сброс лимита - `referral.claimed` — Регистрация по
  * приглашению друга - `referral.rewarded` — За приглашённого друга выдан сброс лимита -
+ * `referral.reward_revoked` — Сброс лимита за оплату приглашённого друга отозван: оплата возвращена -
  * `admin.enterprise_request.status_changed` — Статус заявки Enterprise изменён (платформа) -
  * `admin.training.exported` — Выгрузка для обучения (платформа) - `admin.setting.changed` — Настройка
  * платформы изменена - `admin.logs.purged` — Журнал запросов и итогов ходов ИИ убран вручную
  * (платформа) - `admin.dialog.pd_viewed` — Поддержка открыла разговор с персональными данными -
- * `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к оценкам разговора -
- * `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена (платформа) -
- * `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа) -
+ * `admin.dialog.viewed_without_consent` — Поддержка открыла разговор без согласия клиента (экстренный
+ * доступ) - `admin.dialog.rating_comments_viewed` — Поддержка открыла комментарии человека к оценкам
+ * разговора - `admin.dialog.label_set` — Оценка ответа для обучения поставлена или заменена
+ * (платформа) - `admin.dialog.label_removed` — Оценка ответа для обучения удалена (платформа) -
  * `admin.journal.pd_viewed` — Поддержка открыла журнал ИИ-бухгалтера с персональными данными -
  * `admin.company.pd_viewed` — Поддержка открыла карточку компании-ИП с ИИН -
  * `admin.company.pd_searched` — Поддержка нашла компанию-ИП поиском по ИИН - `admin.payment.pd_viewed`
@@ -149,14 +159,19 @@ import java.util.Objects;
  * поддержку - `admin.support.replied` — Поддержка ответила на обращение - `admin.support.note_added` —
  * Поддержка добавила внутреннюю заметку к обращению - `admin.support.ticket_updated` — Поддержка
  * изменила обращение: состояние, категорию, приоритет или исполнителя -
- * `admin.support.attachment_viewed` — Поддержка скачала вложение обращения - `canary.triggered` —
- * Сработала приманка: украденный ключ или почта «сотрудника» (платформа) - `billing.payment.new` —
- * Платёж: создан - `billing.payment.pending` — Платёж: отправлен в банк -
- * `billing.payment.requires_action` — Платёж: ждёт 3-D Secure - `billing.payment.authorized` — Платёж:
- * одобрен банком - `billing.payment.succeeded` — Платёж: оплачен - `billing.payment.verified` —
- * Платёж: карта проверена - `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled`
- * — Платёж: отменён - `billing.payment.partially_refunded` — Платёж: возвращён частично -
- * `billing.payment.refunded` — Платёж: возвращён
+ * `admin.support.attachment_viewed` — Поддержка скачала вложение обращения -
+ * `admin.staff_access.granted` — Доступы: сотруднику открыты служебные службы (Cloudflare Access,
+ * учётки внутри) (платформа) - `admin.staff_access.revoked` — Доступы: у сотрудника забраны служебные
+ * службы, сессии Access отозваны (платформа) - `admin.staff_access.retried` — Доступы: повторены
+ * несделанные шаги выдачи или отзыва (платформа) - `admin.staff_access.mail_resent` — Доступы: письмо
+ * сотруднику отправлено ещё раз (платформа) - `canary.triggered` — Сработала приманка: украденный ключ
+ * или почта «сотрудника» (платформа) - `billing.payment.new` — Платёж: создан -
+ * `billing.payment.pending` — Платёж: отправлен в банк - `billing.payment.requires_action` — Платёж:
+ * ждёт 3-D Secure - `billing.payment.authorized` — Платёж: одобрен банком -
+ * `billing.payment.succeeded` — Платёж: оплачен - `billing.payment.verified` — Платёж: карта проверена
+ * - `billing.payment.failed` — Платёж: не прошёл - `billing.payment.cancelled` — Платёж: отменён -
+ * `billing.payment.partially_refunded` — Платёж: возвращён частично - `billing.payment.refunded` —
+ * Платёж: возвращён
  * <p>This is an open enumeration: a value this version of the SDK does not know is preserved (see
  * {@link #value()}) and never fails decoding. Compare with <code>equals</code> or switch on {@link
  * #known()}.
@@ -216,6 +231,12 @@ public final class AuditEntryAction {
     /** The value <code>company.onec_connector_revoked</code>. */
     public static final AuditEntryAction COMPANY_ONEC_CONNECTOR_REVOKED = new AuditEntryAction("company.onec_connector_revoked");
 
+    /** The value <code>company.onec_connector_unpaired</code>. */
+    public static final AuditEntryAction COMPANY_ONEC_CONNECTOR_UNPAIRED = new AuditEntryAction("company.onec_connector_unpaired");
+
+    /** The value <code>company.onec_connector_replaced</code>. */
+    public static final AuditEntryAction COMPANY_ONEC_CONNECTOR_REPLACED = new AuditEntryAction("company.onec_connector_replaced");
+
     /** The value <code>company.onec_connector_link_approved</code>. */
     public static final AuditEntryAction COMPANY_ONEC_CONNECTOR_LINK_APPROVED = new AuditEntryAction("company.onec_connector_link_approved");
 
@@ -233,6 +254,9 @@ public final class AuditEntryAction {
 
     /** The value <code>onec_link.wrong_match</code>. */
     public static final AuditEntryAction ONEC_LINK_WRONG_MATCH = new AuditEntryAction("onec_link.wrong_match");
+
+    /** The value <code>onec_link.limit_refused</code>. */
+    public static final AuditEntryAction ONEC_LINK_LIMIT_REFUSED = new AuditEntryAction("onec_link.limit_refused");
 
     /** The value <code>company.profile_rebuild</code>. */
     public static final AuditEntryAction COMPANY_PROFILE_REBUILD = new AuditEntryAction("company.profile_rebuild");
@@ -405,6 +429,9 @@ public final class AuditEntryAction {
     /** The value <code>workspace.compliance_updated</code>. */
     public static final AuditEntryAction WORKSPACE_COMPLIANCE_UPDATED = new AuditEntryAction("workspace.compliance_updated");
 
+    /** The value <code>workspace.card_payments_updated</code>. */
+    public static final AuditEntryAction WORKSPACE_CARD_PAYMENTS_UPDATED = new AuditEntryAction("workspace.card_payments_updated");
+
     /** The value <code>workspace.compliance_read</code>. */
     public static final AuditEntryAction WORKSPACE_COMPLIANCE_READ = new AuditEntryAction("workspace.compliance_read");
 
@@ -482,6 +509,18 @@ public final class AuditEntryAction {
 
     /** The value <code>subscription.resumed</code>. */
     public static final AuditEntryAction SUBSCRIPTION_RESUMED = new AuditEntryAction("subscription.resumed");
+
+    /** The value <code>subscription.terminated</code>. */
+    public static final AuditEntryAction SUBSCRIPTION_TERMINATED = new AuditEntryAction("subscription.terminated");
+
+    /** The value <code>billing.refund_request.submitted</code>. */
+    public static final AuditEntryAction BILLING_REFUND_REQUEST_SUBMITTED = new AuditEntryAction("billing.refund_request.submitted");
+
+    /** The value <code>billing.refund_request.approved</code>. */
+    public static final AuditEntryAction BILLING_REFUND_REQUEST_APPROVED = new AuditEntryAction("billing.refund_request.approved");
+
+    /** The value <code>billing.refund_request.rejected</code>. */
+    public static final AuditEntryAction BILLING_REFUND_REQUEST_REJECTED = new AuditEntryAction("billing.refund_request.rejected");
 
     /** The value <code>extra_usage.configured</code>. */
     public static final AuditEntryAction EXTRA_USAGE_CONFIGURED = new AuditEntryAction("extra_usage.configured");
@@ -636,6 +675,9 @@ public final class AuditEntryAction {
     /** The value <code>referral.rewarded</code>. */
     public static final AuditEntryAction REFERRAL_REWARDED = new AuditEntryAction("referral.rewarded");
 
+    /** The value <code>referral.reward_revoked</code>. */
+    public static final AuditEntryAction REFERRAL_REWARD_REVOKED = new AuditEntryAction("referral.reward_revoked");
+
     /** The value <code>admin.enterprise_request.status_changed</code>. */
     public static final AuditEntryAction ADMIN_ENTERPRISE_REQUEST_STATUS_CHANGED = new AuditEntryAction("admin.enterprise_request.status_changed");
 
@@ -650,6 +692,9 @@ public final class AuditEntryAction {
 
     /** The value <code>admin.dialog.pd_viewed</code>. */
     public static final AuditEntryAction ADMIN_DIALOG_PD_VIEWED = new AuditEntryAction("admin.dialog.pd_viewed");
+
+    /** The value <code>admin.dialog.viewed_without_consent</code>. */
+    public static final AuditEntryAction ADMIN_DIALOG_VIEWED_WITHOUT_CONSENT = new AuditEntryAction("admin.dialog.viewed_without_consent");
 
     /** The value <code>admin.dialog.rating_comments_viewed</code>. */
     public static final AuditEntryAction ADMIN_DIALOG_RATING_COMMENTS_VIEWED = new AuditEntryAction("admin.dialog.rating_comments_viewed");
@@ -723,6 +768,18 @@ public final class AuditEntryAction {
     /** The value <code>admin.support.attachment_viewed</code>. */
     public static final AuditEntryAction ADMIN_SUPPORT_ATTACHMENT_VIEWED = new AuditEntryAction("admin.support.attachment_viewed");
 
+    /** The value <code>admin.staff_access.granted</code>. */
+    public static final AuditEntryAction ADMIN_STAFF_ACCESS_GRANTED = new AuditEntryAction("admin.staff_access.granted");
+
+    /** The value <code>admin.staff_access.revoked</code>. */
+    public static final AuditEntryAction ADMIN_STAFF_ACCESS_REVOKED = new AuditEntryAction("admin.staff_access.revoked");
+
+    /** The value <code>admin.staff_access.retried</code>. */
+    public static final AuditEntryAction ADMIN_STAFF_ACCESS_RETRIED = new AuditEntryAction("admin.staff_access.retried");
+
+    /** The value <code>admin.staff_access.mail_resent</code>. */
+    public static final AuditEntryAction ADMIN_STAFF_ACCESS_MAIL_RESENT = new AuditEntryAction("admin.staff_access.mail_resent");
+
     /** The value <code>canary.triggered</code>. */
     public static final AuditEntryAction CANARY_TRIGGERED = new AuditEntryAction("canary.triggered");
 
@@ -756,7 +813,7 @@ public final class AuditEntryAction {
     /** The value <code>billing.payment.refunded</code>. */
     public static final AuditEntryAction BILLING_PAYMENT_REFUNDED = new AuditEntryAction("billing.payment.refunded");
 
-    private static final List<AuditEntryAction> VALUES = Collections.unmodifiableList(Arrays.asList(COMPANY_CREATED, COMPANY_UPDATED, COMPANY_ARCHIVED, COMPANY_UNARCHIVED, COMPANY_MEMBER_ADDED, COMPANY_MEMBER_ROLE_CHANGED, COMPANY_MEMBER_REMOVED, COMPANY_ONBOARDING_WAIVED, COMPANY_ONBOARDING_UNWAIVED, COMPANY_ONEC_CONNECTED, COMPANY_ONEC_UPDATED, COMPANY_ONEC_COPY_UPLOADED, COMPANY_ONEC_COPY_HELD, COMPANY_ONEC_CONNECTOR_CODE_CREATED, COMPANY_ONEC_CONNECTOR_PAIRED, COMPANY_ONEC_CONNECTOR_ROTATED, COMPANY_ONEC_CONNECTOR_ROTATE_REFUSED, COMPANY_ONEC_CONNECTOR_REVOKED, COMPANY_ONEC_CONNECTOR_LINK_APPROVED, CONNECTOR_LINK_CREATED, CONNECTOR_LINK_DENIED, COMPANY_ONEC_LINK_APPROVED, COMPANY_ONEC_LINK_REVOKED, ONEC_LINK_WRONG_MATCH, COMPANY_PROFILE_REBUILD, WORKSPACE_MEMBER_JOINED, WORKSPACE_MEMBER_ROLE_CHANGED, WORKSPACE_MEMBER_REMOVED, WORKSPACE_MEMBER_ACCESS_REVOKED, WORKSPACE_INVITATION_CREATED, WORKSPACE_INVITATION_CANCELLED, WORKSPACE_POLICIES_UPDATED, WORKSPACE_SCIM_TOKEN_CREATED, WORKSPACE_SCIM_TOKEN_REVOKED, WORKSPACE_SCIM_USER_PROVISIONED, WORKSPACE_SCIM_USER_DEPROVISIONED, WORKSPACE_SCIM_USER_DELETED, WORKSPACE_UPDATED, WORKSPACE_SSO_PROVIDER_UPDATED, WORKSPACE_SSO_PROVIDER_DELETED, WORKSPACE_SSO_DOMAIN_VERIFICATION_REQUESTED, WORKSPACE_SSO_DOMAIN_VERIFIED, WORKSPACE_OWNERSHIP_TRANSFERRED, WORKSPACE_DELETED, WORKSPACE_CREATED, TEAM_CHECKOUT_ABANDONED, ENTERPRISE_REQUEST_CREATED, WORKSPACE_CONVERTED_TO_TEAM, WORKSPACE_DELETION_SCHEDULED, WORKSPACE_DELETION_CANCELLED, WORKSPACE_INVITATION_RESENT, TEAM_SEATS_PURCHASED, TEAM_SEATS_REDUCED, ADMIN_WORKSPACE_KIND_CHANGED, ADMIN_WORKSPACE_CONTRACT_SEATS, ADMIN_PLAN_GRANT_CREATED, ADMIN_PLAN_GRANT_EXTENDED, ADMIN_PLAN_GRANT_REVOKED, ADMIN_PLAN_GRANT_ENDED, ADMIN_PLATFORM_DISCOUNT_CREATED, ADMIN_PLATFORM_DISCOUNT_REVOKED, ADMIN_SUBSCRIPTION_CANCELLED, ADMIN_SUBSCRIPTION_RESUMED, ADMIN_MONEY_EXPORTED, ADMIN_PAYMENT_SEARCH_PD_VIEWED, WORKSPACE_SSO_PROVIDER_CREATED, WORKSPACE_GROUP_CREATED, WORKSPACE_GROUP_UPDATED, WORKSPACE_GROUP_DELETED, WORKSPACE_GROUP_MEMBER_ADDED, WORKSPACE_GROUP_MEMBER_REMOVED, WORKSPACE_GROUP_ROLES_CHANGED, WORKSPACE_CUSTOM_ROLE_CREATED, WORKSPACE_CUSTOM_ROLE_UPDATED, WORKSPACE_CUSTOM_ROLE_DELETED, WORKSPACE_ROLE_CEILING_UPDATED, WORKSPACE_MODEL_POLICY_UPDATED, WORKSPACE_RETENTION_UPDATED, WORKSPACE_TRAINING_CONSENT, WORKSPACE_AUDIT_EXPORTED, WORKSPACE_COMPLIANCE_UPDATED, WORKSPACE_COMPLIANCE_READ, API_KEY_CREATED, API_KEY_UPDATED, API_KEY_ROLLED, API_KEY_REVOKED, API_KEY_TRANSFERRED, API_KEY_DISABLED, API_KEY_ENABLED, WEBHOOK_ENDPOINT_CREATED, WEBHOOK_ENDPOINT_UPDATED, WEBHOOK_ENDPOINT_DELETED, WEBHOOK_SECRET_ROTATED, WEBHOOK_SECRET_READ, WEBHOOK_MESSAGE_RESENT, COMPANY_AUTONOMY_CHANGED, AUTOMATION_PAUSED, AUTOMATION_RESUMED, AUTOMATION_RUN_CANCEL, BILLING_PROFILE_UPDATED, BILLING_PAYMENT_METHOD_DISABLED, BILLING_REFUND_SUCCEEDED, BILLING_MANUAL_CHARGE, SUBSCRIPTION_CREATED, SUBSCRIPTION_CHANGED, SUBSCRIPTION_CANCEL_SCHEDULED, SUBSCRIPTION_RESUMED, EXTRA_USAGE_CONFIGURED, EXTRA_USAGE_ADJUSTED, PLATFORM_CONFIGURED, PLATFORM_ADJUSTED, EXTRA_USAGE_MEMBER_CAP_SET, EXTRA_USAGE_ALERT_THRESHOLDS_SET, COMPANY_SPEND_CAP_SET, TEAM_ANALYTICS_EXPORTED, TEAM_SPEND_EXPORTED, AI_BUDGET_MEMBER_SET, AI_BUDGET_MEMBER_RESET, SPEND_CAP_THRESHOLD_REACHED, SPEND_COMPANY_CAP_REACHED, PLAN_CREATED, PLAN_UPDATED, USAGE_RATE_ADDED, USER_TERMS_ACCEPTED, ACCOUNT_DELETION_CODE_SENT, ACCOUNT_DELETION_SCHEDULED, ACCOUNT_DELETION_CANCELLED, ACCOUNT_DELETED, LANGFUSE_TRACES_PURGED, ADMIN_DIALOG_LANGFUSE_DATASET, ADMIN_DIALOG_LANGFUSE_ANNOTATION, ACCOUNT_EMAIL_CODE_SENT, ACCOUNT_EMAIL_BOUND, ACCOUNT_TELEGRAM_MERGED, ACCOUNT_GOOGLE_LINKED, ACCOUNT_TELEGRAM_MERGE_REFUSED, ADMIN_ADS_CONVERSIONS_RELEASED, ADMIN_ADS_CONVERSIONS_REJECTED, ADMIN_ADS_SIGNUPS_EXPORTED, ADMIN_ACCESS_SIGNED_IN, ADMIN_ACCESS_REFUSED, ADMIN_TWO_FACTOR_VERIFIED, ADMIN_TWO_FACTOR_ENABLE_REQUESTED, ADMIN_TWO_FACTOR_ENABLED, ADMIN_TWO_FACTOR_DISABLED, ADMIN_SESSION_SIGNED_IN, ADMIN_USER_BANNED, ADMIN_USER_UNBANNED, ADMIN_WORKSPACE_BLOCKED, ADMIN_WORKSPACE_UNBLOCKED, ADMIN_WORKSPACE_TRAINING_CONSENT, ADMIN_USER_PLATFORM_ROLES_CHANGED, ADMIN_USER_FREE_ELIGIBILITY_CHANGED, ADMIN_USER_LIMIT_RESETS_GRANTED, ADMIN_USER_LIMIT_RESETS_REVOKED, USAGE_LIMIT_RESET_APPLIED, REFERRAL_CLAIMED, REFERRAL_REWARDED, ADMIN_ENTERPRISE_REQUEST_STATUS_CHANGED, ADMIN_TRAINING_EXPORTED, ADMIN_SETTING_CHANGED, ADMIN_LOGS_PURGED, ADMIN_DIALOG_PD_VIEWED, ADMIN_DIALOG_RATING_COMMENTS_VIEWED, ADMIN_DIALOG_LABEL_SET, ADMIN_DIALOG_LABEL_REMOVED, ADMIN_JOURNAL_PD_VIEWED, ADMIN_COMPANY_PD_VIEWED, ADMIN_COMPANY_PD_SEARCHED, ADMIN_PAYMENT_PD_VIEWED, SITE_POST_PUBLISHED, SITE_POST_UNPUBLISHED, SITE_POST_DELETED, SITE_LEGAL_PUBLISHED, SITE_TRACKERS_SAVED, HELP_SECTION_CREATED, HELP_SECTION_UPDATED, HELP_SECTION_DELETED, HELP_ARTICLE_CREATED, HELP_ARTICLE_UPDATED, HELP_ARTICLE_DELETED, HELP_REORDERED, SUPPORT_TICKET_CREATED, ADMIN_SUPPORT_REPLIED, ADMIN_SUPPORT_NOTE_ADDED, ADMIN_SUPPORT_TICKET_UPDATED, ADMIN_SUPPORT_ATTACHMENT_VIEWED, CANARY_TRIGGERED, BILLING_PAYMENT_NEW, BILLING_PAYMENT_PENDING, BILLING_PAYMENT_REQUIRES_ACTION, BILLING_PAYMENT_AUTHORIZED, BILLING_PAYMENT_SUCCEEDED, BILLING_PAYMENT_VERIFIED, BILLING_PAYMENT_FAILED, BILLING_PAYMENT_CANCELLED, BILLING_PAYMENT_PARTIALLY_REFUNDED, BILLING_PAYMENT_REFUNDED));
+    private static final List<AuditEntryAction> VALUES = Collections.unmodifiableList(Arrays.asList(COMPANY_CREATED, COMPANY_UPDATED, COMPANY_ARCHIVED, COMPANY_UNARCHIVED, COMPANY_MEMBER_ADDED, COMPANY_MEMBER_ROLE_CHANGED, COMPANY_MEMBER_REMOVED, COMPANY_ONBOARDING_WAIVED, COMPANY_ONBOARDING_UNWAIVED, COMPANY_ONEC_CONNECTED, COMPANY_ONEC_UPDATED, COMPANY_ONEC_COPY_UPLOADED, COMPANY_ONEC_COPY_HELD, COMPANY_ONEC_CONNECTOR_CODE_CREATED, COMPANY_ONEC_CONNECTOR_PAIRED, COMPANY_ONEC_CONNECTOR_ROTATED, COMPANY_ONEC_CONNECTOR_ROTATE_REFUSED, COMPANY_ONEC_CONNECTOR_REVOKED, COMPANY_ONEC_CONNECTOR_UNPAIRED, COMPANY_ONEC_CONNECTOR_REPLACED, COMPANY_ONEC_CONNECTOR_LINK_APPROVED, CONNECTOR_LINK_CREATED, CONNECTOR_LINK_DENIED, COMPANY_ONEC_LINK_APPROVED, COMPANY_ONEC_LINK_REVOKED, ONEC_LINK_WRONG_MATCH, ONEC_LINK_LIMIT_REFUSED, COMPANY_PROFILE_REBUILD, WORKSPACE_MEMBER_JOINED, WORKSPACE_MEMBER_ROLE_CHANGED, WORKSPACE_MEMBER_REMOVED, WORKSPACE_MEMBER_ACCESS_REVOKED, WORKSPACE_INVITATION_CREATED, WORKSPACE_INVITATION_CANCELLED, WORKSPACE_POLICIES_UPDATED, WORKSPACE_SCIM_TOKEN_CREATED, WORKSPACE_SCIM_TOKEN_REVOKED, WORKSPACE_SCIM_USER_PROVISIONED, WORKSPACE_SCIM_USER_DEPROVISIONED, WORKSPACE_SCIM_USER_DELETED, WORKSPACE_UPDATED, WORKSPACE_SSO_PROVIDER_UPDATED, WORKSPACE_SSO_PROVIDER_DELETED, WORKSPACE_SSO_DOMAIN_VERIFICATION_REQUESTED, WORKSPACE_SSO_DOMAIN_VERIFIED, WORKSPACE_OWNERSHIP_TRANSFERRED, WORKSPACE_DELETED, WORKSPACE_CREATED, TEAM_CHECKOUT_ABANDONED, ENTERPRISE_REQUEST_CREATED, WORKSPACE_CONVERTED_TO_TEAM, WORKSPACE_DELETION_SCHEDULED, WORKSPACE_DELETION_CANCELLED, WORKSPACE_INVITATION_RESENT, TEAM_SEATS_PURCHASED, TEAM_SEATS_REDUCED, ADMIN_WORKSPACE_KIND_CHANGED, ADMIN_WORKSPACE_CONTRACT_SEATS, ADMIN_PLAN_GRANT_CREATED, ADMIN_PLAN_GRANT_EXTENDED, ADMIN_PLAN_GRANT_REVOKED, ADMIN_PLAN_GRANT_ENDED, ADMIN_PLATFORM_DISCOUNT_CREATED, ADMIN_PLATFORM_DISCOUNT_REVOKED, ADMIN_SUBSCRIPTION_CANCELLED, ADMIN_SUBSCRIPTION_RESUMED, ADMIN_MONEY_EXPORTED, ADMIN_PAYMENT_SEARCH_PD_VIEWED, WORKSPACE_SSO_PROVIDER_CREATED, WORKSPACE_GROUP_CREATED, WORKSPACE_GROUP_UPDATED, WORKSPACE_GROUP_DELETED, WORKSPACE_GROUP_MEMBER_ADDED, WORKSPACE_GROUP_MEMBER_REMOVED, WORKSPACE_GROUP_ROLES_CHANGED, WORKSPACE_CUSTOM_ROLE_CREATED, WORKSPACE_CUSTOM_ROLE_UPDATED, WORKSPACE_CUSTOM_ROLE_DELETED, WORKSPACE_ROLE_CEILING_UPDATED, WORKSPACE_MODEL_POLICY_UPDATED, WORKSPACE_RETENTION_UPDATED, WORKSPACE_TRAINING_CONSENT, WORKSPACE_AUDIT_EXPORTED, WORKSPACE_COMPLIANCE_UPDATED, WORKSPACE_CARD_PAYMENTS_UPDATED, WORKSPACE_COMPLIANCE_READ, API_KEY_CREATED, API_KEY_UPDATED, API_KEY_ROLLED, API_KEY_REVOKED, API_KEY_TRANSFERRED, API_KEY_DISABLED, API_KEY_ENABLED, WEBHOOK_ENDPOINT_CREATED, WEBHOOK_ENDPOINT_UPDATED, WEBHOOK_ENDPOINT_DELETED, WEBHOOK_SECRET_ROTATED, WEBHOOK_SECRET_READ, WEBHOOK_MESSAGE_RESENT, COMPANY_AUTONOMY_CHANGED, AUTOMATION_PAUSED, AUTOMATION_RESUMED, AUTOMATION_RUN_CANCEL, BILLING_PROFILE_UPDATED, BILLING_PAYMENT_METHOD_DISABLED, BILLING_REFUND_SUCCEEDED, BILLING_MANUAL_CHARGE, SUBSCRIPTION_CREATED, SUBSCRIPTION_CHANGED, SUBSCRIPTION_CANCEL_SCHEDULED, SUBSCRIPTION_RESUMED, SUBSCRIPTION_TERMINATED, BILLING_REFUND_REQUEST_SUBMITTED, BILLING_REFUND_REQUEST_APPROVED, BILLING_REFUND_REQUEST_REJECTED, EXTRA_USAGE_CONFIGURED, EXTRA_USAGE_ADJUSTED, PLATFORM_CONFIGURED, PLATFORM_ADJUSTED, EXTRA_USAGE_MEMBER_CAP_SET, EXTRA_USAGE_ALERT_THRESHOLDS_SET, COMPANY_SPEND_CAP_SET, TEAM_ANALYTICS_EXPORTED, TEAM_SPEND_EXPORTED, AI_BUDGET_MEMBER_SET, AI_BUDGET_MEMBER_RESET, SPEND_CAP_THRESHOLD_REACHED, SPEND_COMPANY_CAP_REACHED, PLAN_CREATED, PLAN_UPDATED, USAGE_RATE_ADDED, USER_TERMS_ACCEPTED, ACCOUNT_DELETION_CODE_SENT, ACCOUNT_DELETION_SCHEDULED, ACCOUNT_DELETION_CANCELLED, ACCOUNT_DELETED, LANGFUSE_TRACES_PURGED, ADMIN_DIALOG_LANGFUSE_DATASET, ADMIN_DIALOG_LANGFUSE_ANNOTATION, ACCOUNT_EMAIL_CODE_SENT, ACCOUNT_EMAIL_BOUND, ACCOUNT_TELEGRAM_MERGED, ACCOUNT_GOOGLE_LINKED, ACCOUNT_TELEGRAM_MERGE_REFUSED, ADMIN_ADS_CONVERSIONS_RELEASED, ADMIN_ADS_CONVERSIONS_REJECTED, ADMIN_ADS_SIGNUPS_EXPORTED, ADMIN_ACCESS_SIGNED_IN, ADMIN_ACCESS_REFUSED, ADMIN_TWO_FACTOR_VERIFIED, ADMIN_TWO_FACTOR_ENABLE_REQUESTED, ADMIN_TWO_FACTOR_ENABLED, ADMIN_TWO_FACTOR_DISABLED, ADMIN_SESSION_SIGNED_IN, ADMIN_USER_BANNED, ADMIN_USER_UNBANNED, ADMIN_WORKSPACE_BLOCKED, ADMIN_WORKSPACE_UNBLOCKED, ADMIN_WORKSPACE_TRAINING_CONSENT, ADMIN_USER_PLATFORM_ROLES_CHANGED, ADMIN_USER_FREE_ELIGIBILITY_CHANGED, ADMIN_USER_LIMIT_RESETS_GRANTED, ADMIN_USER_LIMIT_RESETS_REVOKED, USAGE_LIMIT_RESET_APPLIED, REFERRAL_CLAIMED, REFERRAL_REWARDED, REFERRAL_REWARD_REVOKED, ADMIN_ENTERPRISE_REQUEST_STATUS_CHANGED, ADMIN_TRAINING_EXPORTED, ADMIN_SETTING_CHANGED, ADMIN_LOGS_PURGED, ADMIN_DIALOG_PD_VIEWED, ADMIN_DIALOG_VIEWED_WITHOUT_CONSENT, ADMIN_DIALOG_RATING_COMMENTS_VIEWED, ADMIN_DIALOG_LABEL_SET, ADMIN_DIALOG_LABEL_REMOVED, ADMIN_JOURNAL_PD_VIEWED, ADMIN_COMPANY_PD_VIEWED, ADMIN_COMPANY_PD_SEARCHED, ADMIN_PAYMENT_PD_VIEWED, SITE_POST_PUBLISHED, SITE_POST_UNPUBLISHED, SITE_POST_DELETED, SITE_LEGAL_PUBLISHED, SITE_TRACKERS_SAVED, HELP_SECTION_CREATED, HELP_SECTION_UPDATED, HELP_SECTION_DELETED, HELP_ARTICLE_CREATED, HELP_ARTICLE_UPDATED, HELP_ARTICLE_DELETED, HELP_REORDERED, SUPPORT_TICKET_CREATED, ADMIN_SUPPORT_REPLIED, ADMIN_SUPPORT_NOTE_ADDED, ADMIN_SUPPORT_TICKET_UPDATED, ADMIN_SUPPORT_ATTACHMENT_VIEWED, ADMIN_STAFF_ACCESS_GRANTED, ADMIN_STAFF_ACCESS_REVOKED, ADMIN_STAFF_ACCESS_RETRIED, ADMIN_STAFF_ACCESS_MAIL_RESENT, CANARY_TRIGGERED, BILLING_PAYMENT_NEW, BILLING_PAYMENT_PENDING, BILLING_PAYMENT_REQUIRES_ACTION, BILLING_PAYMENT_AUTHORIZED, BILLING_PAYMENT_SUCCEEDED, BILLING_PAYMENT_VERIFIED, BILLING_PAYMENT_FAILED, BILLING_PAYMENT_CANCELLED, BILLING_PAYMENT_PARTIALLY_REFUNDED, BILLING_PAYMENT_REFUNDED));
 
     private final String value;
 
@@ -845,6 +902,10 @@ public final class AuditEntryAction {
                 return Known.COMPANY_ONEC_CONNECTOR_ROTATE_REFUSED;
             case "company.onec_connector_revoked":
                 return Known.COMPANY_ONEC_CONNECTOR_REVOKED;
+            case "company.onec_connector_unpaired":
+                return Known.COMPANY_ONEC_CONNECTOR_UNPAIRED;
+            case "company.onec_connector_replaced":
+                return Known.COMPANY_ONEC_CONNECTOR_REPLACED;
             case "company.onec_connector_link_approved":
                 return Known.COMPANY_ONEC_CONNECTOR_LINK_APPROVED;
             case "connector.link_created":
@@ -857,6 +918,8 @@ public final class AuditEntryAction {
                 return Known.COMPANY_ONEC_LINK_REVOKED;
             case "onec_link.wrong_match":
                 return Known.ONEC_LINK_WRONG_MATCH;
+            case "onec_link.limit_refused":
+                return Known.ONEC_LINK_LIMIT_REFUSED;
             case "company.profile_rebuild":
                 return Known.COMPANY_PROFILE_REBUILD;
             case "workspace.member_joined":
@@ -971,6 +1034,8 @@ public final class AuditEntryAction {
                 return Known.WORKSPACE_AUDIT_EXPORTED;
             case "workspace.compliance_updated":
                 return Known.WORKSPACE_COMPLIANCE_UPDATED;
+            case "workspace.card_payments_updated":
+                return Known.WORKSPACE_CARD_PAYMENTS_UPDATED;
             case "workspace.compliance_read":
                 return Known.WORKSPACE_COMPLIANCE_READ;
             case "api_key.created":
@@ -1023,6 +1088,14 @@ public final class AuditEntryAction {
                 return Known.SUBSCRIPTION_CANCEL_SCHEDULED;
             case "subscription.resumed":
                 return Known.SUBSCRIPTION_RESUMED;
+            case "subscription.terminated":
+                return Known.SUBSCRIPTION_TERMINATED;
+            case "billing.refund_request.submitted":
+                return Known.BILLING_REFUND_REQUEST_SUBMITTED;
+            case "billing.refund_request.approved":
+                return Known.BILLING_REFUND_REQUEST_APPROVED;
+            case "billing.refund_request.rejected":
+                return Known.BILLING_REFUND_REQUEST_REJECTED;
             case "extra_usage.configured":
                 return Known.EXTRA_USAGE_CONFIGURED;
             case "extra_usage.adjusted":
@@ -1125,6 +1198,8 @@ public final class AuditEntryAction {
                 return Known.REFERRAL_CLAIMED;
             case "referral.rewarded":
                 return Known.REFERRAL_REWARDED;
+            case "referral.reward_revoked":
+                return Known.REFERRAL_REWARD_REVOKED;
             case "admin.enterprise_request.status_changed":
                 return Known.ADMIN_ENTERPRISE_REQUEST_STATUS_CHANGED;
             case "admin.training.exported":
@@ -1135,6 +1210,8 @@ public final class AuditEntryAction {
                 return Known.ADMIN_LOGS_PURGED;
             case "admin.dialog.pd_viewed":
                 return Known.ADMIN_DIALOG_PD_VIEWED;
+            case "admin.dialog.viewed_without_consent":
+                return Known.ADMIN_DIALOG_VIEWED_WITHOUT_CONSENT;
             case "admin.dialog.rating_comments_viewed":
                 return Known.ADMIN_DIALOG_RATING_COMMENTS_VIEWED;
             case "admin.dialog.label_set":
@@ -1183,6 +1260,14 @@ public final class AuditEntryAction {
                 return Known.ADMIN_SUPPORT_TICKET_UPDATED;
             case "admin.support.attachment_viewed":
                 return Known.ADMIN_SUPPORT_ATTACHMENT_VIEWED;
+            case "admin.staff_access.granted":
+                return Known.ADMIN_STAFF_ACCESS_GRANTED;
+            case "admin.staff_access.revoked":
+                return Known.ADMIN_STAFF_ACCESS_REVOKED;
+            case "admin.staff_access.retried":
+                return Known.ADMIN_STAFF_ACCESS_RETRIED;
+            case "admin.staff_access.mail_resent":
+                return Known.ADMIN_STAFF_ACCESS_MAIL_RESENT;
             case "canary.triggered":
                 return Known.CANARY_TRIGGERED;
             case "billing.payment.new":
@@ -1272,6 +1357,10 @@ public final class AuditEntryAction {
         COMPANY_ONEC_CONNECTOR_ROTATE_REFUSED,
         /** The value <code>company.onec_connector_revoked</code>. */
         COMPANY_ONEC_CONNECTOR_REVOKED,
+        /** The value <code>company.onec_connector_unpaired</code>. */
+        COMPANY_ONEC_CONNECTOR_UNPAIRED,
+        /** The value <code>company.onec_connector_replaced</code>. */
+        COMPANY_ONEC_CONNECTOR_REPLACED,
         /** The value <code>company.onec_connector_link_approved</code>. */
         COMPANY_ONEC_CONNECTOR_LINK_APPROVED,
         /** The value <code>connector.link_created</code>. */
@@ -1284,6 +1373,8 @@ public final class AuditEntryAction {
         COMPANY_ONEC_LINK_REVOKED,
         /** The value <code>onec_link.wrong_match</code>. */
         ONEC_LINK_WRONG_MATCH,
+        /** The value <code>onec_link.limit_refused</code>. */
+        ONEC_LINK_LIMIT_REFUSED,
         /** The value <code>company.profile_rebuild</code>. */
         COMPANY_PROFILE_REBUILD,
         /** The value <code>workspace.member_joined</code>. */
@@ -1398,6 +1489,8 @@ public final class AuditEntryAction {
         WORKSPACE_AUDIT_EXPORTED,
         /** The value <code>workspace.compliance_updated</code>. */
         WORKSPACE_COMPLIANCE_UPDATED,
+        /** The value <code>workspace.card_payments_updated</code>. */
+        WORKSPACE_CARD_PAYMENTS_UPDATED,
         /** The value <code>workspace.compliance_read</code>. */
         WORKSPACE_COMPLIANCE_READ,
         /** The value <code>api_key.created</code>. */
@@ -1450,6 +1543,14 @@ public final class AuditEntryAction {
         SUBSCRIPTION_CANCEL_SCHEDULED,
         /** The value <code>subscription.resumed</code>. */
         SUBSCRIPTION_RESUMED,
+        /** The value <code>subscription.terminated</code>. */
+        SUBSCRIPTION_TERMINATED,
+        /** The value <code>billing.refund_request.submitted</code>. */
+        BILLING_REFUND_REQUEST_SUBMITTED,
+        /** The value <code>billing.refund_request.approved</code>. */
+        BILLING_REFUND_REQUEST_APPROVED,
+        /** The value <code>billing.refund_request.rejected</code>. */
+        BILLING_REFUND_REQUEST_REJECTED,
         /** The value <code>extra_usage.configured</code>. */
         EXTRA_USAGE_CONFIGURED,
         /** The value <code>extra_usage.adjusted</code>. */
@@ -1552,6 +1653,8 @@ public final class AuditEntryAction {
         REFERRAL_CLAIMED,
         /** The value <code>referral.rewarded</code>. */
         REFERRAL_REWARDED,
+        /** The value <code>referral.reward_revoked</code>. */
+        REFERRAL_REWARD_REVOKED,
         /** The value <code>admin.enterprise_request.status_changed</code>. */
         ADMIN_ENTERPRISE_REQUEST_STATUS_CHANGED,
         /** The value <code>admin.training.exported</code>. */
@@ -1562,6 +1665,8 @@ public final class AuditEntryAction {
         ADMIN_LOGS_PURGED,
         /** The value <code>admin.dialog.pd_viewed</code>. */
         ADMIN_DIALOG_PD_VIEWED,
+        /** The value <code>admin.dialog.viewed_without_consent</code>. */
+        ADMIN_DIALOG_VIEWED_WITHOUT_CONSENT,
         /** The value <code>admin.dialog.rating_comments_viewed</code>. */
         ADMIN_DIALOG_RATING_COMMENTS_VIEWED,
         /** The value <code>admin.dialog.label_set</code>. */
@@ -1610,6 +1715,14 @@ public final class AuditEntryAction {
         ADMIN_SUPPORT_TICKET_UPDATED,
         /** The value <code>admin.support.attachment_viewed</code>. */
         ADMIN_SUPPORT_ATTACHMENT_VIEWED,
+        /** The value <code>admin.staff_access.granted</code>. */
+        ADMIN_STAFF_ACCESS_GRANTED,
+        /** The value <code>admin.staff_access.revoked</code>. */
+        ADMIN_STAFF_ACCESS_REVOKED,
+        /** The value <code>admin.staff_access.retried</code>. */
+        ADMIN_STAFF_ACCESS_RETRIED,
+        /** The value <code>admin.staff_access.mail_resent</code>. */
+        ADMIN_STAFF_ACCESS_MAIL_RESENT,
         /** The value <code>canary.triggered</code>. */
         CANARY_TRIGGERED,
         /** The value <code>billing.payment.new</code>. */

@@ -10,8 +10,14 @@ import java.util.Objects;
 
 /**
  * Что происходит: - `compacting` — сервер сжимает историю длинного разговора - `escalating` — ответ
- * перепроверяется более сильной моделью — ход займёт дольше - `elsewhere` — ответ готовится на другом
- * сервере Tungo — он появится целиком, когда будет готов (событие done со stop_reason elsewhere)
+ * перепроверяется более сильной моделью — ход займёт дольше - `checking_norm` — ответ сослался на
+ * норму, не открыв её: та же модель открывает норму и пишет ответ заново — показанный текст заменит
+ * ответ события done - `writing` — ответ пишется, но его текст придержан до проверки ссылок на нормы:
+ * chars — сколько знаков текста этого витка уже написано (растёт, не чаще ~5 событий в секунду),
+ * самого текста в событии нет. Текст витка придёт событием text целиком после проверки; checking_norm
+ * или escalating — ответ пишется заново, показанный счёт сбросить - `elsewhere` — ответ готовится на
+ * другом сервере Tungo — он появится целиком, когда будет готов (событие done со stop_reason
+ * elsewhere)
  * <p>This is an open enumeration: a value this version of the SDK does not know is preserved (see
  * {@link #value()}) and never fails decoding. Compare with <code>equals</code> or switch on {@link
  * #known()}.
@@ -23,10 +29,16 @@ public final class ChatEventStatusCode {
     /** The value <code>escalating</code>. */
     public static final ChatEventStatusCode ESCALATING = new ChatEventStatusCode("escalating");
 
+    /** The value <code>checking_norm</code>. */
+    public static final ChatEventStatusCode CHECKING_NORM = new ChatEventStatusCode("checking_norm");
+
+    /** The value <code>writing</code>. */
+    public static final ChatEventStatusCode WRITING = new ChatEventStatusCode("writing");
+
     /** The value <code>elsewhere</code>. */
     public static final ChatEventStatusCode ELSEWHERE = new ChatEventStatusCode("elsewhere");
 
-    private static final List<ChatEventStatusCode> VALUES = Collections.unmodifiableList(Arrays.asList(COMPACTING, ESCALATING, ELSEWHERE));
+    private static final List<ChatEventStatusCode> VALUES = Collections.unmodifiableList(Arrays.asList(COMPACTING, ESCALATING, CHECKING_NORM, WRITING, ELSEWHERE));
 
     private final String value;
 
@@ -83,6 +95,10 @@ public final class ChatEventStatusCode {
                 return Known.COMPACTING;
             case "escalating":
                 return Known.ESCALATING;
+            case "checking_norm":
+                return Known.CHECKING_NORM;
+            case "writing":
+                return Known.WRITING;
             case "elsewhere":
                 return Known.ELSEWHERE;
             default:
@@ -120,6 +136,10 @@ public final class ChatEventStatusCode {
         COMPACTING,
         /** The value <code>escalating</code>. */
         ESCALATING,
+        /** The value <code>checking_norm</code>. */
+        CHECKING_NORM,
+        /** The value <code>writing</code>. */
+        WRITING,
         /** The value <code>elsewhere</code>. */
         ELSEWHERE,
         /** A value this version of the SDK does not know. */

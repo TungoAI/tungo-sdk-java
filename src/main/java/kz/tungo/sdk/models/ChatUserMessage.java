@@ -43,6 +43,10 @@ public final class ChatUserMessage implements ChatMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ChatHistoryMention> mentions;
 
+    @JsonProperty("onec_object")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final ChatOnecObject onecObject;
+
     @JsonProperty("pending")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Boolean pending;
@@ -63,6 +67,7 @@ public final class ChatUserMessage implements ChatMessage {
         @JsonProperty("attachments") List<ChatAttachmentMeta> attachments,
         @JsonProperty("id") String id,
         @JsonProperty("mentions") List<ChatHistoryMention> mentions,
+        @JsonProperty("onec_object") ChatOnecObject onecObject,
         @JsonProperty("pending") Boolean pending,
         @JsonProperty("role") String role,
         @JsonProperty("text") String text) {
@@ -70,6 +75,7 @@ public final class ChatUserMessage implements ChatMessage {
         this.attachments = Internal.list(attachments);
         this.id = id;
         this.mentions = Internal.list(mentions);
+        this.onecObject = onecObject;
         this.pending = pending;
         this.role = role != null ? role : "user";
         this.text = text;
@@ -127,6 +133,15 @@ public final class ChatUserMessage implements ChatMessage {
      */
     public Optional<List<ChatHistoryMention>> mentions() {
         return Optional.ofNullable(mentions);
+    }
+
+    /**
+     * The <code>onec_object</code> property.
+     *
+     * @return the value, or empty when it is absent or null
+     */
+    public Optional<ChatOnecObject> onecObject() {
+        return Optional.ofNullable(onecObject);
     }
 
     /**
@@ -192,6 +207,7 @@ public final class ChatUserMessage implements ChatMessage {
             && Objects.equals(attachments, other.attachments)
             && Objects.equals(id, other.id)
             && Objects.equals(mentions, other.mentions)
+            && Objects.equals(onecObject, other.onecObject)
             && Objects.equals(pending, other.pending)
             && Objects.equals(role, other.role)
             && Objects.equals(text, other.text);
@@ -199,7 +215,7 @@ public final class ChatUserMessage implements ChatMessage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, at, attachments, id, mentions, pending, role, text);
+        return Objects.hash(additionalProperties, at, attachments, id, mentions, onecObject, pending, role, text);
     }
 
     @Override
@@ -213,6 +229,7 @@ public final class ChatUserMessage implements ChatMessage {
         private List<ChatAttachmentMeta> attachments;
         private String id;
         private List<ChatHistoryMention> mentions;
+        private ChatOnecObject onecObject;
         private Boolean pending;
         private String text;
         private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
@@ -225,6 +242,7 @@ public final class ChatUserMessage implements ChatMessage {
             this.attachments = source.attachments;
             this.id = source.id;
             this.mentions = source.mentions;
+            this.onecObject = source.onecObject;
             this.pending = source.pending;
             this.text = source.text;
             this.additionalProperties.putAll(source.additionalProperties);
@@ -275,6 +293,17 @@ public final class ChatUserMessage implements ChatMessage {
         }
 
         /**
+         * The <code>onec_object</code> property.
+         *
+         * @param onecObject the value; null leaves the property out
+         * @return this builder
+         */
+        public Builder onecObject(ChatOnecObject onecObject) {
+            this.onecObject = onecObject;
+            return this;
+        }
+
+        /**
          * Вопрос идущего хода: ответа ещё нет, его дочитывают потоком (GET
          * …/chat/&#123;id&#125;/events?turn=). Только у последнего сообщения
          *
@@ -321,6 +350,7 @@ public final class ChatUserMessage implements ChatMessage {
                 attachments,
                 Internal.required(id, "id"),
                 mentions,
+                onecObject,
                 pending,
                 "user",
                 Internal.required(text, "text"));

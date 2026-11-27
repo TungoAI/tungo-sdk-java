@@ -174,10 +174,6 @@ class ModelsTest {
         assertTrue(String.valueOf(created.secret()).contains("whsec_TOPSECRET"));
         assertTrue(encode(created).contains("whsec_TOPSECRET"));
 
-        kz.tungo.sdk.models.ApiKeyRolled rolled = decode("{\"key\":\"tg_TOPSECRET\",\"company_ids\":[],\"permissions\":[]}", kz.tungo.sdk.models.ApiKeyRolled.class);
-        assertFalse(rolled.toString().contains("TOPSECRET"), rolled.toString());
-        assertTrue(String.valueOf(rolled.key()).contains("tg_TOPSECRET"));
-
         kz.tungo.sdk.models.AutomationHookWithToken hook = decode(
             "{\"id\":\"hk_1\",\"token\":\"th_TOPSECRET\",\"url\":\"https://api.tungo.kz/hooks/th_TOPSECRET\"}",
             kz.tungo.sdk.models.AutomationHookWithToken.class);

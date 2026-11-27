@@ -10,8 +10,8 @@ import java.util.Objects;
 
 /**
  * Как Tungo достаёт данные 1С: odata — живая 1С через интернет; connector — коробочная 1С в офисе
- * через программу Tungo Connector; snapshot — загруженная копия базы, только чтение; fake — только в
- * тестах
+ * через программу Tungo Connector; module — через расширение «Tungo в 1С», пока у человека открыта 1С;
+ * snapshot — загруженная копия базы, только чтение; fake — только в тестах
  * <p>This is an open enumeration: a value this version of the SDK does not know is preserved (see
  * {@link #value()}) and never fails decoding. Compare with <code>equals</code> or switch on {@link
  * #known()}.
@@ -29,7 +29,10 @@ public final class OneCGateway {
     /** The value <code>connector</code>. */
     public static final OneCGateway CONNECTOR = new OneCGateway("connector");
 
-    private static final List<OneCGateway> VALUES = Collections.unmodifiableList(Arrays.asList(ODATA, SNAPSHOT, FAKE, CONNECTOR));
+    /** The value <code>module</code>. */
+    public static final OneCGateway MODULE = new OneCGateway("module");
+
+    private static final List<OneCGateway> VALUES = Collections.unmodifiableList(Arrays.asList(ODATA, SNAPSHOT, FAKE, CONNECTOR, MODULE));
 
     private final String value;
 
@@ -90,6 +93,8 @@ public final class OneCGateway {
                 return Known.FAKE;
             case "connector":
                 return Known.CONNECTOR;
+            case "module":
+                return Known.MODULE;
             default:
                 return Known.UNKNOWN_VALUE;
         }
@@ -129,6 +134,8 @@ public final class OneCGateway {
         FAKE,
         /** The value <code>connector</code>. */
         CONNECTOR,
+        /** The value <code>module</code>. */
+        MODULE,
         /** A value this version of the SDK does not know. */
         UNKNOWN_VALUE
     }

@@ -26,6 +26,10 @@ public final class ChatDialogSummary {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String id;
 
+    @JsonProperty("memory")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Boolean memory;
+
     @JsonProperty("message_count")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final Double messageCount;
@@ -51,12 +55,14 @@ public final class ChatDialogSummary {
     @JsonCreator
     private ChatDialogSummary(
         @JsonProperty("id") String id,
+        @JsonProperty("memory") Boolean memory,
         @JsonProperty("message_count") Double messageCount,
         @JsonProperty("running") Boolean running,
         @JsonProperty("title") String title,
         @JsonProperty("title_source") ChatTitleSource titleSource,
         @JsonProperty("updated_at") String updatedAt) {
         this.id = id;
+        this.memory = memory;
         this.messageCount = messageCount;
         this.running = running;
         this.title = title;
@@ -90,6 +96,15 @@ public final class ChatDialogSummary {
      */
     public String id() {
         return id;
+    }
+
+    /**
+     * false — разговор «без памяти»
+     *
+     * @return the value; null only if the API omitted this required property
+     */
+    public Boolean memory() {
+        return memory;
     }
 
     /**
@@ -164,6 +179,7 @@ public final class ChatDialogSummary {
         ChatDialogSummary other = (ChatDialogSummary) o;
         return additionalProperties.equals(other.additionalProperties)
             && Objects.equals(id, other.id)
+            && Objects.equals(memory, other.memory)
             && Objects.equals(messageCount, other.messageCount)
             && Objects.equals(running, other.running)
             && Objects.equals(title, other.title)
@@ -173,7 +189,7 @@ public final class ChatDialogSummary {
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, id, messageCount, running, title, titleSource, updatedAt);
+        return Objects.hash(additionalProperties, id, memory, messageCount, running, title, titleSource, updatedAt);
     }
 
     @Override
@@ -184,6 +200,7 @@ public final class ChatDialogSummary {
     /** Builder of {@link ChatDialogSummary}. */
     public static final class Builder {
         private String id;
+        private Boolean memory;
         private Double messageCount;
         private Boolean running;
         private String title;
@@ -196,6 +213,7 @@ public final class ChatDialogSummary {
 
         private Builder(ChatDialogSummary source) {
             this.id = source.id;
+            this.memory = source.memory;
             this.messageCount = source.messageCount;
             this.running = source.running;
             this.title = source.title;
@@ -213,6 +231,17 @@ public final class ChatDialogSummary {
          */
         public Builder id(String id) {
             this.id = id;
+            return this;
+        }
+
+        /**
+         * false — разговор «без памяти»
+         *
+         * @param memory the value (required)
+         * @return this builder
+         */
+        public Builder memory(Boolean memory) {
+            this.memory = memory;
             return this;
         }
 
@@ -293,6 +322,7 @@ public final class ChatDialogSummary {
         public ChatDialogSummary build() {
             ChatDialogSummary built = new ChatDialogSummary(
                 Internal.required(id, "id"),
+                Internal.required(memory, "memory"),
                 Internal.required(messageCount, "message_count"),
                 Internal.required(running, "running"),
                 Internal.required(title, "title"),

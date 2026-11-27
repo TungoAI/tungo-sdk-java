@@ -36,6 +36,8 @@ import kz.tungo.sdk.resources.EsfResource;
 import kz.tungo.sdk.resources.FormsResource;
 import kz.tungo.sdk.resources.OnecResource;
 import kz.tungo.sdk.resources.AutomationsResource;
+import kz.tungo.sdk.resources.VerificationResource;
+import kz.tungo.sdk.resources.ReleasesResource;
 
 /**
  * The synchronous client of the Tungo Platform API.
@@ -68,6 +70,8 @@ public final class TungoClient implements AutoCloseable {
     private final FormsResource forms;
     private final OnecResource onec;
     private final AutomationsResource automations;
+    private final VerificationResource verification;
+    private final ReleasesResource releases;
 
     private TungoClient(ClientConfig config) {
         this.engine = new HttpEngine(config);
@@ -84,6 +88,8 @@ public final class TungoClient implements AutoCloseable {
         this.forms = new FormsResource(engine);
         this.onec = new OnecResource(engine);
         this.automations = new AutomationsResource(engine);
+        this.verification = new VerificationResource(engine);
+        this.releases = new ReleasesResource(engine);
         this.async = new TungoAsyncClient(this, engine);
     }
 
@@ -232,6 +238,25 @@ public final class TungoClient implements AutoCloseable {
      */
     public AutomationsResource automations() {
         return automations;
+    }
+
+    /**
+     * Публичная проверка электронной подписи документов Tungo: по коду, по файлу, по блоку QR и ключи
+     * подписи (без ключа API).
+     *
+     * @return the <code>verification</code> resource
+     */
+    public VerificationResource verification() {
+        return verification;
+    }
+
+    /**
+     * Публичный список загрузок: расширение 1С и Tungo Connector (без ключа API).
+     *
+     * @return the <code>releases</code> resource
+     */
+    public ReleasesResource releases() {
+        return releases;
     }
 
     /**
