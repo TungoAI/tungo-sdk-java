@@ -25,7 +25,6 @@ import kz.tungo.sdk.models.ChatTurnResult;
 import kz.tungo.sdk.models.WebhookEvent;
 import kz.tungo.sdk.resources.WorkspacesResource;
 import kz.tungo.sdk.resources.CompaniesResource;
-import kz.tungo.sdk.resources.PlatformResource;
 import kz.tungo.sdk.resources.ApiKeysResource;
 import kz.tungo.sdk.resources.WebhooksResource;
 import kz.tungo.sdk.resources.ChatResource;
@@ -37,7 +36,6 @@ import kz.tungo.sdk.resources.FormsResource;
 import kz.tungo.sdk.resources.OnecResource;
 import kz.tungo.sdk.resources.AutomationsResource;
 import kz.tungo.sdk.resources.VerificationResource;
-import kz.tungo.sdk.resources.ReleasesResource;
 
 /**
  * The synchronous client of the Tungo Platform API.
@@ -59,7 +57,6 @@ public final class TungoClient implements AutoCloseable {
     private final TungoAsyncClient async;
     private final WorkspacesResource workspaces;
     private final CompaniesResource companies;
-    private final PlatformResource platform;
     private final ApiKeysResource apiKeys;
     private final WebhooksResource webhooks;
     private final ChatResource chat;
@@ -71,13 +68,11 @@ public final class TungoClient implements AutoCloseable {
     private final OnecResource onec;
     private final AutomationsResource automations;
     private final VerificationResource verification;
-    private final ReleasesResource releases;
 
     private TungoClient(ClientConfig config) {
         this.engine = new HttpEngine(config);
         this.workspaces = new WorkspacesResource(engine);
         this.companies = new CompaniesResource(engine);
-        this.platform = new PlatformResource(engine);
         this.apiKeys = new ApiKeysResource(engine);
         this.webhooks = new WebhooksResource(engine);
         this.chat = new ChatResource(engine);
@@ -89,7 +84,6 @@ public final class TungoClient implements AutoCloseable {
         this.onec = new OnecResource(engine);
         this.automations = new AutomationsResource(engine);
         this.verification = new VerificationResource(engine);
-        this.releases = new ReleasesResource(engine);
         this.async = new TungoAsyncClient(this, engine);
     }
 
@@ -123,7 +117,7 @@ public final class TungoClient implements AutoCloseable {
     }
 
     /**
-     * Организации (workspace), доступные ключу API.
+     * Организации (workspace), доступные ключу API, и остаток баланса платформы.
      *
      * @return the <code>workspaces</code> resource
      */
@@ -141,16 +135,7 @@ public final class TungoClient implements AutoCloseable {
     }
 
     /**
-     * Баланс платформы, книга движений, отчёты о расходе, лимиты, аудит и тарифы моделей.
-     *
-     * @return the <code>platform</code> resource
-     */
-    public PlatformResource platform() {
-        return platform;
-    }
-
-    /**
-     * Сведения о текущем ключе API и статистика его расхода.
+     * Сведения о текущем ключе API: права, срок, траты месяца и почему вызовы не пройдут.
      *
      * @return the <code>apiKeys</code> resource
      */
@@ -248,15 +233,6 @@ public final class TungoClient implements AutoCloseable {
      */
     public VerificationResource verification() {
         return verification;
-    }
-
-    /**
-     * Публичный список загрузок: расширение 1С и Tungo Connector (без ключа API).
-     *
-     * @return the <code>releases</code> resource
-     */
-    public ReleasesResource releases() {
-        return releases;
     }
 
     /**

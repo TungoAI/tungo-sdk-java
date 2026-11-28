@@ -19,7 +19,6 @@ import kz.tungo.sdk.models.WebhookEndpointPatch;
 import kz.tungo.sdk.models.WebhookMessage;
 import kz.tungo.sdk.models.WebhookResend;
 import kz.tungo.sdk.models.WebhookSecretRotated;
-import kz.tungo.sdk.models.WebhookUsage;
 import kz.tungo.sdk.params.WebhooksListEndpointAttemptsParams;
 import kz.tungo.sdk.params.WebhooksListEndpointsParams;
 import kz.tungo.sdk.params.WebhooksListMessageAttemptsParams;
@@ -670,46 +669,5 @@ public final class WebhooksResourceAsync {
             sync.resendMessage(workspaceId, id, body);
             return null;
         });
-    }
-
-    /**
-     * Счётчик событий месяца.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/webhooks/usage</code>, permission <code>Владелец или
-     * админ workspace; ключ API — с правом webhooks.manage</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param options per-request options; may be null
-     * @return a future of decoded body with the response details (status, headers, request id, rate
-     *     limit); it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiResponse<WebhookUsage>> getUsageWithResponse(
-        String workspaceId,
-        RequestOptions options) {
-        return engine.async(() -> sync.getUsageWithResponse(workspaceId, options));
-    }
-
-    /**
-     * Счётчик событий месяца.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/webhooks/usage</code>, permission <code>Владелец или
-     * админ workspace; ключ API — с правом webhooks.manage</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param options per-request options; may be null
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<WebhookUsage> getUsage(String workspaceId, RequestOptions options) {
-        return engine.async(() -> sync.getUsage(workspaceId, options));
-    }
-
-    /**
-     * Счётчик событий месяца.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/webhooks/usage</code>, permission <code>Владелец или
-     * админ workspace; ключ API — с правом webhooks.manage</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<WebhookUsage> getUsage(String workspaceId) {
-        return engine.async(() -> sync.getUsage(workspaceId));
     }
 }

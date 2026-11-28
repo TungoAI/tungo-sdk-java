@@ -26,7 +26,7 @@ import kz.tungo.sdk.errors.LimitException;
 import kz.tungo.sdk.errors.TungoTimeoutException;
 import kz.tungo.sdk.errors.UnavailableException;
 import kz.tungo.sdk.internal.ClientConfig;
-import kz.tungo.sdk.models.ChatDialogPatch;
+import kz.tungo.sdk.models.AutomationHookPatch;
 import kz.tungo.sdk.models.ChatMessageRequest;
 import kz.tungo.sdk.models.ChatTokenCountRequest;
 import org.junit.jupiter.api.Test;
@@ -140,7 +140,7 @@ class ReliabilityTest {
             assertEquals(1, server.requestCount());
             assertNull(server.request(0).header("idempotency-key"));
             assertThrows(UnavailableException.class,
-                () -> client.chat().update("co_1", "d1", ChatDialogPatch.builder().title("t").build()));
+                () -> client.automations().updateHook("co_1", "h1", AutomationHookPatch.builder().name("t").build()));
             assertEquals(2, server.requestCount());
 
             server.always((request, exchange) -> exchange.abort());

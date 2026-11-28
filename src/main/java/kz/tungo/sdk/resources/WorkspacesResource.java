@@ -4,11 +4,13 @@ package kz.tungo.sdk.resources;
 import kz.tungo.sdk.ApiResponse;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.internal.HttpEngine;
+import kz.tungo.sdk.internal.PathSegments;
 import kz.tungo.sdk.internal.RequestSpec;
 import kz.tungo.sdk.models.ListWorkspacesResponse;
+import kz.tungo.sdk.models.PlatformBalance;
 
 /**
- * Организации (workspace), доступные ключу API.
+ * Организации (workspace), доступные ключу API, и остаток баланса платформы.
  * <p>Blocking methods of the <code>workspaces</code> resource. Obtain it from {@link
  * kz.tungo.sdk.TungoClient}.
  */
@@ -56,8 +58,47 @@ public final class WorkspacesResource {
         return list(RequestOptions.none());
     }
 
+    /**
+     * Остаток баланса платформы.
+     * <p><code>GET /v1/workspaces/&#123;ws&#125;/platform/balance</code>.
+     *
+     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
+     * @param options per-request options; may be null
+     * @return the decoded body with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<PlatformBalance> getBalanceWithResponse(String workspaceId, RequestOptions options) {
+        return engine.execute(getBalanceRequest(workspaceId), options, PlatformBalance.class);
+    }
+
+    /**
+     * Остаток баланса платформы.
+     * <p><code>GET /v1/workspaces/&#123;ws&#125;/platform/balance</code>.
+     *
+     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
+     * @param options per-request options; may be null
+     * @return the decoded response
+     */
+    public PlatformBalance getBalance(String workspaceId, RequestOptions options) {
+        return getBalanceWithResponse(workspaceId, options).body();
+    }
+
+    /**
+     * Остаток баланса платформы.
+     * <p><code>GET /v1/workspaces/&#123;ws&#125;/platform/balance</code>.
+     *
+     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
+     * @return the decoded response
+     */
+    public PlatformBalance getBalance(String workspaceId) {
+        return getBalance(workspaceId, RequestOptions.none());
+    }
+
     private static RequestSpec listRequest() {
         return RequestSpec.of("GET", "/v1/workspaces", "/v1/workspaces");
+    }
+
+    private static RequestSpec getBalanceRequest(String workspaceId) {
+        return RequestSpec.of("GET", "/v1/workspaces/{ws}/platform/balance", "/v1/workspaces/" + PathSegments.encode("workspaceId", workspaceId) + "/platform/balance");
     }
 
 }

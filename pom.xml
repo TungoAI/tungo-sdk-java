@@ -7,7 +7,7 @@
 
   <groupId>kz.tungo</groupId>
   <artifactId>tungo-sdk</artifactId>
-  <version>1.0.0</version> <!-- x-release-version -->
+  <version>2.0.0</version> <!-- x-release-version -->
   <packaging>jar</packaging>
 
   <name>Tungo SDK for Java</name>
@@ -38,11 +38,6 @@
     <url>https://github.com/TungoAI/tungo-sdk-java</url>
     <tag>HEAD</tag>
   </scm>
-
-  <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/TungoAI/tungo-sdk-java/issues</url>
-  </issueManagement>
 
   <properties>
     <maven.compiler.release>11</maven.compiler.release>

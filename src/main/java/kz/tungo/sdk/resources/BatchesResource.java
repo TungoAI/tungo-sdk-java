@@ -5,6 +5,7 @@ import java.util.Objects;
 import kz.tungo.sdk.ApiResponse;
 import kz.tungo.sdk.AutoPager;
 import kz.tungo.sdk.ChatStream;
+import kz.tungo.sdk.DownloadedFile;
 import kz.tungo.sdk.EventStream;
 import kz.tungo.sdk.Page;
 import kz.tungo.sdk.RequestOptions;
@@ -24,6 +25,7 @@ import kz.tungo.sdk.models.DirectBankPollResult;
 import kz.tungo.sdk.models.EsfPurchasesJobRequest;
 import kz.tungo.sdk.models.StatementDay;
 import kz.tungo.sdk.models.StatementDayList;
+import kz.tungo.sdk.params.BatchesExportParams;
 import kz.tungo.sdk.params.BatchesListParams;
 import kz.tungo.sdk.params.BatchesListStatementsParams;
 
@@ -314,6 +316,79 @@ public final class BatchesResource {
     }
 
     /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the downloaded file with the response details (status, headers, request id, rate limit)
+     */
+    public ApiResponse<DownloadedFile> exportWithResponse(
+        String companyId,
+        String id,
+        BatchesExportParams params,
+        RequestOptions options) {
+        return engine.download(exportRequest(companyId, id, params), options);
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return the downloaded file
+     */
+    public DownloadedFile export(String companyId, String id, BatchesExportParams params, RequestOptions options) {
+        return exportWithResponse(companyId, id, params, options).body();
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @param params the query parameters; may be null
+     * @return the downloaded file
+     */
+    public DownloadedFile export(String companyId, String id, BatchesExportParams params) {
+        return export(companyId, id, params, RequestOptions.none());
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @return the downloaded file
+     */
+    public DownloadedFile export(String companyId, String id) {
+        return export(companyId, id, null, RequestOptions.none());
+    }
+
+    /**
      * Остановить задание.
      * <p><code>POST /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/stop</code>, permission
      * <code>proposals.create</code>.
@@ -563,6 +638,15 @@ public final class BatchesResource {
 
     private static RequestSpec listEventsRequest(String companyId, String id) {
         return RequestSpec.of("GET", "/v1/companies/{co}/batch/{id}/events", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/batch/" + PathSegments.encode("id", id) + "/events");
+    }
+
+    private static RequestSpec exportRequest(String companyId, String id, BatchesExportParams params) {
+        QueryString query = new QueryString();
+        if (params != null) {
+            query.add("format", params.format().orElse(null));
+        }
+        return RequestSpec.of("GET", "/v1/companies/{co}/batch/{id}/export", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/batch/" + PathSegments.encode("id", id) + "/export")
+            .query(query);
     }
 
     private static RequestSpec stopRequest(String companyId, String id) {

@@ -432,9 +432,7 @@ public final class ApiKeySelf {
     /**
      * Предел записи в 1С по ключу: какие виды документов ключ может одобрять (как kinds правила
      * автоодобрения: sale, purchase, bank_receipt, bank_payment, counterparty, contract,
-     * inventory_writeoff, cash_order_in, cash_order_out, advance_report, revert). null — любые. Без
-     * всех трёх пределов ключ с proposals.approve пишет в 1С без ограничений — тогда в ответе
-     * предупреждение write_unlimited
+     * inventory_writeoff, cash_order_in, cash_order_out, advance_report, revert). null — любые
      *
      * @return the value, or empty when it is absent or null
      */
@@ -444,8 +442,9 @@ public final class ApiKeySelf {
 
     /**
      * Предел записи в 1С по ключу: сумма всех документов, одобренных ключом за день по Алматы, в
-     * тиынах. Документ с неизвестным исходом записи (1С не ответила) тоже считается. null — без
-     * предела
+     * тиынах. Документ с неизвестным исходом записи (1С не ответила) тоже считается. Обязателен для
+     * ключа с proposals.approve (иначе 400, error.code write_limits_required); null — только у ключа
+     * без этого права
      *
      * @return the value, or empty when it is absent or null
      */
@@ -456,7 +455,9 @@ public final class ApiKeySelf {
     /**
      * Предел записи в 1С по ключу: потолок суммы одного документа, который ключ одобряет (approve,
      * approve-batch), в тиынах (1 ₸ = 100 тиын). Документ дороже или без известной суммы ключ не
-     * запишет (403, error.code key_write_limit) — его запишет человек. null — без предела
+     * запишет (403, error.code key_write_limit) — его запишет человек. Обязателен для ключа с
+     * proposals.approve (иначе 400, error.code write_limits_required); null — только у ключа без этого
+     * права
      *
      * @return the value, or empty when it is absent or null
      */
@@ -865,9 +866,7 @@ public final class ApiKeySelf {
         /**
          * Предел записи в 1С по ключу: какие виды документов ключ может одобрять (как kinds правила
          * автоодобрения: sale, purchase, bank_receipt, bank_payment, counterparty, contract,
-         * inventory_writeoff, cash_order_in, cash_order_out, advance_report, revert). null — любые.
-         * Без всех трёх пределов ключ с proposals.approve пишет в 1С без ограничений — тогда в ответе
-         * предупреждение write_unlimited
+         * inventory_writeoff, cash_order_in, cash_order_out, advance_report, revert). null — любые
          *
          * @param writeKinds the value; null sends an explicit JSON null
          * @return this builder
@@ -879,8 +878,9 @@ public final class ApiKeySelf {
 
         /**
          * Предел записи в 1С по ключу: сумма всех документов, одобренных ключом за день по Алматы, в
-         * тиынах. Документ с неизвестным исходом записи (1С не ответила) тоже считается. null — без
-         * предела
+         * тиынах. Документ с неизвестным исходом записи (1С не ответила) тоже считается. Обязателен
+         * для ключа с proposals.approve (иначе 400, error.code write_limits_required); null — только у
+         * ключа без этого права
          *
          * @param writeMaxAmountPerDayTiyn the value; null sends an explicit JSON null
          * @return this builder
@@ -893,7 +893,9 @@ public final class ApiKeySelf {
         /**
          * Предел записи в 1С по ключу: потолок суммы одного документа, который ключ одобряет (approve,
          * approve-batch), в тиынах (1 ₸ = 100 тиын). Документ дороже или без известной суммы ключ не
-         * запишет (403, error.code key_write_limit) — его запишет человек. null — без предела
+         * запишет (403, error.code key_write_limit) — его запишет человек. Обязателен для ключа с
+         * proposals.approve (иначе 400, error.code write_limits_required); null — только у ключа без
+         * этого права
          *
          * @param writeMaxAmountPerDocumentTiyn the value; null sends an explicit JSON null
          * @return this builder

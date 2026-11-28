@@ -30,7 +30,6 @@ import kz.tungo.sdk.models.AutomationScenarioSaved;
 import kz.tungo.sdk.models.AutomationState;
 import kz.tungo.sdk.models.AutomationStateInput;
 import kz.tungo.sdk.models.CompanyAutonomy;
-import kz.tungo.sdk.models.CompanyAutonomyInput;
 import kz.tungo.sdk.models.ListCompanyAutomationsHooksResponse;
 import kz.tungo.sdk.models.ListCompanyAutomationsRunsResponse;
 import kz.tungo.sdk.models.ListCompanyAutomationsScenariosResponse;
@@ -1102,50 +1101,6 @@ public final class AutomationsResource {
         return getAutonomy(companyId, RequestOptions.none());
     }
 
-    /**
-     * Изменить доверие ИИ в компании.
-     * <p><code>PUT /v1/companies/&#123;co&#125;/autonomy</code>, permission <code>workspace
-     * owner/admin (поднять) | automations.manage (снизить)</code>.
-     *
-     * @param companyId id компании, co_… — из GET /v1/companies
-     * @param body the request body
-     * @param options per-request options; may be null
-     * @return the decoded body with the response details (status, headers, request id, rate limit)
-     */
-    public ApiResponse<CompanyAutonomy> putAutonomyWithResponse(
-        String companyId,
-        CompanyAutonomyInput body,
-        RequestOptions options) {
-        return engine.execute(putAutonomyRequest(companyId, body), options, CompanyAutonomy.class);
-    }
-
-    /**
-     * Изменить доверие ИИ в компании.
-     * <p><code>PUT /v1/companies/&#123;co&#125;/autonomy</code>, permission <code>workspace
-     * owner/admin (поднять) | automations.manage (снизить)</code>.
-     *
-     * @param companyId id компании, co_… — из GET /v1/companies
-     * @param body the request body
-     * @param options per-request options; may be null
-     * @return the decoded response
-     */
-    public CompanyAutonomy putAutonomy(String companyId, CompanyAutonomyInput body, RequestOptions options) {
-        return putAutonomyWithResponse(companyId, body, options).body();
-    }
-
-    /**
-     * Изменить доверие ИИ в компании.
-     * <p><code>PUT /v1/companies/&#123;co&#125;/autonomy</code>, permission <code>workspace
-     * owner/admin (поднять) | automations.manage (снизить)</code>.
-     *
-     * @param companyId id компании, co_… — из GET /v1/companies
-     * @param body the request body
-     * @return the decoded response
-     */
-    public CompanyAutonomy putAutonomy(String companyId, CompanyAutonomyInput body) {
-        return putAutonomy(companyId, body, RequestOptions.none());
-    }
-
     private static RequestSpec postHookRequest(String token, HookRequest request) {
         return RequestSpec.of("POST", "/hooks/{token}", "/hooks/" + PathSegments.encode("token", token))
             .auth(RequestSpec.Auth.NONE)
@@ -1259,11 +1214,6 @@ public final class AutomationsResource {
 
     private static RequestSpec getAutonomyRequest(String companyId) {
         return RequestSpec.of("GET", "/v1/companies/{co}/autonomy", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/autonomy");
-    }
-
-    private static RequestSpec putAutonomyRequest(String companyId, CompanyAutonomyInput body) {
-        return RequestSpec.of("PUT", "/v1/companies/{co}/autonomy", "/v1/companies/" + PathSegments.encode("companyId", companyId) + "/autonomy")
-            .jsonBody(Objects.requireNonNull(body, "body"));
     }
 
 }

@@ -26,7 +26,6 @@ import kz.tungo.sdk.models.AutomationScenarioSaved;
 import kz.tungo.sdk.models.AutomationState;
 import kz.tungo.sdk.models.AutomationStateInput;
 import kz.tungo.sdk.models.CompanyAutonomy;
-import kz.tungo.sdk.models.CompanyAutonomyInput;
 import kz.tungo.sdk.models.ListCompanyAutomationsHooksResponse;
 import kz.tungo.sdk.models.ListCompanyAutomationsRunsResponse;
 import kz.tungo.sdk.models.ListCompanyAutomationsScenariosResponse;
@@ -1116,53 +1115,5 @@ public final class AutomationsResourceAsync {
      */
     public CompletableFuture<CompanyAutonomy> getAutonomy(String companyId) {
         return engine.async(() -> sync.getAutonomy(companyId));
-    }
-
-    /**
-     * Изменить доверие ИИ в компании.
-     * <p><code>PUT /v1/companies/&#123;co&#125;/autonomy</code>, permission <code>workspace
-     * owner/admin (поднять) | automations.manage (снизить)</code>.
-     *
-     * @param companyId id компании, co_… — из GET /v1/companies
-     * @param body the request body
-     * @param options per-request options; may be null
-     * @return a future of decoded body with the response details (status, headers, request id, rate
-     *     limit); it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiResponse<CompanyAutonomy>> putAutonomyWithResponse(
-        String companyId,
-        CompanyAutonomyInput body,
-        RequestOptions options) {
-        return engine.async(() -> sync.putAutonomyWithResponse(companyId, body, options));
-    }
-
-    /**
-     * Изменить доверие ИИ в компании.
-     * <p><code>PUT /v1/companies/&#123;co&#125;/autonomy</code>, permission <code>workspace
-     * owner/admin (поднять) | automations.manage (снизить)</code>.
-     *
-     * @param companyId id компании, co_… — из GET /v1/companies
-     * @param body the request body
-     * @param options per-request options; may be null
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<CompanyAutonomy> putAutonomy(
-        String companyId,
-        CompanyAutonomyInput body,
-        RequestOptions options) {
-        return engine.async(() -> sync.putAutonomy(companyId, body, options));
-    }
-
-    /**
-     * Изменить доверие ИИ в компании.
-     * <p><code>PUT /v1/companies/&#123;co&#125;/autonomy</code>, permission <code>workspace
-     * owner/admin (поднять) | automations.manage (снизить)</code>.
-     *
-     * @param companyId id компании, co_… — из GET /v1/companies
-     * @param body the request body
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<CompanyAutonomy> putAutonomy(String companyId, CompanyAutonomyInput body) {
-        return engine.async(() -> sync.putAutonomy(companyId, body));
     }
 }

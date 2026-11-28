@@ -9,17 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.Collections;
 import kz.tungo.sdk.errors.ValidationException;
 import kz.tungo.sdk.internal.Json;
 import kz.tungo.sdk.models.ApproveRequest;
+import kz.tungo.sdk.models.AutomationHookCreate;
 import kz.tungo.sdk.models.AutomationHookPatch;
-import kz.tungo.sdk.models.ChatDialogPatch;
 import kz.tungo.sdk.models.ChatMessageRequest;
 import kz.tungo.sdk.models.Money;
+import kz.tungo.sdk.params.AutomationsListRunsParams;
 import kz.tungo.sdk.params.FeedListEventsParams;
-import kz.tungo.sdk.params.PlatformListRequestsParams;
 import kz.tungo.sdk.params.ProposalsListParams;
 import org.junit.jupiter.api.Test;
 
@@ -82,11 +81,12 @@ class RequestBuildingTest {
             assertFalse(query.contains("cursor"), query);
             assertFalse(query.contains("date_to"), query);
 
-            client.platform().listRequests("ws_1", PlatformListRequestsParams.builder()
-                .from(OffsetDateTime.parse("2026-11-09T15:00:00+05:00")).statusMin(400).build());
+            client.automations().listRuns("co_1", AutomationsListRunsParams.builder()
+                .scenario("scn/1 ?").limit(400L).build());
             query = server.request(1).query();
-            assertTrue(query.contains("from=2026-11-09T15%3A00%3A00%2B05%3A00"), query);
-            assertTrue(query.contains("status_min=400"), query);
+            assertTrue(query.contains("scenario=scn%2F1%20%3F"), query);
+            assertTrue(query.contains("limit=400"), query);
+            assertFalse(query.contains("cursor"), query);
 
             client.proposals().list("co_1");
             assertEquals("/v1/companies/co_1/proposals", server.request(2).target);
@@ -140,9 +140,9 @@ class RequestBuildingTest {
             new String(Json.encode(cleared), java.nio.charset.StandardCharsets.UTF_8));
         assertTrue(cleared.idPath().isNull());
         assertTrue(absent.idPath().isUndefined());
-        ChatDialogPatch patch = ChatDialogPatch.builder().title("Q4").build();
-        assertEquals("{\"title\":\"Q4\"}", new String(Json.encode(patch), java.nio.charset.StandardCharsets.UTF_8));
-        assertThrows(ValidationException.class, () -> ChatDialogPatch.builder().build(), "a required field is checked locally");
+        AutomationHookCreate create = AutomationHookCreate.builder().name("Q4").build();
+        assertEquals("{\"name\":\"Q4\"}", new String(Json.encode(create), java.nio.charset.StandardCharsets.UTF_8));
+        assertThrows(ValidationException.class, () -> AutomationHookCreate.builder().build(), "a required field is checked locally");
     }
 
     @Test

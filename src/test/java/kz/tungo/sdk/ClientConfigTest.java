@@ -140,8 +140,8 @@ class ClientConfigTest {
     void publicEndpointsAndHooksNeverGetTheApiKey() {
         try (MockServer server = new MockServer();
             TungoClient client = TestSupport.builder(server).defaultHeader("Authorization", "Bearer leaked").build()) {
-            server.enqueueJson(200, "{\"data\":[]}");
-            client.platform().listUsageRates();
+            server.enqueueJson(200, "{\"keys\":[]}");
+            client.verification().listKeys();
             assertNull(server.request(0).header("x-api-key"));
             assertNull(server.request(0).header("authorization"));
 
@@ -157,8 +157,8 @@ class ClientConfigTest {
     void publicEndpointsWorkWithoutAnApiKey() {
         try (MockServer server = new MockServer();
             TungoClient client = TungoClient.builder().environment(name -> null).baseUrl(server.url()).build()) {
-            server.enqueueJson(200, "{\"data\":[]}");
-            assertNotNull(client.platform().listUsageRates());
+            server.enqueueJson(200, "{\"keys\":[]}");
+            assertNotNull(client.verification().listKeys());
             assertEquals(1, server.requestCount());
         }
     }

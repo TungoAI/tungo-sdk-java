@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import kz.tungo.sdk.ApiResponse;
+import kz.tungo.sdk.DownloadedFile;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.SdkVersion;
 import kz.tungo.sdk.errors.ApiException;
@@ -169,6 +170,20 @@ public final class HttpEngine implements AutoCloseable {
     public ApiResponse<Void> executeEmpty(RequestSpec spec, RequestOptions options) {
         Exchange x = run(spec, options, false);
         return new ApiResponse<>(x.status, x.headers, null);
+    }
+
+    /**
+     * Downloads a file: the request is sent with <code>Accept: *&#47;*</code> and the body of the
+     * success response is kept as bytes, never decoded. Errors, retries and timeouts are those of
+     * every other call; the attempt timeout covers reading the whole body.
+     *
+     * @param spec the request
+     * @param options per-request options, may be null
+     * @return the downloaded file with the response details
+     */
+    public ApiResponse<DownloadedFile> download(RequestSpec spec, RequestOptions options) {
+        Exchange x = run(spec, options, false, ACCEPT_ANY);
+        return new ApiResponse<>(x.status, x.headers, new DownloadedFile(x.status, x.headers, x.body));
     }
 
     /**
@@ -442,7 +457,15 @@ public final class HttpEngine implements AutoCloseable {
         }
     }
 
+    private static final String ACCEPT_JSON = "application/json";
+    private static final String ACCEPT_STREAM = "text/event-stream";
+    private static final String ACCEPT_ANY = "*/*";
+
     private Exchange run(RequestSpec spec, RequestOptions options, boolean streaming) {
+        return run(spec, options, streaming, streaming ? ACCEPT_STREAM : ACCEPT_JSON);
+    }
+
+    private Exchange run(RequestSpec spec, RequestOptions options, boolean streaming, String accept) {
         ensureOpen();
         RequestOptions opts = options == null ? RequestOptions.none() : options;
         boolean keyed = spec.auth == RequestSpec.Auth.KEY;
@@ -488,7 +511,7 @@ public final class HttpEngine implements AutoCloseable {
                 throw new InterruptedRequestException("Interrupted before the request was sent", null);
             }
             long deadline = System.nanoTime() + timeout.toNanos();
-            HttpRequest request = buildRequest(spec, opts, uri, keyed, idempotencyHeader, idempotencyKey, streaming, timeout);
+            HttpRequest request = buildRequest(spec, opts, uri, keyed, idempotencyHeader, idempotencyKey, accept, timeout);
             TungoException failure;
             Double serverDelay = null;
             try {
@@ -534,7 +557,7 @@ public final class HttpEngine implements AutoCloseable {
     }
 
     private HttpRequest buildRequest(RequestSpec spec, RequestOptions opts, URI uri, boolean keyed, String idempotencyHeader,
-        String idempotencyKey, boolean streaming, Duration timeout) {
+        String idempotencyKey, String accept, Duration timeout) {
         HttpRequest.Builder rb;
         try {
             rb = HttpRequest.newBuilder(uri);
@@ -543,7 +566,7 @@ public final class HttpEngine implements AutoCloseable {
         }
         try {
             rb.timeout(timeout);
-            rb.setHeader("Accept", streaming ? "text/event-stream" : "application/json");
+            rb.setHeader("Accept", accept);
             rb.setHeader("User-Agent", SdkVersion.USER_AGENT);
             boolean dropKey = spec.idempotencyHeader == null;
             for (Map.Entry<String, String> h : config.defaultHeaders.entrySet()) {

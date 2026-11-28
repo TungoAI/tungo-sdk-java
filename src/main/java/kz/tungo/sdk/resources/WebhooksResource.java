@@ -23,7 +23,6 @@ import kz.tungo.sdk.models.WebhookEndpointPatch;
 import kz.tungo.sdk.models.WebhookMessage;
 import kz.tungo.sdk.models.WebhookResend;
 import kz.tungo.sdk.models.WebhookSecretRotated;
-import kz.tungo.sdk.models.WebhookUsage;
 import kz.tungo.sdk.params.WebhooksListEndpointAttemptsParams;
 import kz.tungo.sdk.params.WebhooksListEndpointsParams;
 import kz.tungo.sdk.params.WebhooksListMessageAttemptsParams;
@@ -846,44 +845,6 @@ public final class WebhooksResource {
         resendMessage(workspaceId, id, body, RequestOptions.none());
     }
 
-    /**
-     * Счётчик событий месяца.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/webhooks/usage</code>, permission <code>Владелец или
-     * админ workspace; ключ API — с правом webhooks.manage</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param options per-request options; may be null
-     * @return the decoded body with the response details (status, headers, request id, rate limit)
-     */
-    public ApiResponse<WebhookUsage> getUsageWithResponse(String workspaceId, RequestOptions options) {
-        return engine.execute(getUsageRequest(workspaceId), options, WebhookUsage.class);
-    }
-
-    /**
-     * Счётчик событий месяца.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/webhooks/usage</code>, permission <code>Владелец или
-     * админ workspace; ключ API — с правом webhooks.manage</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param options per-request options; may be null
-     * @return the decoded response
-     */
-    public WebhookUsage getUsage(String workspaceId, RequestOptions options) {
-        return getUsageWithResponse(workspaceId, options).body();
-    }
-
-    /**
-     * Счётчик событий месяца.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/webhooks/usage</code>, permission <code>Владелец или
-     * админ workspace; ключ API — с правом webhooks.manage</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @return the decoded response
-     */
-    public WebhookUsage getUsage(String workspaceId) {
-        return getUsage(workspaceId, RequestOptions.none());
-    }
-
     private static RequestSpec listEndpointsRequest(String workspaceId, WebhooksListEndpointsParams params) {
         QueryString query = new QueryString();
         if (params != null) {
@@ -964,10 +925,6 @@ public final class WebhooksResource {
         return RequestSpec.of("POST", "/v1/workspaces/{ws}/webhooks/messages/{id}/resend", "/v1/workspaces/" + PathSegments.encode("workspaceId", workspaceId) + "/webhooks/messages/" + PathSegments.encode("id", id) + "/resend")
             .jsonBody(Objects.requireNonNull(body, "body"))
             .idempotent("Idempotency-Key");
-    }
-
-    private static RequestSpec getUsageRequest(String workspaceId) {
-        return RequestSpec.of("GET", "/v1/workspaces/{ws}/webhooks/usage", "/v1/workspaces/" + PathSegments.encode("workspaceId", workspaceId) + "/webhooks/usage");
     }
 
 }

@@ -4,6 +4,7 @@ package kz.tungo.sdk.resources;
 import java.util.concurrent.CompletableFuture;
 import kz.tungo.sdk.ApiResponse;
 import kz.tungo.sdk.ChatStream;
+import kz.tungo.sdk.DownloadedFile;
 import kz.tungo.sdk.Page;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.internal.HttpEngine;
@@ -16,6 +17,7 @@ import kz.tungo.sdk.models.DirectBankPollResult;
 import kz.tungo.sdk.models.EsfPurchasesJobRequest;
 import kz.tungo.sdk.models.StatementDay;
 import kz.tungo.sdk.models.StatementDayList;
+import kz.tungo.sdk.params.BatchesExportParams;
 import kz.tungo.sdk.params.BatchesListParams;
 import kz.tungo.sdk.params.BatchesListStatementsParams;
 
@@ -278,6 +280,84 @@ public final class BatchesResourceAsync {
      */
     public CompletableFuture<ChatStream> listEvents(String companyId, String id) {
         return engine.async(() -> sync.listEvents(companyId, id));
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of downloaded file with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<DownloadedFile>> exportWithResponse(
+        String companyId,
+        String id,
+        BatchesExportParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.exportWithResponse(companyId, id, params, options));
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of downloaded file; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<DownloadedFile> export(
+        String companyId,
+        String id,
+        BatchesExportParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.export(companyId, id, params, options));
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @param params the query parameters; may be null
+     * @return a future of downloaded file; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<DownloadedFile> export(String companyId, String id, BatchesExportParams params) {
+        return engine.async(() -> sync.export(companyId, id, params));
+    }
+
+    /**
+     * Скачать результат задания файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/batch/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id id задания пачки (bat_…) — поле id из ответа запуска задания, из GET …/batch или
+     *     batch_id из ленты
+     * @return a future of downloaded file; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<DownloadedFile> export(String companyId, String id) {
+        return engine.async(() -> sync.export(companyId, id));
     }
 
     /**

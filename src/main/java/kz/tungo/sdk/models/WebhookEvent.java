@@ -23,17 +23,15 @@ import java.util.Objects;
  * <code>batch.failed</code> {@link WebhookEventBatchFailed}, <code>chat.turn.completed</code> {@link
  * WebhookEventChatTurnCompleted}, <code>esf.incoming.received</code> {@link
  * WebhookEventEsfIncomingReceived}, <code>onec.connection.changed</code> {@link
- * WebhookEventOnecConnectionChanged}, <code>payment.failed</code> {@link WebhookEventPaymentFailed},
- * <code>payment.succeeded</code> {@link WebhookEventPaymentSucceeded}, <code>ping</code> {@link
- * WebhookEventPing}, <code>platform.balance_exhausted</code> {@link
- * WebhookEventPlatformBalanceExhausted}, <code>platform.balance_low</code> {@link
- * WebhookEventPlatformBalanceLow}, <code>platform.cap_threshold_reached</code> {@link
- * WebhookEventPlatformCapThresholdReached}, <code>proposal.awaiting_approval</code> {@link
- * WebhookEventProposalAwaitingApproval}, <code>proposal.failed</code> {@link
- * WebhookEventProposalFailed}, <code>proposal.rejected</code> {@link WebhookEventProposalRejected},
- * <code>proposal.written</code> {@link WebhookEventProposalWritten}. A value with a tag this version
- * of the SDK does not know is decoded as {@link Unknown}. Use <code>instanceof</code> or {@link
- * #accept(Visitor)}.
+ * WebhookEventOnecConnectionChanged}, <code>ping</code> {@link WebhookEventPing},
+ * <code>platform.balance_exhausted</code> {@link WebhookEventPlatformBalanceExhausted},
+ * <code>platform.balance_low</code> {@link WebhookEventPlatformBalanceLow},
+ * <code>platform.cap_threshold_reached</code> {@link WebhookEventPlatformCapThresholdReached},
+ * <code>proposal.awaiting_approval</code> {@link WebhookEventProposalAwaitingApproval},
+ * <code>proposal.failed</code> {@link WebhookEventProposalFailed}, <code>proposal.rejected</code>
+ * {@link WebhookEventProposalRejected}, <code>proposal.written</code> {@link
+ * WebhookEventProposalWritten}. A value with a tag this version of the SDK does not know is decoded as
+ * {@link Unknown}. Use <code>instanceof</code> or {@link #accept(Visitor)}.
  */
 @JsonDeserialize(using = WebhookEvent.Deserializer.class)
 public interface WebhookEvent {
@@ -178,26 +176,6 @@ public interface WebhookEvent {
          * @return the result
          */
         default R visitOnecConnectionChanged(WebhookEventOnecConnectionChanged value) {
-            return visitDefault(value);
-        }
-
-        /**
-         * Handles the <code>payment.failed</code> variant.
-         *
-         * @param value the value
-         * @return the result
-         */
-        default R visitPaymentFailed(WebhookEventPaymentFailed value) {
-            return visitDefault(value);
-        }
-
-        /**
-         * Handles the <code>payment.succeeded</code> variant.
-         *
-         * @param value the value
-         * @return the result
-         */
-        default R visitPaymentSucceeded(WebhookEventPaymentSucceeded value) {
             return visitDefault(value);
         }
 
@@ -391,10 +369,6 @@ public interface WebhookEvent {
                         return context.readTreeAsValue(node, WebhookEventEsfIncomingReceived.class);
                     case "onec.connection.changed":
                         return context.readTreeAsValue(node, WebhookEventOnecConnectionChanged.class);
-                    case "payment.failed":
-                        return context.readTreeAsValue(node, WebhookEventPaymentFailed.class);
-                    case "payment.succeeded":
-                        return context.readTreeAsValue(node, WebhookEventPaymentSucceeded.class);
                     case "ping":
                         return context.readTreeAsValue(node, WebhookEventPing.class);
                     case "platform.balance_exhausted":

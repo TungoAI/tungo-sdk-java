@@ -3,9 +3,9 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/TungoAI/.github/main/assets/logo02.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/TungoAI/.github/main/assets/logo03.svg" />
-  <img alt="Tungo AI" src="https://raw.githubusercontent.com/TungoAI/.github/main/assets/logo03.svg" width="240" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/TungoAI/tungo-sdk-java/main/.github/logo-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/TungoAI/tungo-sdk-java/main/.github/logo.svg" />
+  <img alt="Tungo AI" src="https://raw.githubusercontent.com/TungoAI/tungo-sdk-java/main/.github/logo.svg" width="240" />
 </picture>
 
 # Java үшін Tungo SDK
@@ -18,7 +18,7 @@
 
 [English](https://github.com/TungoAI/tungo-sdk-java/blob/main/README.md) · [Русский](https://github.com/TungoAI/tungo-sdk-java/blob/main/README.ru.md) · **Қазақша**
 
-[tungo.kz](https://tungo.kz) · [Жылдам бастау](#жылдам-бастау) · [API анықтамалығы](#api-анықтамалығы) · [Өзгерістер тарихы](https://github.com/TungoAI/tungo-sdk-java/blob/main/CHANGELOG.md) · [Өтініштер](https://github.com/TungoAI/tungo-sdk-java/issues)
+[tungo.kz](https://tungo.kz) · [Жылдам бастау](#жылдам-бастау) · [API анықтамалығы](#api-анықтамалығы) · [Өзгерістер тарихы](https://github.com/TungoAI/tungo-sdk-java/blob/main/CHANGELOG.md) · [Қолдау](https://app.tungo.kz)
 
 </div>
 
@@ -28,25 +28,29 @@ Tungo платформасының API-іне (`https://api.tungo.kz`) арна�
 
 Кітапхана API-дің OpenAPI келісімшартынан жасалады, сондықтан оның әдістері мен модельдері өзі жиналған келісімшартқа әрдайым сәйкес келеді.
 
-> Тек осы тілге қатысты ескертпелері бар толық нұсқа — [ағылшынша README](https://github.com/TungoAI/tungo-sdk-java/blob/main/README.md) файлында.
-
 ## Талаптар
 
-Қолдау көрсетілетін нұсқалар мен тәуелділіктер [ағылшынша README](https://github.com/TungoAI/tungo-sdk-java/blob/main/README.md#requirements) файлында келтірілген.
+Java 11 немесе одан жаңа нұсқа. Кітапхана JDK-ның `java.net.http.HttpClient` клиентін қолданады және тек 2.14 немесе одан жаңа нұсқадағы [Jackson](https://github.com/FasterXML/jackson) кітапханасына (`jackson-core` және `jackson-annotations` бар `jackson-databind`) тәуелді; жинақта 2.22.4 нұсқасы көрсетілген. CI Java 11, 17, 21 және 25 нұсқаларында іске қосылады.
 
 ## Орнату
+
+Maven:
 
 ```xml
 <dependency>
   <groupId>kz.tungo</groupId>
   <artifactId>tungo-sdk</artifactId>
-  <version>1.0.0</version> <!-- x-release-version -->
+  <version>2.0.0</version> <!-- x-release-version -->
 </dependency>
 ```
 
+Gradle:
+
 ```kotlin
-implementation("kz.tungo:tungo-sdk:1.0.0") // x-release-version
+implementation("kz.tungo:tungo-sdk:2.0.0") // x-release-version
 ```
+
+Автоматты модуль атауы — `kz.tungo.sdk`. Осы README-дің коды [`examples/`](https://github.com/TungoAI/tungo-sdk-java/blob/main/examples) каталогында орналасқан, оны тестілер жиыны компиляциялап, іске қосады.
 
 ## Жылдам бастау
 
@@ -99,6 +103,8 @@ Company company = client.companies().get("co_...", RequestOptions.builder()
     .build());
 ```
 
+`TungoClient.fromEnv()` клиентті тек орта айнымалыларынан құрады. `RequestOptions` параметрін әр әдіс қабылдайды. Ағынның үзілуі (thread interrupt) сұрауды, қайталау кідірісін, ағынды оқуды немесе күтуді `InterruptedRequestException` арқылы тоқтатады, ал үзу жалаушасы орнатулы күйінде қалады. `client.close()` клиент жасаған ағындарды босатады; сіз берген `HttpClient` немесе орындаушыға (executor) тиіспейді.
+
 ## Қателер
 
 Кез келген ақау — SDK-ның негізгі қатесінің ішкі түрі. HTTP қатесі бар жауап API қатесіне айналады: оның түрі жауап денесіндегі `error.type` өрісі бойынша, ал дене API-дің стандартты қатесі болмаса, HTTP күйі бойынша таңдалады:
@@ -135,6 +141,8 @@ try {
 }
 ```
 
+Барлық ерекшеліктер тексерілмейтін (unchecked) және `TungoException` класын кеңейтеді: `ApiException` (HTTP қатесі; ішкі класы `error.type` бойынша таңдалады: `InvalidRequestException`, `AuthenticationException`, `PaymentRequiredException`, `PermissionDeniedException`, `NotFoundException`, `ConflictException`, `GoneException`, `LimitException`, `InternalServerException`, `UnavailableException`), `ConnectionException`, `TungoTimeoutException` (және күту көмекшілері үшін `WaitTimeoutException`), `DecodeException`, `ConfigException`, `ValidationException`, `PaginationException`, `InterruptedRequestException` және `WebhookVerificationException`. Ақау басқа ерекшелікті орап тұрса (енгізу-шығару қатесі, талдағыш қатесі), сол ерекшелік `getCause()` ішінде болады.
+
 ## Қайталаулар және күту уақыты
 
 Сұрау байланыс қателерінде, күту уақыты біткенде және 408, 429, 500, 502, 503, 504 күйлерінде 2 ретке дейін қайталанады (барлығы 3 әрекет), бірақ тек қайталау қауіпсіз болғанда: `GET`, `HEAD`, `PUT` және `DELETE` сұраулары, сондай-ақ келісімшарты `Idempotency-Key` тақырыбын жариялайтын операциялардың `POST` пен `PATCH` сұраулары. Олар үшін SDK кездейсоқ кілтті өзі жасап, оны барлық әрекетте қолданады; өз кілтіңізді беруге болады. Басқа операциялар кілтті, тіпті берілгенін де, жібермейді: API оны онда ескермейді.
@@ -156,6 +164,8 @@ ChatTurnResult turn = client.ask("co_...", "Проверь выписку", Requ
     .idempotencyKey("ask-2026-11-09-001") // generated automatically when left out
     .build());
 ```
+
+`POST` немесе `PATCH` сұрауы тек `Idempotency-Key` тақырыбы болғанда қайталанады; келісімшарты бұл тақырыпты жариялайтын операциялар үшін SDK кілтті өзі жасайды және оны барлық әрекетте қайта қолданады.
 
 ## Беттеп шығару
 
@@ -180,6 +190,8 @@ for (ProposalListItem proposal : client.proposals().listAll("co_...", filter)) {
 long total = client.proposals().listAll("co_...", filter).stream().count();
 ```
 
+Тізім операциясы `data` және `next_cursor` өрістерінен көбірек қайтарса, `Page.body()` бүкіл типтелген бетті береді. `listAll(...)` жалқау: келесі бетті тек итерация оған жеткенде ғана сұрайды. `data` массиві жоқ тізім жауабы бос бет емес, `DecodeException` болады; сервер аралау барысында бұрын қайтарған курсор (сол курсор қайтадан немесе цикл) итерацияны `PaginationException` қатесімен аяқтайды.
+
 ## Ағынды беру
 
 Ағынды операциялар server-sent events қолданады және типтелген оқиғаларды келген бойда береді. Циклден ерте шығу немесе ағынды жабу қосылымды жабады. Ағынды сұрау тек алғашқы байт алынғанға дейін қайталанады; қатесі бар жауап кәдімгі шақырулардағыдай типтелген API қатесіне айналады. Соңғы оқиғаға жетпей үзілген чат ағыны қате деп саналады және ешқашан дайын жауап ретінде берілмейді.
@@ -203,6 +215,21 @@ try (ChatStream stream = client.chat().createStream("co_...", question)) {
 // a stream that ends before its "done" event as a DecodeException.
 ChatStreamResult result = client.askStream("co_...", "Что с НДС за квартал?").accumulate();
 System.out.println(result.text() + " (" + result.stopReason().orElse("?") + ")");
+```
+
+Ағын қосылымды ұстап тұрады: оны әрқашан жабыңыз (try-with-resources). Сол түрлер `chat().answerStream`, `chat().listEvents`, `batches().listEvents` және `feed().listEvents` (`EventStream<FeedItem>`) үшін қолданылады. Ағынның жалпы күту уақыты жоқ, тек бос тұру уақыты бар (әдепкі бойынша 120 с). Сервер ағынды жапқанда аралау жай ғана аяқталады, бірақ `accumulate()` тек аяқталған айналымды қайтарады: ағын `done` оқиғасына дейін аяқталса (қосылым үзілсе, `close()` ерте шақырылса), ол жартылай мәтінді қайтармай, `DecodeException` лақтырады. `text/event-stream` емес сәтті жауап та `DecodeException` болады. Бұл ережеден тыс жағдай — қайталанған `Idempotency-Key` үшін API қайта беретін аяқталған чат айналымы (`Idempotent-Replayed: true` бар `application/json`): оның сақталған нәтижесі сол айналымның оқиғалары ретінде келеді және `next` (бар болса, қосымша сұрақтар мен келесі әрекет) және `done` оқиғаларымен аяқталады.
+
+## Файлдарды жүктеп алу
+
+Файлмен жауап беретін операциялар (`chat.download_file` — ЖИ жинаған Excel, Word, PDF және CSV файлдары; `proposals.export` және `batches.export` — xlsx, csv немесе pdf) жүктелген файлды қайтарады: оның байттарын, `Content-Disposition` тақырыбындағы файл атауын (бар болса UTF-8 `filename*`, әйтпесе `filename`; сервер атау жібермесе, атау болмайды) және `Content-Type`. Файл толығымен жадқа оқылады. Қателер, қайталаулар және күту уақыты басқа сұраулардағыдай. Файл атауы — сервердің ұсынысы, қауіпсіз жол емес: одан тексерусіз жол құрастырмаңыз.
+
+```java
+DownloadedFile file = client.proposals().export("co_...", "P-000123",
+    ProposalsExportParams.builder().format(GetCompanyProposalExportFormat.PDF).build());
+// The name is the server's suggestion, not a safe path: strip the separators. dir is the target folder.
+String name = file.filename().orElse("proposal.pdf").replaceAll("[/\\\\]", "_");
+Path saved = file.writeTo(dir.resolve(name));
+System.out.println(saved + ": " + file.size() + " bytes, " + file.contentType().orElse("?"));
 ```
 
 ## Вебхуктар
@@ -232,6 +259,8 @@ AutomationHookAccepted accepted = client.sendHook("hook-token",
         .build());
 ```
 
+`verifyWebhook` клиенттің вебхук құпиясын қолданады; `TungoWebhooks.verify(body, headers, secret)` және `WebhookVerifier` клиентсіз жұмыс істейді. Бастапқы денені дәл алынған күйінде беріңіз: әр `verify` әдісі оны `String` түрінде немесе, одан да жақсысы, фреймворкіңіз сокеттен оқыған `byte[]` түрінде қабылдайды. `TungoWebhooks.verifyHookSignature` кіріс хуктың `X-Signature` қолтаңбасын тексереді.
+
 ## Ақша
 
 API сомаларды тиынмен (теңгенің 1/100 бөлігі) 64 биттік бүтін сандар түрінде береді. Ақша функциялары ондық жолдар мен дәл ондық мәндерді бөлшек сандардың қателігінсіз тиынға айналдырады, жартыны нөлден әрі қарай дөңгелектейді (`"1.005"` → `101`) және тиынды көрсету үшін пішімдейді (`4500000` → `45 000,00 ₸`). Жарамсыз енгізу типтелген қате тудырады.
@@ -243,27 +272,81 @@ String text = TungoMoney.formatTiyn(tiyn);                 // "1 234,57 ₸"
 boolean valid = TungoMoney.isValidBinIin("990140000017");  // true
 ```
 
+Сомалар `long` түрінде бүтін тиынмен беріледі. `toTiyn` ондық `String` немесе `BigDecimal` мәнін қабылдайды және жартыны нөлден әрі қарай дөңгелектейді; жарамсыз енгізу `ValidationException` тудырады.
+
+## Асинхронды клиент
+
+`client.async()` — әдістері `CompletableFuture` қайтаратын сол клиенттің көрінісі. Бұл бұғаттамайтын енгізу-шығару емес: әр асинхронды әдіс бұғаттайтын шақыруды орындаушыда (executor) іске қосады, сондықтан шақыру өз жауабы оқылғанша бір ағынды алып тұрады (ағынды әдіс — ағын ашылғанша, күту көмекші әдісі — күту аяқталғанша). Әдепкі бойынша орындаушы — клиентке тиесілі, 64 ағынмен шектелген (`asyncMaxThreads(n)`) daemon ағындар пулы; одан арғы шақырулар кезекте күтеді. Өз орындаушыңызды `asyncExecutor(...)` арқылы беріңіз, мысалы, Java 21 немесе одан жаңа нұсқада `Executors.newVirtualThreadPerTaskExecutor()`. Future-ды тоқтату шақыруды үзеді; Java 16 және одан жаңа нұсқаларда бұл қосылымды да бірден жабады, ал Java 11-ден 15-ке дейінгі нұсқаларда тасталған қосылым сұраудың күту уақыты өткенде жабылады.
+
+```java
+CompletableFuture<String> name = client.async().companies().get("co_...")
+    .thenApply(Company::name);
+```
+
+## Модельдер
+
+Әр сұрау мен жауап — құрастырушысы (builder) бар өзгермейтін класс. Міндетті қасиеттің қарапайым getter әдісі бар; міндетті емес немесе null бола алатын қасиет `Optional<T>` қайтарады; анық `null` ретінде жіберілуі мүмкін сұрау қасиеті — `JsonNullable<T>` (жоқ, null немесе мән). Enum түрлері ашық: белгісіз мән сақталады (`value()`, `isKnown()`). Дискриминаторы бар `oneOf` — әр вариантқа бір класы, `Unknown` варианты және `Visitor` бар интерфейс; басқа біріктірулер — `isX()` / `asX()` қатынау әдістері бар орауыштар. SDK-ның бұл нұсқасы білмейтін қасиеттер `additionalProperties()` ішінде сақталады.
+
+Декодтау толықтыруларға төзімді, ал түрлерге қатаң. Белгісіз қасиеттер, enum мәндері және union варианттары ешқашан қате тудырмайды. Ал JSON түрі дұрыс емес мән қате тудырады: бүтін сан күтілген жерде бөлшек сан немесе жол, жол күтілген жерде сан. Міндетті тізім немесе map ешқашан `null` болмайды: онсыз келген жауап — `DecodeException`. Басқа міндетті қасиеттер декодтау кезінде тексерілмейді, сондықтан API міндетті скаляр немесе объектіні жібермесе, оның getter әдісі `null` қайтарады.
+
+```java
+ChatMessageRequest request = ChatMessageRequest.builder()
+    .message("Продолжим")
+    .dialogId(JsonNullable.ofNull()) // sends "dialog_id": null; leave it out to omit the property
+    .build();
+
+String description = event.accept(new ChatEvent.Visitor<String>() {
+    @Override
+    public String visitText(ChatEventText value) {
+        return "text " + value.delta();
+    }
+
+    @Override
+    public String visitDefault(ChatEvent value) {
+        return "event " + value.type(); // every other variant, known or not
+    }
+});
+```
+
+## HTTP жауабы толығымен
+
+Әр қарапайым әдістің `ApiResponse<T>` қайтаратын `...WithResponse` нұсқасы бар: күй, тақырыптар, сұрау идентификаторы және дәл сол жауаптың сұрау жиілігі шектеуі. `Page` пен ағын да дәл соны `response()` арқылы береді.
+
+```java
+ApiResponse<Company> response = client.companies().getWithResponse("co_...", RequestOptions.none());
+String requestId = response.requestId().orElse("?");
+long remaining = response.rateLimit().map(limit -> limit.remaining()).orElse(-1L);
+Company company = response.body();
+```
+
+## Ұзақ жұмысты күту
+
+`waitForRun`, `runScenarioAndWait` және `waitForBatch` жұмыс соңғы күйге жеткенше немесе мерзім өткенше (`WaitTimeoutException`) мезгіл-мезгіл сұрау жіберіп тұрады (аралық 1 с-тан басталып, 5 с-қа дейін өседі).
+
+```java
+AutomationRunDetail run = client.runScenarioAndWait("co_...", "scenario-id", null, options);
+System.out.println(run.state().value()); // done, error, skipped or cancelled
+```
+
 ## API анықтамалығы
 
-Tungo платформасы API-інің келісімшартынан жасалған: **ресурстар — 15, әдістер — 100, вебхук оқиғаларының түрлері — 22**.
+Tungo платформасы API-інің келісімшартынан жасалған: **ресурстар — 13, әдістер — 83, вебхук оқиғаларының түрлері — 20**.
 
 | Ресурс | Сипаттама | Әдістер |
 | --- | --- | --- |
-| `client.workspaces()` | API кілтіне қолжетімді ұйымдар (workspace) | `list` |
+| `client.workspaces()` | API кілтіне қолжетімді ұйымдар (workspace) және платформа балансының қалдығы | `list` · `getBalance` |
 | `client.companies()` | Ұйымның компаниялары және олардың карточкалары | `list` · `get` |
-| `client.platform()` | Платформа балансы, қозғалыстар кітабы, шығын есептері, лимиттер, аудит және модельдер тарифтері | `listUsageRates` · `getAccount` · `getAudit / getAuditAll` · `getLedger / getLedgerAll` · `listLimits` · `listRequests / listRequestsAll` · `getUsage` |
-| `client.apiKeys()` | Ағымдағы API кілті туралы мәлімет және оның шығын статистикасы | `getCurrent` · `getCurrentUsage` · `getUsage` |
-| `client.webhooks()` | Ұйымның шығыс вебхуктары (Svix): мекенжайлар, оқиғалар каталогы, жеткізулер және қолтаңбаны тексеру | `listEndpoints / listEndpointsAll` · `createEndpoint` · `getEndpoint` · `updateEndpoint` · `deleteEndpoint` · `listEndpointAttempts / listEndpointAttemptsAll` · `rotateEndpointSecret` · `testEndpoint` · `listEventTypes` · `listMessages / listMessagesAll` · `listMessageAttempts / listMessageAttemptsAll` · `resendMessage` · `getUsage` |
-| `client.chat()` | ЖИ-бухгалтермен диалогтар: сұрақтар, ағынды чат (SSE), токендерді санау және тарих | `list / listAll` · `create / createStream` · `countTokens` · `listFiles / listFilesAll` · `listMentions` · `getRatingOptions` · `listSuggestions` · `createUpload` · `deleteUpload` · `putUploadPart` · `get` · `update` · `delete` · `answer / answerStream` · `listEvents` · `rateMessage` · `deleteMessageRating` · `rate` · `dismissRating` · `stop` · `translateThinking` |
-| `client.proposals()` | ЖИ-бухгалтер ұсынған құжаттар: қарау, 1С-ке жазуды мақұлдау және қабылдамау | `list / listAll` · `approveBatch` · `get` · `approve` · `reject` · `requestApproval` |
+| `client.apiKeys()` | Ағымдағы API кілті: құқықтары, мерзімі, айдағы шығыны және шақырулар неге өтпейтіні | `getCurrent` |
+| `client.webhooks()` | Ұйымның шығыс вебхуктары (Svix): мекенжайлар, оқиғалар каталогы, жеткізулер және қолтаңбаны тексеру | `listEndpoints / listEndpointsAll` · `createEndpoint` · `getEndpoint` · `updateEndpoint` · `deleteEndpoint` · `listEndpointAttempts / listEndpointAttemptsAll` · `rotateEndpointSecret` · `testEndpoint` · `listEventTypes` · `listMessages / listMessagesAll` · `listMessageAttempts / listMessageAttemptsAll` · `resendMessage` |
+| `client.chat()` | ЖИ-бухгалтермен диалогтар: сұрақтар, ағынды чат (SSE), токендерді санау және тарих | `list / listAll` · `create / createStream` · `countTokens` · `listFiles / listFilesAll` · `createUpload` · `deleteUpload` · `putUploadPart` · `get` · `delete` · `answer / answerStream` · `listEvents` · `downloadFile` · `stop` |
+| `client.proposals()` | ЖИ-бухгалтер ұсынған құжаттар: қарау, 1С-ке жазуды мақұлдау және қабылдамау | `list / listAll` · `approveBatch` · `get` · `approve` · `export` · `reject` · `requestApproval` |
 | `client.feed()` | Компанияның оқиғалар мен ұсыныстар таспасы (беттер және тікелей SSE ағыны) | `get / getAll` · `listEvents` |
-| `client.batches()` | Банк үзінді көшірмелерін, кіріс ЭШФ-ларды және DirectBank-ті өңдеу бумалары | `list / listAll` · `createBankStatement` · `createEsfPurchases` · `get` · `listEvents` · `stop` · `getSummary` · `listStatements / listStatementsAll` · `pollDirectbank` |
+| `client.batches()` | Банк үзінді көшірмелерін, кіріс ЭШФ-ларды және DirectBank-ті өңдеу бумалары | `list / listAll` · `createBankStatement` · `createEsfPurchases` · `get` · `listEvents` · `export` · `stop` · `getSummary` · `listStatements / listStatementsAll` · `pollDirectbank` |
 | `client.esf()` | Кіріс және шығыс электрондық шот-фактуралар (ЭШФ АЖ) | `getIncoming / getIncomingAll` · `getOutgoing / getOutgoingAll` |
 | `client.forms()` | Салық нысандары (СЕН 100.00 және басқалары): құрастыру, ИСНА тексеруі және деректердегі алшақтықтар | `list` · `build` · `listDataGaps` · `getIsna` · `listNotes` |
 | `client.onec()` | Компанияның 1С базасына қосылу күйі | `getStatus` |
-| `client.automations()` | Компания автоматтандырулары: кіріс хуктар, сценарийлер, қадамдар тізбегі, іске қосулар және ЖИ дербестігінің деңгейі | `postHook` · `listHooks` · `createHook` · `getHook` · `updateHook` · `deleteHook` · `rotateHook` · `testHook` · `listRuns / listRunsAll` · `getRun` · `cancelRun` · `retryRun` · `listScenarios` · `createScenario` · `getScenario` · `putScenario` · `updateScenario` · `deleteScenario` · `runScenario` · `getState` · `putState` · `getAutonomy` · `putAutonomy` |
+| `client.automations()` | Компания автоматтандырулары: кіріс хуктар, сценарийлер, қадамдар тізбегі, іске қосулар және ЖИ дербестігінің деңгейі | `postHook` · `listHooks` · `createHook` · `getHook` · `updateHook` · `deleteHook` · `rotateHook` · `testHook` · `listRuns / listRunsAll` · `getRun` · `cancelRun` · `retryRun` · `listScenarios` · `createScenario` · `getScenario` · `putScenario` · `updateScenario` · `deleteScenario` · `runScenario` · `getState` · `putState` · `getAutonomy` |
 | `client.verification()` | Tungo құжаттарының электрондық қолтаңбасын ашық тексеру: код, файл, QR блогы бойынша және қолтаңба кілттері (API кілтісіз) | `listKeys` · `verifyQr` · `get` · `check` |
-| `client.releases()` | Ашық жүктеулер тізімі: 1С кеңейтімі және Tungo Connector (API кілтісіз) | `list` |
 
 ## Басқа SDK-лар
 
@@ -273,7 +356,7 @@ Tungo платформасы API-інің келісімшартынан жас�
 | --- | --- | --- |
 | TypeScript | [tungo-sdk-typescript](https://github.com/TungoAI/tungo-sdk-typescript) | `@tungoai/sdk` |
 | Python | [tungo-sdk-python](https://github.com/TungoAI/tungo-sdk-python) | `tungoai` |
-| Go | [tungo-sdk-go](https://github.com/TungoAI/tungo-sdk-go) | `github.com/TungoAI/tungo-sdk-go` |
+| Go | [tungo-sdk-go](https://github.com/TungoAI/tungo-sdk-go) | `github.com/TungoAI/tungo-sdk-go/v2` |
 | Rust | [tungo-sdk-rust](https://github.com/TungoAI/tungo-sdk-rust) | `tungo-sdk` |
 | PHP | [tungo-sdk-php](https://github.com/TungoAI/tungo-sdk-php) | `tungo/sdk` |
 | **Java** | [tungo-sdk-java](https://github.com/TungoAI/tungo-sdk-java) | `kz.tungo:tungo-sdk` |
@@ -284,9 +367,9 @@ Tungo платформасы API-інің келісімшартынан жас�
 
 ## Нұсқалар және қолдау
 
-Кітапхана [семантикалық нұсқалауды](https://semver.org/) ұстанады. Аралық және түзету шығарылымдары үйлесімді: API толықтыру арқылы өседі, ал алынатын өріс не әдіс алдымен ескірген деп белгіленіп, кемінде алты ай сақталады. Үйлесімсіз өзгерістер тек жаңа жоғарғы нұсқада болады және ауысу нұсқауларымен бірге [өзгерістер тарихында](https://github.com/TungoAI/tungo-sdk-java/blob/main/CHANGELOG.md) келтіріледі. Бұл README 1.0.0 нұсқасын сипаттайды.
+Кітапхана [семантикалық нұсқалауды](https://semver.org/) ұстанады. Аралық және түзету шығарылымдары үйлесімді: API толықтыру арқылы өседі, ал алынатын өріс не әдіс алдымен ескірген деп белгіленіп, кемінде алты ай сақталады. Үйлесімсіз өзгерістер тек жаңа жоғарғы нұсқада болады және ауысу нұсқауларымен бірге [өзгерістер тарихында](https://github.com/TungoAI/tungo-sdk-java/blob/main/CHANGELOG.md) келтіріледі. Бұл README 2.0.0 нұсқасын сипаттайды.
 
-Код генератормен жасалады: мәселелер мен ұсыныстар туралы жасалған файлдарға түзету жібермей, [өтініштерге](https://github.com/TungoAI/tungo-sdk-java/issues) жазыңыз. Осалдық туралы [қауіпсіздік саясаты](https://github.com/TungoAI/tungo-sdk-java/blob/main/SECURITY.md) бойынша хабарлаңыз.
+Сұрақтар мен мәселелер бойынша [Tungo жеке кабинетіндегі](https://app.tungo.kz) қолдау қызметіне жүгініңіз. Код API келісімшартынан генератормен жасалады, ал жасалған файлға енгізілген түзету келесі генерация кезінде өшіріледі, сондықтан pull request жібермей, қажетті өзгерісті өтінішіңізде сипаттаңыз. Осалдық туралы [қауіпсіздік саясаты](https://github.com/TungoAI/tungo-sdk-java/blob/main/SECURITY.md) бойынша хабарлаңыз.
 
 ## Лицензия
 

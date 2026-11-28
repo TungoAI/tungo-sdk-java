@@ -6,9 +6,10 @@ import kz.tungo.sdk.ApiResponse;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.internal.HttpEngine;
 import kz.tungo.sdk.models.ListWorkspacesResponse;
+import kz.tungo.sdk.models.PlatformBalance;
 
 /**
- * Организации (workspace), доступные ключу API.
+ * Организации (workspace), доступные ключу API, и остаток баланса платформы.
  * <p>Asynchronous methods of the <code>workspaces</code> resource: each call runs on the client's
  * async executor and completes a {@link CompletableFuture}; cancelling the future interrupts the call.
  * Obtain it from {@link kz.tungo.sdk.TungoAsyncClient}.
@@ -59,5 +60,43 @@ public final class WorkspacesResourceAsync {
      */
     public CompletableFuture<ListWorkspacesResponse> list() {
         return engine.async(() -> sync.list());
+    }
+
+    /**
+     * Остаток баланса платформы.
+     * <p><code>GET /v1/workspaces/&#123;ws&#125;/platform/balance</code>.
+     *
+     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
+     * @param options per-request options; may be null
+     * @return a future of decoded body with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<PlatformBalance>> getBalanceWithResponse(
+        String workspaceId,
+        RequestOptions options) {
+        return engine.async(() -> sync.getBalanceWithResponse(workspaceId, options));
+    }
+
+    /**
+     * Остаток баланса платформы.
+     * <p><code>GET /v1/workspaces/&#123;ws&#125;/platform/balance</code>.
+     *
+     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
+     * @param options per-request options; may be null
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<PlatformBalance> getBalance(String workspaceId, RequestOptions options) {
+        return engine.async(() -> sync.getBalance(workspaceId, options));
+    }
+
+    /**
+     * Остаток баланса платформы.
+     * <p><code>GET /v1/workspaces/&#123;ws&#125;/platform/balance</code>.
+     *
+     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
+     * @return a future of decoded response; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<PlatformBalance> getBalance(String workspaceId) {
+        return engine.async(() -> sync.getBalance(workspaceId));
     }
 }

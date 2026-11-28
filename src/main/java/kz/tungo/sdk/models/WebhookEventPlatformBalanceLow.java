@@ -20,7 +20,8 @@ import kz.tungo.sdk.internal.Json;
 
 /**
  * Баланс платформы для разработчиков этим списанием опустился ниже порога (настройка платформы
- * platform.billing). Пополнить — POST /v1/workspaces/&#123;ws&#125;/platform/purchases.
+ * platform.billing). Пополняет владелец или админ организации в кабинете (раздел «Платформа»); остаток
+ * — GET /v1/workspaces/&#123;ws&#125;/platform/balance.
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE,

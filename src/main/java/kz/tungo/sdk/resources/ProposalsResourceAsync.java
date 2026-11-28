@@ -3,6 +3,7 @@ package kz.tungo.sdk.resources;
 
 import java.util.concurrent.CompletableFuture;
 import kz.tungo.sdk.ApiResponse;
+import kz.tungo.sdk.DownloadedFile;
 import kz.tungo.sdk.Page;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.internal.HttpEngine;
@@ -16,6 +17,7 @@ import kz.tungo.sdk.models.ProposalDecision;
 import kz.tungo.sdk.models.ProposalListItem;
 import kz.tungo.sdk.models.ProposalPage;
 import kz.tungo.sdk.models.RejectRequest;
+import kz.tungo.sdk.params.ProposalsExportParams;
 import kz.tungo.sdk.params.ProposalsListParams;
 
 /**
@@ -257,6 +259,84 @@ public final class ProposalsResourceAsync {
      */
     public CompletableFuture<ProposalDecision> approve(String companyId, String id) {
         return engine.async(() -> sync.approve(companyId, id));
+    }
+
+    /**
+     * Скачать документ файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of downloaded file with the response details (status, headers, request id, rate
+     *     limit); it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<ApiResponse<DownloadedFile>> exportWithResponse(
+        String companyId,
+        String id,
+        ProposalsExportParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.exportWithResponse(companyId, id, params, options));
+    }
+
+    /**
+     * Скачать документ файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param params the query parameters; may be null
+     * @param options per-request options; may be null
+     * @return a future of downloaded file; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<DownloadedFile> export(
+        String companyId,
+        String id,
+        ProposalsExportParams params,
+        RequestOptions options) {
+        return engine.async(() -> sync.export(companyId, id, params, options));
+    }
+
+    /**
+     * Скачать документ файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @param params the query parameters; may be null
+     * @return a future of downloaded file; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<DownloadedFile> export(String companyId, String id, ProposalsExportParams params) {
+        return engine.async(() -> sync.export(companyId, id, params));
+    }
+
+    /**
+     * Скачать документ файлом.
+     * <p><code>GET /v1/companies/&#123;co&#125;/proposals/&#123;id&#125;/export</code>, permission
+     * <code>company.read</code>.
+     * <p>Returns the downloaded file: its bytes (read whole into memory), the file name from
+     * <code>Content-Disposition</code> and the <code>Content-Type</code>.
+     *
+     * @param companyId id компании, co_… — из GET /v1/companies
+     * @param id Номер предложения внутри компании: P- и шесть цифр (P-000123). У двух компаний номера
+     *     могут совпадать
+     * @return a future of downloaded file; it fails with the exceptions of the blocking call
+     */
+    public CompletableFuture<DownloadedFile> export(String companyId, String id) {
+        return engine.async(() -> sync.export(companyId, id));
     }
 
     /**

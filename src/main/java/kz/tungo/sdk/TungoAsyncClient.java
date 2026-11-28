@@ -11,7 +11,6 @@ import kz.tungo.sdk.models.ChatTurnResult;
 import kz.tungo.sdk.models.WebhookEvent;
 import kz.tungo.sdk.resources.WorkspacesResourceAsync;
 import kz.tungo.sdk.resources.CompaniesResourceAsync;
-import kz.tungo.sdk.resources.PlatformResourceAsync;
 import kz.tungo.sdk.resources.ApiKeysResourceAsync;
 import kz.tungo.sdk.resources.WebhooksResourceAsync;
 import kz.tungo.sdk.resources.ChatResourceAsync;
@@ -23,7 +22,6 @@ import kz.tungo.sdk.resources.FormsResourceAsync;
 import kz.tungo.sdk.resources.OnecResourceAsync;
 import kz.tungo.sdk.resources.AutomationsResourceAsync;
 import kz.tungo.sdk.resources.VerificationResourceAsync;
-import kz.tungo.sdk.resources.ReleasesResourceAsync;
 
 /**
  * The asynchronous view of a {@link TungoClient}: every method returns a
@@ -40,7 +38,6 @@ public final class TungoAsyncClient {
     private final HttpEngine engine;
     private final WorkspacesResourceAsync workspaces;
     private final CompaniesResourceAsync companies;
-    private final PlatformResourceAsync platform;
     private final ApiKeysResourceAsync apiKeys;
     private final WebhooksResourceAsync webhooks;
     private final ChatResourceAsync chat;
@@ -52,14 +49,12 @@ public final class TungoAsyncClient {
     private final OnecResourceAsync onec;
     private final AutomationsResourceAsync automations;
     private final VerificationResourceAsync verification;
-    private final ReleasesResourceAsync releases;
 
     TungoAsyncClient(TungoClient sync, HttpEngine engine) {
         this.sync = sync;
         this.engine = engine;
         this.workspaces = new WorkspacesResourceAsync(sync.workspaces(), engine);
         this.companies = new CompaniesResourceAsync(sync.companies(), engine);
-        this.platform = new PlatformResourceAsync(sync.platform(), engine);
         this.apiKeys = new ApiKeysResourceAsync(sync.apiKeys(), engine);
         this.webhooks = new WebhooksResourceAsync(sync.webhooks(), engine);
         this.chat = new ChatResourceAsync(sync.chat(), engine);
@@ -71,7 +66,6 @@ public final class TungoAsyncClient {
         this.onec = new OnecResourceAsync(sync.onec(), engine);
         this.automations = new AutomationsResourceAsync(sync.automations(), engine);
         this.verification = new VerificationResourceAsync(sync.verification(), engine);
-        this.releases = new ReleasesResourceAsync(sync.releases(), engine);
     }
 
     /**
@@ -84,7 +78,7 @@ public final class TungoAsyncClient {
     }
 
     /**
-     * Организации (workspace), доступные ключу API.
+     * Организации (workspace), доступные ключу API, и остаток баланса платформы.
      *
      * @return the <code>workspaces</code> resource
      */
@@ -102,16 +96,7 @@ public final class TungoAsyncClient {
     }
 
     /**
-     * Баланс платформы, книга движений, отчёты о расходе, лимиты, аудит и тарифы моделей.
-     *
-     * @return the <code>platform</code> resource
-     */
-    public PlatformResourceAsync platform() {
-        return platform;
-    }
-
-    /**
-     * Сведения о текущем ключе API и статистика его расхода.
+     * Сведения о текущем ключе API: права, срок, траты месяца и почему вызовы не пройдут.
      *
      * @return the <code>apiKeys</code> resource
      */
@@ -209,15 +194,6 @@ public final class TungoAsyncClient {
      */
     public VerificationResourceAsync verification() {
         return verification;
-    }
-
-    /**
-     * Публичный список загрузок: расширение 1С и Tungo Connector (без ключа API).
-     *
-     * @return the <code>releases</code> resource
-     */
-    public ReleasesResourceAsync releases() {
-        return releases;
     }
 
     /**

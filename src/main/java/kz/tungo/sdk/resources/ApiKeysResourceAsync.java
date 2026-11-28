@@ -6,12 +6,9 @@ import kz.tungo.sdk.ApiResponse;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.internal.HttpEngine;
 import kz.tungo.sdk.models.ApiKeySelf;
-import kz.tungo.sdk.models.ApiKeyUsage;
-import kz.tungo.sdk.params.ApiKeysGetCurrentUsageParams;
-import kz.tungo.sdk.params.ApiKeysGetUsageParams;
 
 /**
- * Сведения о текущем ключе API и статистика его расхода.
+ * Сведения о текущем ключе API: права, срок, траты месяца и почему вызовы не пройдут.
  * <p>Asynchronous methods of the <code>api_keys</code> resource: each call runs on the client's async
  * executor and completes a {@link CompletableFuture}; cancelling the future interrupts the call.
  * Obtain it from {@link kz.tungo.sdk.TungoAsyncClient}.
@@ -62,119 +59,5 @@ public final class ApiKeysResourceAsync {
      */
     public CompletableFuture<ApiKeySelf> getCurrent() {
         return engine.async(() -> sync.getCurrent());
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return a future of decoded body with the response details (status, headers, request id, rate
-     *     limit); it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiResponse<ApiKeyUsage>> getCurrentUsageWithResponse(
-        ApiKeysGetCurrentUsageParams params,
-        RequestOptions options) {
-        return engine.async(() -> sync.getCurrentUsageWithResponse(params, options));
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiKeyUsage> getCurrentUsage(ApiKeysGetCurrentUsageParams params, RequestOptions options) {
-        return engine.async(() -> sync.getCurrentUsage(params, options));
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @param params the query parameters; may be null
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiKeyUsage> getCurrentUsage(ApiKeysGetCurrentUsageParams params) {
-        return engine.async(() -> sync.getCurrentUsage(params));
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiKeyUsage> getCurrentUsage() {
-        return engine.async(() -> sync.getCurrentUsage());
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return a future of decoded body with the response details (status, headers, request id, rate
-     *     limit); it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiResponse<ApiKeyUsage>> getUsageWithResponse(
-        String workspaceId,
-        String id,
-        ApiKeysGetUsageParams params,
-        RequestOptions options) {
-        return engine.async(() -> sync.getUsageWithResponse(workspaceId, id, params, options));
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiKeyUsage> getUsage(
-        String workspaceId,
-        String id,
-        ApiKeysGetUsageParams params,
-        RequestOptions options) {
-        return engine.async(() -> sync.getUsage(workspaceId, id, params, options));
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @param params the query parameters; may be null
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiKeyUsage> getUsage(String workspaceId, String id, ApiKeysGetUsageParams params) {
-        return engine.async(() -> sync.getUsage(workspaceId, id, params));
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @return a future of decoded response; it fails with the exceptions of the blocking call
-     */
-    public CompletableFuture<ApiKeyUsage> getUsage(String workspaceId, String id) {
-        return engine.async(() -> sync.getUsage(workspaceId, id));
     }
 }

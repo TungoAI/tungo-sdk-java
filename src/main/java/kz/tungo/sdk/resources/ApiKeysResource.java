@@ -4,16 +4,11 @@ package kz.tungo.sdk.resources;
 import kz.tungo.sdk.ApiResponse;
 import kz.tungo.sdk.RequestOptions;
 import kz.tungo.sdk.internal.HttpEngine;
-import kz.tungo.sdk.internal.PathSegments;
-import kz.tungo.sdk.internal.QueryString;
 import kz.tungo.sdk.internal.RequestSpec;
 import kz.tungo.sdk.models.ApiKeySelf;
-import kz.tungo.sdk.models.ApiKeyUsage;
-import kz.tungo.sdk.params.ApiKeysGetCurrentUsageParams;
-import kz.tungo.sdk.params.ApiKeysGetUsageParams;
 
 /**
- * Сведения о текущем ключе API и статистика его расхода.
+ * Сведения о текущем ключе API: права, срок, траты месяца и почему вызовы не пройдут.
  * <p>Blocking methods of the <code>api_keys</code> resource. Obtain it from {@link
  * kz.tungo.sdk.TungoClient}.
  */
@@ -61,136 +56,8 @@ public final class ApiKeysResource {
         return getCurrent(RequestOptions.none());
     }
 
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return the decoded body with the response details (status, headers, request id, rate limit)
-     */
-    public ApiResponse<ApiKeyUsage> getCurrentUsageWithResponse(
-        ApiKeysGetCurrentUsageParams params,
-        RequestOptions options) {
-        return engine.execute(getCurrentUsageRequest(params), options, ApiKeyUsage.class);
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return the decoded response
-     */
-    public ApiKeyUsage getCurrentUsage(ApiKeysGetCurrentUsageParams params, RequestOptions options) {
-        return getCurrentUsageWithResponse(params, options).body();
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @param params the query parameters; may be null
-     * @return the decoded response
-     */
-    public ApiKeyUsage getCurrentUsage(ApiKeysGetCurrentUsageParams params) {
-        return getCurrentUsage(params, RequestOptions.none());
-    }
-
-    /**
-     * Расход ключа, по которому пришёл запрос.
-     * <p><code>GET /v1/api-key/usage</code>.
-     *
-     * @return the decoded response
-     */
-    public ApiKeyUsage getCurrentUsage() {
-        return getCurrentUsage(null, RequestOptions.none());
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return the decoded body with the response details (status, headers, request id, rate limit)
-     */
-    public ApiResponse<ApiKeyUsage> getUsageWithResponse(
-        String workspaceId,
-        String id,
-        ApiKeysGetUsageParams params,
-        RequestOptions options) {
-        return engine.execute(getUsageRequest(workspaceId, id, params), options, ApiKeyUsage.class);
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @param params the query parameters; may be null
-     * @param options per-request options; may be null
-     * @return the decoded response
-     */
-    public ApiKeyUsage getUsage(String workspaceId, String id, ApiKeysGetUsageParams params, RequestOptions options) {
-        return getUsageWithResponse(workspaceId, id, params, options).body();
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @param params the query parameters; may be null
-     * @return the decoded response
-     */
-    public ApiKeyUsage getUsage(String workspaceId, String id, ApiKeysGetUsageParams params) {
-        return getUsage(workspaceId, id, params, RequestOptions.none());
-    }
-
-    /**
-     * Расход ключа за период.
-     * <p><code>GET /v1/workspaces/&#123;ws&#125;/api-keys/&#123;id&#125;/usage</code>, permission
-     * <code>Владелец или админ workspace; по ключу — свой</code>.
-     *
-     * @param workspaceId id организации (workspace), ws_… — из GET /v1/workspaces
-     * @param id id ключа (key_…)
-     * @return the decoded response
-     */
-    public ApiKeyUsage getUsage(String workspaceId, String id) {
-        return getUsage(workspaceId, id, null, RequestOptions.none());
-    }
-
     private static RequestSpec getCurrentRequest() {
         return RequestSpec.of("GET", "/v1/api-key", "/v1/api-key");
-    }
-
-    private static RequestSpec getCurrentUsageRequest(ApiKeysGetCurrentUsageParams params) {
-        QueryString query = new QueryString();
-        if (params != null) {
-            query.add("from", params.from().orElse(null));
-            query.add("to", params.to().orElse(null));
-        }
-        return RequestSpec.of("GET", "/v1/api-key/usage", "/v1/api-key/usage")
-            .query(query);
-    }
-
-    private static RequestSpec getUsageRequest(String workspaceId, String id, ApiKeysGetUsageParams params) {
-        QueryString query = new QueryString();
-        if (params != null) {
-            query.add("from", params.from().orElse(null));
-            query.add("to", params.to().orElse(null));
-        }
-        return RequestSpec.of("GET", "/v1/workspaces/{ws}/api-keys/{id}/usage", "/v1/workspaces/" + PathSegments.encode("workspaceId", workspaceId) + "/api-keys/" + PathSegments.encode("id", id) + "/usage")
-            .query(query);
     }
 
 }

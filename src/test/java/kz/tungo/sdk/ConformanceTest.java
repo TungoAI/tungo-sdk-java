@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.http.HttpHeaders;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
@@ -28,6 +29,7 @@ import kz.tungo.sdk.errors.ApiException;
 import kz.tungo.sdk.errors.DecodeException;
 import kz.tungo.sdk.errors.ValidationException;
 import kz.tungo.sdk.errors.WebhookVerificationException;
+import kz.tungo.sdk.internal.ContentDisposition;
 import kz.tungo.sdk.internal.Json;
 import kz.tungo.sdk.internal.PathSegments;
 import kz.tungo.sdk.internal.QueryString;
@@ -244,6 +246,19 @@ class ConformanceTest {
             boolean safe = RetryPolicy.isRetrySafe(c.get("method").asText(), c.get("idempotency_key").asBoolean());
             boolean retryableCause = c.get("cause").isNumber() ? RetryPolicy.isRetryableStatus(c.get("cause").asInt()) : true;
             assertEquals(c.get("expect").get("retry").asBoolean(), safe && retryableCause, name(c));
+        }
+    }
+
+    @Test
+    void contentDisposition() {
+        for (JsonNode c : cases("content_disposition")) {
+            String header = c.get("header").isNull() ? null : c.get("header").asText();
+            JsonNode expected = c.get("expect").get("filename");
+            assertEquals(expected.isNull() ? null : expected.asText(), ContentDisposition.filename(header), name(c));
+            HttpHeaders headers = HttpHeaders.of(header == null ? Map.of() : Map.of("Content-Disposition", List.of(header)),
+                (a, b) -> true);
+            assertEquals(Optional.ofNullable(expected.isNull() ? null : expected.asText()),
+                new DownloadedFile(200, headers, new byte[0]).filename(), name(c));
         }
     }
 

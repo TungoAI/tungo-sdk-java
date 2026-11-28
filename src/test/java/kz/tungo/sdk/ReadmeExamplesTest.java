@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -19,6 +20,7 @@ import kz.tungo.examples.ReadmeExamples;
 import kz.tungo.sdk.internal.Json;
 import kz.tungo.sdk.models.ChatEvent;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /** Runs every code sample of the README (examples/kz/tungo/examples/ReadmeExamples.java). */
 class ReadmeExamplesTest {
@@ -97,6 +99,24 @@ class ReadmeExamplesTest {
             });
             assertEquals("НДС 5 400 ₸", ReadmeExamples.streaming(client));
             assertEquals("НДС 5 400 ₸", ReadmeExamples.streamingAccumulate(client));
+        }
+    }
+
+    @Test
+    void downloads(@TempDir Path dir) throws Exception {
+        byte[] pdf = {'%', 'P', 'D', 'F', 0x00, (byte) 0xFF, (byte) 0xFE, (byte) 0x80};
+        try (MockServer server = new MockServer(); TungoClient client = TestSupport.client(server)) {
+            server.enqueue((request, exchange) -> exchange.respond(200, "application/pdf", pdf,
+                "Content-Disposition", "attachment; filename*=UTF-8''%D0%9F-000123.pdf"));
+            Path saved = ReadmeExamples.downloads(client, dir);
+            assertEquals(dir.resolve("П-000123.pdf"), saved);
+            assertTrue(java.util.Arrays.equals(pdf, Files.readAllBytes(saved)));
+            assertEquals("format=pdf", server.lastRequest().query());
+            server.enqueue((request, exchange) -> exchange.respond(200, "application/pdf", pdf,
+                "Content-Disposition", "attachment; filename=\"../up.pdf\""));
+            assertEquals(dir.resolve(".._up.pdf"), ReadmeExamples.downloads(client, dir));
+            server.enqueue((request, exchange) -> exchange.respond(200, "application/pdf", pdf));
+            assertEquals(dir.resolve("proposal.pdf"), ReadmeExamples.downloads(client, dir));
         }
     }
 
